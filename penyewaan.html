@@ -17,6 +17,10 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        input[type="number"] {
+            text-align: right;
+        }
+
         a,
         a:hover {
             text-decoration: none;
@@ -83,10 +87,10 @@
                         <a class="nav-link" id="tabCreate" data-toggle="pill" href="#create">Buat Transaksi</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="tabReturn" data-toggle="pill" href="#return">Pengembalian</a>
+                        <a class="nav-link" id="tabExtend" data-toggle="pill" href="#send">Pengiriman</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="tabExtend" data-toggle="pill" href="#extend">Perpanjangan</a>
+                        <a class="nav-link" id="tabReturn" data-toggle="pill" href="#return">Pengembalian</a>
                     </li>
                 </ul>
             </div>
@@ -106,7 +110,7 @@
                             </div>
                             <input type="text" class="form-control" placeholder="masukkan kata kunci">
                         </div>
-                        <table class="table">
+                        <table class="table accordion" id="tableTx">
                             <thead>
                                 <tr>
                                     <th scope="col">Tanggal Penyewaan</th>
@@ -121,28 +125,77 @@
                                     <td>PT. Sejahtera Indah</td>
                                     <td>Belum Dibayar</td>
                                     <td>
-                                        <button type="button" class="btn btn-info">Cetak Kwitansi Pembayaran Pelanggan</button>
-                                        <button type="button" class="btn btn-success">Dibayar</button>
-                                        <button type="button" class="btn btn-warning">Ubah</button>
-                                        <button type="button" class="btn btn-danger">Hapus</button>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-info" data-toggle="collapse"
+                                                data-target="#SEJAH191220220" data-parent="#tableTx" class="collapsed">
+                                                Detail
+                                            </button>
+                                            <button type="button" class="btn btn-warning">Ubah</button>
+                                            <button type="button" class="btn btn-danger">Hapus</button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-success">Bayar</button>
+                                            <button type="button" class="btn btn-primary">Kirim</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="SEJAH191220220">
+                                    <td colspan="4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Ringkasan
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">PT. Sejahtera Indah</h5>
+                                                <h6 class="card-subtitle mb-2 text-muted">
+                                                    Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda,
+                                                    Kalimantan
+                                                    Timur 75122
+                                                </h6>
+                                                <p class="card-text">CP Eko Patrio - 085777888999</p>
+                                            </div>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item text-right">
+                                                    Mainframe &times; 3 Batang &times; 3 Minggu = Rp90.000
+                                                </li>
+                                                <li class="list-group-item text-right">
+                                                    Baut &times; 2 Buah &times; 3 Minggu = Rp6.000
+                                                </li>
+                                                <li class="list-group-item text-right">
+                                                    Ongkos Kirim = Rp50.000
+                                                </li>
+                                            </ul>
+                                            <div class="card-footer text-right font-weight-bold">
+                                                Total Tagihan: Rp146.000
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>19/12/2020</td>
                                     <td>PT. Sejahtera Indah</td>
-                                    <td>Sudah Dibayar</td>
+                                    <td>Lunas</td>
                                     <td>
-                                        <button type="button" class="btn btn-info">Cetak Surat Jalan Keluar</button>
-                                        <button type="button" class="btn btn-warning">Dikirim</button>
+                                        <button type="button" class="btn btn-info" data-toggle="collapse"
+                                            data-target="#SEJAH191220220" data-parent="#tableTx" class="collapsed">
+                                            Detail
+                                        </button>
+                                        <button type="button" class="btn btn-primary">Kirim</button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>19/12/2020</td>
                                     <td>PT. Sejahtera Indah</td>
-                                    <td>Siap Dikirim tgl 20/12/2020</td>
+                                    <td>Sedang Dipinjam</td>
                                     <td>
-                                        <button type="button" class="btn btn-info">Cetak Surat Jalan Keluar</button>
-                                        <button type="button" class="btn btn-warning">Ubah Waktu Pengiriman</button>
+                                        <button type="button" class="btn btn-info" data-toggle="collapse"
+                                            data-target="#SEJAH191220220" data-parent="#tableTx" class="collapsed">
+                                            Detail
+                                        </button>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-success">Bayar</button>
+                                            <button type="button" class="btn btn-primary">Ubah Pengiriman</button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -150,16 +203,29 @@
                                     <td>PT. Sejahtera Indah</td>
                                     <td>Dipinjam hingga tgl 20/12/2020</td>
                                     <td>
-                                        <button type="button" class="btn btn-info">Cetak Surat Jalan Kembali</button>
-                                        <button type="button" class="btn btn-warning">Dikembalikan</button>
-                                        <button type="button" class="btn btn-success">Perpanjangan</button>
+                                        <button type="button" class="btn btn-info" data-toggle="collapse"
+                                            data-target="#SEJAH191220220" data-parent="#tableTx" class="collapsed">
+                                            Detail
+                                        </button>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-primary">Kembali</button>
+                                            <button type="button" class="btn btn-warning" data-toggle="modal"
+                                                data-target="#extendModal">
+                                                Perpanjangan
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>19/12/2020</td>
                                     <td>PT. Sejahtera Indah</td>
                                     <td>Selesai</td>
-                                    <td></td>
+                                    <td>
+                                        <button type="button" class="btn btn-info" data-toggle="collapse"
+                                            data-target="#SEJAH191220220" data-parent="#tableTx" class="collapsed">
+                                            Detail
+                                        </button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -197,8 +263,8 @@
                                 <tr>
                                     <th scope="row">MH001</th>
                                     <td>3 Batang</td>
-                                    <td>2 Hari</td>
-                                    <td>Rp10.000/Hari</td>
+                                    <td>2 Minggu</td>
+                                    <td>Rp10.000/Minggu</td>
                                     <th>Rp60.000</th>
                                     <td>
                                         <button type="button" class="btn btn-warning">Ubah</button>
@@ -235,14 +301,14 @@
                                                             <input class="form-check-input" type="radio" name="price"
                                                                 id="day1" value="10000">
                                                             <label class="form-check-label" for="day1">
-                                                                1 Hari - Rp10.000
+                                                                1 Minggu - Rp10.000
                                                             </label>
                                                         </div>
                                                         <div class="form-check m-2">
                                                             <input class="form-check-input" type="radio" name="price"
                                                                 id="week1" value="20000">
                                                             <label class="form-check-label" for="week1">
-                                                                7 Hari - Rp20.000
+                                                                7 Minggu - Rp20.000
                                                             </label>
                                                         </div>
                                                     </div>
@@ -264,7 +330,7 @@
                                                     <input name="time" type="number" class="form-control"
                                                         id="timeBarang">
                                                     <div class="input-group-append">
-                                                        <span class="input-group-text">&times; 7 Hari</span>
+                                                        <span class="input-group-text">&times; 7 Minggu</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -283,67 +349,307 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="form-group">
-                            <label for="customerAddress">Lokasi</label>
-                            <textarea class="form-control" type="text" disabled
-                                id="customerAddress">Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75122</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="deliveryFee">Ongkos Kirim</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Rp</span>
+                        <div class="form-row">
+                            <div class="form-group col-12">
+                                <label for="customerAddress">Lokasi</label>
+                                <textarea class="form-control" type="text" disabled
+                                    id="customerAddress">Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75122</textarea>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="discount">Diskon</label>
+                                <div class="input-group">
+                                    <input name="time" type="number" class="form-control" id="discount" max="100"
+                                        min="0">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
                                 </div>
-                                <input name="delivery" type="number" class="form-control" id="deliveryFee">
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="deliveryFee">Ongkos Kirim</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input name="delivery" type="number" class="form-control" id="deliveryFee">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        Ringkasan
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">PT. Sejahtera Indah</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan
+                                            Timur 75122
+                                        </h6>
+                                        <p class="card-text">CP Eko Patrio - 085777888999</p>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item text-right">
+                                            Mainframe &times; 3 Batang &times; 3 Minggu = Rp90.000
+                                        </li>
+                                        <li class="list-group-item text-right">
+                                            Baut &times; 2 Buah &times; 3 Minggu = Rp6.000
+                                        </li>
+                                        <li class="list-group-item text-right">
+                                            Ongkos Kirim = Rp50.000
+                                        </li>
+                                    </ul>
+                                    <div class="card-footer text-right font-weight-bold">
+                                        Total Tagihan: Rp146.000
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header">
-                                Ringkasan
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">PT. Sejahtera Indah</h5>
-                                <h6 class="card-subtitle mb-2 text-muted">Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu,
-                                    Kota Samarinda, Kalimantan Timur 75122</h6>
-                                <p class="card-text">CP Eko Patrio - 085777888999</p>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item text-right">Mainframe &times; 3 Batang &times; 3 Hari =
-                                    Rp90.000</li>
-                                <li class="list-group-item text-right">Baut &times; 2 Buah &times; 3 Hari = Rp6.000
-                                </li>
-                                <li class="list-group-item text-right">Ongkos Kirim = Rp50.000
-                                </li>
-                            </ul>
-                            <div class="card-footer text-right font-weight-bold">
-                                Total Tagihan: Rp146.000
-                            </div>
-                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Submit</button>
                     </div>
                     <!-- END BUAT TRANSAKSI -->
 
                     <!-- PENGEMBALIAN -->
                     <div class="tab-pane fade" id="return" role="tabpanel">
-                        This is return
+                        <div class="form-row">
+                            <div class="form-group col-6 col-md-3">
+                                <label for="txDateReturn">Tanggal Transaksi</label>
+                                <div class="input-group">
+                                    <input name="txdate" class="form-control datepicker" id="txDateReturn">
+                                </div>
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="customerCodeReturn">Kode Pelanggan</label>
+                                <select name="code" class="form-control autocomplete" id="customerCodeReturn"
+                                    data-url="testdata/pelanggan.json" autocomplete="off"></select>
+                            </div>
+                            <div class="form-group col col-md-6">
+                                <label for="customerNameReturn">Nama</label>
+                                <input class="form-control" type="text" disabled id="customerNameReturn"
+                                    value="PT. Sejahtera Indah">
+                            </div>
+                        </div>
+
+                        <table class="table" id="tableBarang">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Kode</th>
+                                    <th scope="col">Jumlah</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">
+                                        <div class="form-group">
+                                            <label for="txDateReturn">Tanggal Kembali</label>
+                                            <div class="input-group">
+                                                <input name="txdate" class="form-control datepicker" id="txDateReturn">
+                                            </div>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">MH001</th>
+                                    <td>3 Batang</td>
+                                    <td>Jatuh Tempo 03/01/2021</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#returnModal">
+                                            Kembali
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">BT002</th>
+                                    <td>10 Buah</td>
+                                    <td>Dikembalikan 03/01/2021</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <button type="button" class="btn btn-warning">Ubah</button>
+                                            </div>
+                                            <input disabled name="c2" type="text" class="form-control" id="r2"
+                                                value="Kembali: 3; Kondisi: 2 Baik, 1 Rusak Ringan">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">BT003</th>
+                                    <td>1 Buah</td>
+                                    <td>Belum Dikirim</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">BT003</th>
+                                    <td>1 Buah</td>
+                                    <td>Dikirim 13/01/2021</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-info">Cetak Surat Kembali</button>
+                        <button type="submit" class="btn btn-success">Submit</button>
                     </div>
                     <!-- END PENGEMBALIAN -->
 
-                    <!-- PERPANJANGAN -->
-                    <div class="tab-pane fade" id="extend" role="tabpanel">
-                        This is extend
+                    <!-- PENGIRIMAN -->
+                    <div class="tab-pane fade" id="send" role="tabpanel">
+                        <div class="form-row">
+                            <div class="form-group col-6 col-md-3">
+                                <label for="txDateExtend">Tanggal Transaksi</label>
+                                <div class="input-group">
+                                    <input name="txdate" class="form-control datepicker" id="txDateExtend">
+                                </div>
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="customerCodeExtend">Kode Pelanggan</label>
+                                <div class="input-group">
+                                    <select name="code" class="form-control autocomplete" id="customerCodeExtend"
+                                        data-url="testdata/pelanggan.json" autocomplete="off"></select>
+                                </div>
+                            </div>
+                            <div class="form-group col col-md-6">
+                                <label for="customerNameExtend">Nama</label>
+                                <input class="form-control" type="text" disabled id="customerNameExtend"
+                                    value="PT. Sejahtera Indah">
+                            </div>
+                        </div>
                     </div>
-                    <!-- END PERPANJANGAN -->
+                    <!-- END PENGIRIMAN -->
             </main>
+
+            <!-- MODAL -->
+            <div class="modal fade" id="extendModal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="modal-title">19/12/2020 PT. Sejahtera Indah</span>
+                            <button type="button" class="close" data-dismiss="modal"> &times; </button>
+                        </div>
+
+                        <table class="table modal-body" id="tableBarang">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Kode</th>
+                                    <th scope="col">Jumlah</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">MH001</th>
+                                    <td>3 Batang</td>
+                                    <td>Kembali 03/01/2021</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">BT002</th>
+                                    <td>10 Buah</td>
+                                    <td>Jatuh Tempo 03/01/2021</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">
+                                                    <input type="checkbox">
+                                                </div>
+                                            </div>
+                                            <input name="c2" type="number" class="form-control" id="e2" value="">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">BT003</th>
+                                    <td>1 Buah</td>
+                                    <td>Belum Dikirim</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">
+                                                    <input type="checkbox">
+                                                </div>
+                                            </div>
+                                            <input name="c2" type="number" class="form-control" id="e2" value="">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">BT003</th>
+                                    <td>1 Buah</td>
+                                    <td>Dikirim 13/01/2021</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">
+                                                    <input type="checkbox">
+                                                </div>
+                                            </div>
+                                            <input name="c2" type="number" class="form-control" id="e2" value="">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-primary">Buat Transaksi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="returnModal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="modal-title">19/12/2020 PT. Sejahtera Indah</span>
+                            <button type="button" class="close" data-dismiss="modal"> &times; </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="good">Baik</label>
+                                <input name="time" type="number" class="form-control" id="good" max="10" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="low">Rusak Ringan</label>
+                                <input name="time" type="number" class="form-control" id="low" max="10" min="0">
+                                <small class="form-text text-muted">
+                                    Biaya klaim sebesar 20% harga barang
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label for="med">Rusak Sedang</label>
+                                <input name="time" type="number" class="form-control" id="med" max="10" min="0">
+                                <small class="form-text text-muted">
+                                    Biaya klaim sebesar 50% harga barang
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label for="high">Rusak Berat / Hilang</label>
+                                <input name="time" type="number" class="form-control" id="high" max="10" min="0">
+                                <small class="form-text text-muted">
+                                    Biaya klaim sebesar 100% harga barang
+                                </small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-primary">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END MODAL -->
         </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js">
-    </script>
-    <script>
-        $('.autocomplete').autoComplete();
-    </script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js">
+        </script>
+        <script
+            src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js">
+        </script>
+        <script>
+            $('.autocomplete').autoComplete();
+            $('.datepicker').datepicker();
+        </script>
 </body>
 
 </html>

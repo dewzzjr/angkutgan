@@ -13,6 +13,10 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
+        input[type="number"] {
+            text-align: right;
+        }
+
         .text-title {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -116,53 +120,69 @@
                                 <tr>
                                     <th scope="row">SEJAH</th>
                                     <td>PT. Sejahtera Indah</td>
-                                    <td>Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75122</td>
+                                    <td>Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur
+                                        75122</td>
                                     <td>
-										<button type="button" class="btn btn-success" data-toggle="collapse" data-target="#SEJAH" data-parent="#tablePelanggan" class="collapsed">Detail</button>
-                                        <button type="button" class="btn btn-info">Cetak Surat Perjanjian Kerja Sama</button>
-                                        <button type="button" class="btn btn-warning">Ubah</button>
-                                        <button type="button" class="btn btn-danger">Hapus</button>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-success" data-toggle="collapse"
+                                                data-target="#SEJAH" data-parent="#tablePelanggan"
+                                                class="collapsed">Detail</button>
+                                            <button type="button" class="btn btn-warning">Ubah</button>
+                                            <button type="button" class="btn btn-danger">Hapus</button>
+                                        </div>
                                     </td>
                                 </tr>
-								<tr class="collapse" id="SEJAH">
-									<th class="text-right" scope="row" colspan="2">
+                                <tr class="collapse" id="SEJAH">
+                                    <th class="text-right" scope="row" colspan="2">
                                         <p>Jenis: </p>
-										<p>NIK: </p>
-										<p>Nama: </p>
-										<p>No. Telp: </p>
-									</th>
-									<td colspan="3">
+                                        <p>NIK: </p>
+                                        <p>Nama: </p>
+                                        <p>No. Telp: </p>
+                                    </th>
+                                    <td colspan="3">
                                         <p>PT</p>
-										<p>3322181182780001</p>
-										<p>Eko Patrio</p>
-										<p>085-777-169-123</p>
-									</td>
-								</tr>
+                                        <p>3322181182780001</p>
+                                        <p>Eko Patrio</p>
+                                        <p>085-777-169-123</p>
+                                        
+                                        <button type="button" class="btn btn-info">
+                                            Cetak Surat Perjanjian Kerja Sama
+                                        </button>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <th scope="row">FADIL</th>
                                     <td>Firman Adi Laksana</td>
-                                    <td>Jl. Siti Aisyah No.20, Tlk. Lerong Ilir, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75243</td>
+                                    <td>Jl. Siti Aisyah No.20, Tlk. Lerong Ilir, Kec. Samarinda Ulu, Kota Samarinda,
+                                        Kalimantan Timur 75243</td>
                                     <td>
-                                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#FADIL" data-parent="#tablePelanggan" class="collapsed">Detail</button>
-                                        <button type="button" class="btn btn-info">Cetak Surat Perjanjian Kerja Sama</button>
-                                        <button type="button" class="btn btn-warning">Ubah</button>
-                                        <button type="button" class="btn btn-danger">Hapus</button>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-success" data-toggle="collapse"
+                                                data-target="#FADIL" data-parent="#tablePelanggan"
+                                                class="collapsed">Detail</button>
+                                            <button type="button" class="btn btn-warning">Ubah</button>
+                                            <button type="button" class="btn btn-danger">Hapus</button>
+                                        </div>
                                     </td>
                                 </tr>
-								<tr class="collapse" id="FADIL">
-									<th class="text-right" scope="row" colspan="2">
+                                <tr class="collapse" id="FADIL">
+                                    <th class="text-right" scope="row" colspan="2">
                                         <p>Jenis: </p>
-										<p>NIK: </p>
-										<p>Nama: </p>
-										<p>No. Telp: </p>
-									</th>
-									<td colspan="3">
+                                        <p>NIK: </p>
+                                        <p>Nama: </p>
+                                        <p>No. Telp: </p>
+                                    </th>
+                                    <td colspan="3">
                                         <p>Perorangan</p>
-										<p>3322181182780002</p>
-										<p>Firman Adi Laksana</p>
-										<p>081-666-169-444</p>
-									</td>
-								</tr>
+                                        <p>3322181182780002</p>
+                                        <p>Firman Adi Laksana</p>
+                                        <p>081-666-169-444</p>
+                                        
+                                        <button type="button" class="btn btn-info">
+                                            Cetak Surat Perjanjian Kerja Sama
+                                        </button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -247,7 +267,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="phoneEdit">Nomor Telepon</label>
-                                <input name="phone" type="text" class="form-control" id="phoneEdit" value="085-777-169-123">
+                                <input name="phone" type="text" class="form-control" id="phoneEdit"
+                                    value="085-777-169-123">
                             </div>
                             <div class="form-group">
                                 <label for="addressEdit">Lokasi Proyek</label>

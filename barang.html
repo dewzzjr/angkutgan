@@ -13,6 +13,10 @@
 			font-family: Arial, Helvetica, sans-serif;
 		}
 
+		input[type="number"] {
+			text-align: right;
+		}
+
 		.text-title {
 			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 		}
@@ -126,7 +130,9 @@
 									<td>90/100</td>
 									<td>Batang</td>
 									<td>
-										<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#MF001" data-parent="#tableBarang" class="collapsed">Detail</button>
+										<button type="button" class="btn btn-info" data-toggle="collapse"
+											data-target="#MF001" data-parent="#tableBarang"
+											class="collapsed">Detail</button>
 										<button type="button" class="btn btn-warning">Ubah</button>
 										<button type="button" class="btn btn-danger">Hapus</button>
 									</td>
@@ -140,8 +146,8 @@
 										<p>Rp10.000.000</p>
 										<p>
 											<ul>
-												<li>1 Hari: Rp100.000</li>
-												<li>7 Hari: Rp500.000</li>
+												<li>1 Minggu: Rp100.000</li>
+												<li>7 Minggu: Rp500.000</li>
 											</ul>
 										</p>
 									</td>
@@ -152,7 +158,9 @@
 									<td>1/12</td>
 									<td>Set</td>
 									<td>
-										<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#TG009" data-parent="#tableBarang" class="collapsed">Detail</button>
+										<button type="button" class="btn btn-info" data-toggle="collapse"
+											data-target="#TG009" data-parent="#tableBarang"
+											class="collapsed">Detail</button>
 										<button type="button" class="btn btn-warning">Ubah</button>
 										<button type="button" class="btn btn-danger">Hapus</button>
 									</td>
@@ -166,8 +174,8 @@
 										<p>Rp10.000.000</p>
 										<p>
 											<ul>
-												<li>1 Hari: Rp100.000</li>
-												<li>7 Hari: Rp500.000</li>
+												<li>1 Minggu: Rp100.000</li>
+												<li>7 Minggu: Rp500.000</li>
 											</ul>
 										</p>
 									</td>
@@ -178,7 +186,9 @@
 									<td>90/90</td>
 									<td>Buah</td>
 									<td>
-										<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#JP002" data-parent="#tableBarang" class="collapsed">Detail</button>
+										<button type="button" class="btn btn-info" data-toggle="collapse"
+											data-target="#JP002" data-parent="#tableBarang"
+											class="collapsed">Detail</button>
 										<button type="button" class="btn btn-warning">Ubah</button>
 										<button type="button" class="btn btn-danger">Hapus</button>
 									</td>
@@ -192,8 +202,8 @@
 										<p>Rp10.000.000</p>
 										<p>
 											<ul>
-												<li>1 Hari: Rp100.000</li>
-												<li>7 Hari: Rp500.000</li>
+												<li>1 Minggu: Rp100.000</li>
+												<li>7 Minggu: Rp500.000</li>
 											</ul>
 										</p>
 									</td>
@@ -254,8 +264,9 @@
 								<div class="form-group col-6">
 									<label for="stockEdit">Stok</label>
 									<input name="stock" type="number" class="form-control" id="stockEdit" value="100">
-									<small class="form-text text-muted">Jumlah barang yang sekarang sedang disewa adalah
-										10 batang</small>
+									<small class="form-text text-muted">
+										Jumlah barang yang sekarang sedang disewa adalah 10 batang
+									</small>
 								</div>
 								<div class="form-group col-6">
 									<label for="unitEdit">Satuan</label>
@@ -331,16 +342,16 @@
 									value="Mainframe">
 							</div>
 							<div class="form-row">
-								<div class="form-group col-4">
+								<div class="form-group col-3">
 									<label for="timeRent">Waktu</label>
 									<div class="input-group">
 										<input name="time" type="number" class="form-control" id="timeRent" value="7">
 										<div class="input-group-append">
-											<span class="input-group-text">Hari</span>
+											<span class="input-group-text">Minggu</span>
 										</div>
 									</div>
 								</div>
-								<div class="form-group col-4">
+								<div class="form-group col-3">
 									<label for="priceRent">Harga Sewa</label>
 									<div class="input-group">
 										<div class="input-group-prepend">
@@ -350,12 +361,45 @@
 											value="10000">
 									</div>
 								</div>
-								<div class="form-group col-4">
+								<div class="form-group col-3">
 									<label for="unitRent">Satuan</label>
 									<input disabled name="unit" type="text" class="form-control" id="unitRent"
 										value="Batang">
 								</div>
+								<div class="col-3 d-flex align-items-center">
+									<button class="btn btn-danger">Delete</button>
+								</div>
 							</div>
+							<div class="form-row">
+								<div class="form-group col-3">
+									<label for="timeRent">Waktu</label>
+									<div class="input-group">
+										<input name="time" type="number" class="form-control" id="timeRent" value="7">
+										<div class="input-group-append">
+											<span class="input-group-text">Minggu</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group col-3">
+									<label for="priceRent">Harga Sewa</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">Rp</span>
+										</div>
+										<input name="price" type="number" class="form-control" id="priceRent"
+											value="10000">
+									</div>
+								</div>
+								<div class="form-group col-3">
+									<label for="unitRent">Satuan</label>
+									<input disabled name="unit" type="text" class="form-control" id="unitRent"
+										value="Batang">
+								</div>
+								<div class="col-3 d-flex align-items-center">
+									<button class="btn btn-danger">Delete</button>
+								</div>
+							</div>
+							<button class="btn btn-warning">Tambah Harga Sewa</button>
 							<button type="submit" class="btn btn-success">Submit</button>
 						</form>
 					</div>
