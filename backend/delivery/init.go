@@ -18,7 +18,7 @@ type Delivery struct {
 func New(u *usecase.Usecase) *Delivery {
 	cfg := config.Get()
 	return &Delivery{
-		http:    http.New(cfg.Delivery),
+		http:    http.New(cfg.Delivery, u),
 		usecase: u,
 	}
 }

@@ -1,0 +1,399 @@
+<html>
+
+<head>
+	<title>Barang</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+	<link rel="icon" size="100x74" href="../img/logo.webp">
+	<link rel="stylesheet" href="assets/css/default.css">
+	<script src="https://kit.fontawesome.com/6f48c57228.js"></script>
+</head>
+
+<body>
+	<header class="navbar navbar-expand navbar-light flex-column flex-md-row">
+		<!-- GENERAL HEADER -->
+		<a class="navbar-brand text-title" href="#">
+			<img src="assets/img/logo.webp" />
+			<span class="bold">Scaffolding </span>Samarinda
+		</a>
+		<div class="navbar-nav-scroll">
+			<ul class="navbar-nav">
+				<li class="nav-item active">
+					<a class="nav-link">Barang</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="pelanggan.html">Pelanggan</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="penyewaan.html">Penyewaan</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="penjualan.html">Penjualan</a>
+				</li>
+			</ul>
+		</div>
+		<!-- END GENERAL HEADER -->
+
+		<!-- DYNAMIC HEADER -->
+		<ul class="navbar-nav ml-md-auto">
+			<li class="nav-item">
+				<a class="nav-link" href="admin.html">Admin</a>
+			</li>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">[username]</a>
+				<div class="dropdown-menu dropdown-menu-right">
+					<a class="dropdown-item">Edit Profile</a>
+					<a class="dropdown-item">Ubah Password</a>
+					<a class="dropdown-item">Keluar</a>
+				</div>
+			</li>
+		</ul>
+		<!-- END DYNAMIC HEADER -->
+	</header>
+	<div class="container-fluid">
+		<div class="row flex-xl-nowrap">
+			<!-- SIDEBAR -->
+			<div class="col-md-3 pb-3">
+				<h4 class="nav-link text-title bold" href="#">Barang</h4>
+				<ul class="nav flex-row flex-md-column nav-pills" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link" id="tabList" data-toggle="pill" href="#list">Daftar</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="tabAdd" data-toggle="pill" href="#add">Tambah</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="tabEdit" data-toggle="pill" href="#edit">Ubah</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="tabSell" data-toggle="pill" href="#sell">Harga Jual</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="tabRent" data-toggle="pill" href="#rent">Harga Sewa</a>
+					</li>
+				</ul>
+			</div>
+			<!-- END SIDEBAR -->
+			<main class="col-md-9">
+				<div class="tab-content" id="tabContent">
+					<!-- DAFTAR -->
+					<div class="tab-pane fade" id="list" role="tabpanel">
+						<div class="input-group mb-3">
+							<div class="input-group-prepend">
+								<button class="btn btn-outline-secondary dropdown-toggle" type="button"
+									data-toggle="dropdown">Cari</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" href="#" value="code">Kode</a>
+									<a class="dropdown-item" href="#" value="keyword">Nama</a>
+								</div>
+							</div>
+							<input type="text" class="form-control" placeholder="masukkan kata kunci">
+						</div>
+						<table class="table accordion" id="tableBarang">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">Nama</th>
+									<th scope="col">Stok</th>
+									<th scope="col">Satuan</th>
+									<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<th scope="row">MF001</th>
+									<td>Mainframe</td>
+									<td>90/100</td>
+									<td>Batang</td>
+									<td>
+										<button type="button" class="btn btn-info" data-toggle="collapse"
+											data-target="#MF001" data-parent="#tableBarang"
+											class="collapsed">Detail</button>
+										<button type="button" class="btn btn-warning">Ubah</button>
+										<button type="button" class="btn btn-danger">Hapus</button>
+									</td>
+								</tr>
+								<tr class="collapse" id="MF001">
+									<th class="text-right" scope="row" colspan="2">
+										<p>Harga Jual: </p>
+										<p>Harga Sewa: </p>
+									</th>
+									<td colspan="3">
+										<p>Rp10.000.000</p>
+										<p>
+											<ul>
+												<li>1 Minggu: Rp100.000</li>
+												<li>7 Minggu: Rp500.000</li>
+											</ul>
+										</p>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">TG009</th>
+									<td>Tangga</td>
+									<td>1/12</td>
+									<td>Set</td>
+									<td>
+										<button type="button" class="btn btn-info" data-toggle="collapse"
+											data-target="#TG009" data-parent="#tableBarang"
+											class="collapsed">Detail</button>
+										<button type="button" class="btn btn-warning">Ubah</button>
+										<button type="button" class="btn btn-danger">Hapus</button>
+									</td>
+								</tr>
+								<tr class="collapse" id="TG009">
+									<th class="text-right" scope="row" colspan="2">
+										<p>Harga Jual: </p>
+										<p>Harga Sewa: </p>
+									</th>
+									<td colspan="3">
+										<p>Rp10.000.000</p>
+										<p>
+											<ul>
+												<li>1 Minggu: Rp100.000</li>
+												<li>7 Minggu: Rp500.000</li>
+											</ul>
+										</p>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">JP002</th>
+									<td>Joint Pin</td>
+									<td>90/90</td>
+									<td>Buah</td>
+									<td>
+										<button type="button" class="btn btn-info" data-toggle="collapse"
+											data-target="#JP002" data-parent="#tableBarang"
+											class="collapsed">Detail</button>
+										<button type="button" class="btn btn-warning">Ubah</button>
+										<button type="button" class="btn btn-danger">Hapus</button>
+									</td>
+								</tr>
+								<tr class="collapse" id="JP002">
+									<th class="text-right" scope="row" colspan="2">
+										<p>Harga Jual: </p>
+										<p>Harga Sewa: </p>
+									</th>
+									<td colspan="3">
+										<p>Rp10.000.000</p>
+										<p>
+											<ul>
+												<li>1 Minggu: Rp100.000</li>
+												<li>7 Minggu: Rp500.000</li>
+											</ul>
+										</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<!-- END DAFTAR -->
+
+					<!-- TAMBAH -->
+					<div class="tab-pane fade" id="add" role="tabpanel">
+						<form id="formAdd">
+							<div class="form-group">
+								<label for="codeAdd">Kode</label>
+								<input name="code" type="text" class="form-control" id="codeAdd"
+									style="text-transform:uppercase" />
+							</div>
+							<div class="form-group">
+								<label for="nameAdd">Nama Barang</label>
+								<input name="name" type="text" class="form-control" id="nameAdd">
+							</div>
+							<div class="form-row">
+								<div class="form-group col-6">
+									<label for="stockAdd">Stok</label>
+									<input name="stock" type="number" class="form-control" id="stockAdd">
+								</div>
+								<div class="form-group col-6">
+									<label for="unitAdd">Satuan</label>
+									<input name="unit" type="text" class="form-control" id="unitAdd">
+								</div>
+							</div>
+							<button type="submit" class="btn btn-success">Submit</button>
+						</form>
+					</div>
+					<!-- END TAMBAH -->
+
+					<!-- UBAH -->
+					<div class="tab-pane fade" id="edit" role="tabpanel">
+						<form id="formEdit">
+							<div class="form-group ">
+								<label for="newCodeEdit">Kode</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<button class="btn btn-outline-secondary" type="button" id="setEdit">
+											<i class="fas fa-check"></i>
+										</button>
+									</div>
+									<select name="code" class="form-control autocomplete" id="newCodeEdit"
+										data-url="testdata/barang.json" autocomplete="off"></select>
+								</div>
+								<input type="hidden" id="codeEdit" />
+							</div>
+							<div class="form-group">
+								<label for="nameEdit">Nama Barang</label>
+								<input name="name" type="text" class="form-control" id="nameEdit" value="Mainframe">
+							</div>
+							<div class="form-row">
+								<div class="form-group col-6">
+									<label for="stockEdit">Stok</label>
+									<input name="stock" type="number" class="form-control" id="stockEdit" value="100">
+									<small class="form-text text-muted">
+										Jumlah barang yang sekarang sedang disewa adalah 10 batang
+									</small>
+								</div>
+								<div class="form-group col-6">
+									<label for="unitEdit">Satuan</label>
+									<input name="unit" type="text" class="form-control" id="unitEdit" value="Batang">
+								</div>
+							</div>
+							<button type="submit" class="btn btn-success">Submit</button>
+						</form>
+					</div>
+					<!-- END UBAH -->
+
+					<!-- HARGA JUAL -->
+					<div class="tab-pane fade" id="sell" role="tabpanel">
+						<form id="formSell">
+							<div class="form-group ">
+								<label for="newCodeSell">Kode</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<button class="btn btn-outline-secondary" type="button" id="setSell">
+											<i class="fas fa-check"></i>
+										</button>
+									</div>
+									<select name="code" class="form-control autocomplete" id="newCodeSell"
+										data-url="testdata/barang.json" autocomplete="off"></select>
+								</div>
+								<input type="hidden" id="codeSell" />
+							</div>
+							<div class="form-group">
+								<label for="nameSell">Nama Barang</label>
+								<input disabled name="name" type="text" class="form-control" id="nameSell"
+									value="Mainframe">
+							</div>
+							<div class="form-row">
+								<div class="form-group col-6">
+									<label for="priceSell">Harga Jual</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">Rp</span>
+										</div>
+										<input name="price" type="number" class="form-control" id="priceSell"
+											value="10000">
+									</div>
+								</div>
+								<div class="form-group col-6">
+									<label for="unitSell">Satuan</label>
+									<input disabled name="unit" type="text" class="form-control" id="unitSell"
+										value="Batang">
+								</div>
+							</div>
+							<button type="submit" class="btn btn-success">Submit</button>
+						</form>
+					</div>
+					<!-- END HARGA JUAL -->
+					<!-- HARGA SEWA -->
+					<div class="tab-pane fade" id="rent" role="tabpanel">
+						<form id="formRent">
+							<div class="form-group ">
+								<label for="newCodeRent">Kode</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<button class="btn btn-outline-secondary" type="button" id="setRent">
+											<i class="fas fa-check"></i>
+										</button>
+									</div>
+									<select name="code" class="form-control autocomplete" id="newCodeRent"
+										data-url="testdata/barang.json" autocomplete="off"></select>
+								</div>
+								<input type="hidden" id="codeRent" />
+							</div>
+							<div class="form-group">
+								<label for="nameRent">Nama Barang</label>
+								<input disabled name="name" type="text" class="form-control" id="nameRent"
+									value="Mainframe">
+							</div>
+							<div class="form-row">
+								<div class="form-group col-3">
+									<label for="timeRent">Waktu</label>
+									<div class="input-group">
+										<input name="time" type="number" class="form-control" id="timeRent" value="7">
+										<div class="input-group-append">
+											<span class="input-group-text">Minggu</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group col-3">
+									<label for="priceRent">Harga Sewa</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">Rp</span>
+										</div>
+										<input name="price" type="number" class="form-control" id="priceRent"
+											value="10000">
+									</div>
+								</div>
+								<div class="form-group col-3">
+									<label for="unitRent">Satuan</label>
+									<input disabled name="unit" type="text" class="form-control" id="unitRent"
+										value="Batang">
+								</div>
+								<div class="col-3 d-flex align-items-center">
+									<button class="btn btn-danger">Delete</button>
+								</div>
+							</div>
+							<div class="form-row">
+								<div class="form-group col-3">
+									<label for="timeRent">Waktu</label>
+									<div class="input-group">
+										<input name="time" type="number" class="form-control" id="timeRent" value="7">
+										<div class="input-group-append">
+											<span class="input-group-text">Minggu</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group col-3">
+									<label for="priceRent">Harga Sewa</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">Rp</span>
+										</div>
+										<input name="price" type="number" class="form-control" id="priceRent"
+											value="10000">
+									</div>
+								</div>
+								<div class="form-group col-3">
+									<label for="unitRent">Satuan</label>
+									<input disabled name="unit" type="text" class="form-control" id="unitRent"
+										value="Batang">
+								</div>
+								<div class="col-3 d-flex align-items-center">
+									<button class="btn btn-danger">Delete</button>
+								</div>
+							</div>
+							<button class="btn btn-warning">Tambah Harga Sewa</button>
+							<button type="submit" class="btn btn-success">Submit</button>
+						</form>
+					</div>
+					<!-- END HARGA JUAL -->
+				</div>
+			</main>
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js">
+	</script>
+	<script>
+		$('.autocomplete').autoComplete('set', {
+			value: "MF001",
+			text: "MF001 - Mainframe"
+		});
+	</script>
+</body>
+
+</html>
