@@ -23,6 +23,8 @@ func (h *HTTP) Routing() {
 	h.Router.POST("/user/session", h.Refresh)
 	h.Router.GET("/user/info", h.GetUserInfo)
 
+	h.Router.POST("/user/create", h.CreateUser)
+
 	h.Router.GET("/items", h.GetItems)
 	h.Router.GET("/item/:code", h.GetItemByCode)
 	h.Router.POST("/item/:code", h.PostItemByCode)

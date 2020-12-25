@@ -1,10 +1,12 @@
 package http
 
 import (
+	"context"
 	"time"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
 	"github.com/dewzzjr/angkutgan/backend/usecase"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -22,14 +24,16 @@ func New(cfg model.Delivery, u *usecase.Usecase) *HTTP {
 		Router: httprouter.New(),
 		Static: httprouter.New(),
 		Config: cfg,
-		users:  u.Users,
+		// users: u.Users,
+		users: bypass(u.Users, cfg.ByPass),
 	}
 }
 
 type iUsers interface {
-	Verify(username, password string) (ok bool, err error)
-	CreateSession(username string) (claim model.Claims, expire time.Time, err error)
-	CreateToken(claim *model.Claims) (token string, err error)
-	GetByToken(token string) (user model.Claims, status int, err error)
-	RefreshSession(claim *model.Claims) (expire time.Time, ok bool)
+	Verify(ctx context.Context, username, password string) (ok bool, err error)
+	CreateSession(ctx context.Context, username string) (claim model.Claims, expire time.Time, err error)
+	CreateToken(ctx context.Context, claim *model.Claims) (token string, err error)
+	GetByToken(ctx context.Context, token string) (user model.Claims, tkn *jwt.Token, err error)
+	RefreshSession(ctx context.Context, claim *model.Claims) (expire time.Time, ok bool)
+	Create(ctx context.Context, data model.UserInfo, actionBy int64) (err error)
 }

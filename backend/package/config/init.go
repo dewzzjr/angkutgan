@@ -30,7 +30,7 @@ func load(path ...string) {
 		}
 	}
 	if config == nil {
-		log.Println("No config loaded ...")
+		log.Println("no config loaded")
 	}
 }
 

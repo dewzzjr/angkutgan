@@ -5,6 +5,7 @@ type Delivery struct {
 	Port       int    `yaml:"http_port"`
 	StaticPath string `yaml:"static_path"`
 	CookieName string `yaml:"cookie_name"`
+	ByPass     bool   `yaml:"bypass"`
 }
 
 // Repository injected to backend/repository
@@ -13,6 +14,7 @@ type Repository struct {
 	DatabaseUser     string `yaml:"db_user"`
 	DatabaseName     string `yaml:"db_name"`
 	DatabasePassword string `yaml:"db_pass"`
+	DefaultPassword  string `yaml:"default_pass"`
 }
 
 // Users injected to backend/usecase/users

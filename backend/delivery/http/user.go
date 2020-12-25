@@ -2,8 +2,8 @@ package http
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+	"time"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
 	"github.com/dewzzjr/angkutgan/backend/package/response"
@@ -12,16 +12,13 @@ import (
 
 // Login sign in using jwt
 func (h *HTTP) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	var creds model.Credentials
-	// Get the JSON body and decode into credentials
-	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
-		// If the structure of the body is wrong, return an HTTP error
+	ctx := r.Context()
+	creds := model.Credentials{}
+	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	ok, err := h.users.Verify(creds.Username, creds.Password)
+	ok, err := h.users.Verify(ctx, creds.Username, creds.Password)
 	if err != nil {
 		response.Error(w, err)
 		return
@@ -30,21 +27,16 @@ func (h *HTTP) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-
-	claims, expirationTime, err := h.users.CreateSession(creds.Username)
+	claims, expirationTime, err := h.users.CreateSession(ctx, creds.Username)
 	if err != nil {
 		response.Error(w, err)
 		return
 	}
-
-	tokenString, err := h.users.CreateToken(&claims)
+	tokenString, err := h.users.CreateToken(ctx, &claims)
 	if err != nil {
 		response.Error(w, err)
 		return
 	}
-
-	// Finally, we set the client cookie for "token" as the JWT we just generated
-	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, &http.Cookie{
 		Name:    h.Config.CookieName,
 		Value:   tokenString,
@@ -58,39 +50,21 @@ func (h *HTTP) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params
 
 // Refresh jwt token
 func (h *HTTP) Refresh(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	c, err := r.Cookie(h.Config.CookieName)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
+	ctx := r.Context()
+	claims, ok := h.Auth(ctx, w, r)
+	if !ok {
 		return
 	}
-
-	claims, status, err := h.users.GetByToken(c.Value)
-	if status != 0 {
-		w.WriteHeader(status)
-		return
-	}
-	if err != nil {
-		response.Error(w, err)
-		return
-	}
-
-	expirationTime, ok := h.users.RefreshSession(&claims)
+	expirationTime, ok := h.users.RefreshSession(ctx, &claims)
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	tokenString, err := h.users.CreateToken(&claims)
+	tokenString, err := h.users.CreateToken(ctx, &claims)
 	if err != nil {
 		response.Error(w, err)
 		return
 	}
-
-	// Set the new token as the users `token` cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:    h.Config.CookieName,
 		Value:   tokenString,
@@ -104,31 +78,36 @@ func (h *HTTP) Refresh(w http.ResponseWriter, r *http.Request, p httprouter.Para
 
 // GetUserInfo get user information
 func (h *HTTP) GetUserInfo(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	// We can obtain the session token from the requests cookies, which come with every request
-	c, err := r.Cookie(h.Config.CookieName)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			// If the cookie is not set, return an unauthorized status
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		// For any other type of error, return a bad request status
+	ctx := r.Context()
+	claims, ok := h.Auth(ctx, w, r)
+	if !ok {
+		return
+	}
+	response.JSON(w, map[string]interface{}{
+		"result": claims,
+	})
+	return
+}
+
+// CreateUser add new user information
+func (h *HTTP) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	ctx := r.Context()
+	claims, ok := h.Auth(ctx, w, r)
+	if !ok {
+		return
+	}
+	payload := model.UserInfo{}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	claims, status, err := h.users.GetByToken(c.Value)
-	if status != 0 {
-		w.WriteHeader(status)
-		return
-	}
-	if err != nil {
+	payload.Birthdate, _ = time.Parse("02/01/2006", payload.BirthdateStr)
+	if err := h.users.Create(ctx, payload, claims.UserID); err != nil {
 		response.Error(w, err)
 		return
 	}
-
 	response.JSON(w, map[string]interface{}{
-		"result": claims,
+		"result": "OK",
 	})
 	return
 }

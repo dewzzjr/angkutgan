@@ -1,46 +1,36 @@
 package users
 
 import (
-	"fmt"
-	"net/http"
+	"context"
 	"time"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/pkg/errors"
 )
 
 // GetByToken convert token to user info
-func (u *Users) GetByToken(token string) (user model.Claims, status int, err error) {
-	var tkn *jwt.Token
+func (u *Users) GetByToken(ctx context.Context, token string) (user model.Claims, tkn *jwt.Token, err error) {
 	tkn, err = jwt.ParseWithClaims(token, &user, func(token *jwt.Token) (interface{}, error) {
 		return u.Key, nil
 	})
-	if err == jwt.ErrSignatureInvalid {
-		status = http.StatusUnauthorized
-		return
-	}
 	if err != nil {
-		status = http.StatusBadRequest
-		return
-	}
-	if !tkn.Valid {
-		status = http.StatusUnauthorized
+		err = errors.Wrap(err, "ParseWithClaims")
 		return
 	}
 	return
 }
 
 // CreateToken from claim
-func (u *Users) CreateToken(claim *model.Claims) (token string, err error) {
+func (u *Users) CreateToken(ctx context.Context, claim *model.Claims) (token string, err error) {
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 	token, err = tkn.SignedString(u.Key)
+	err = errors.Wrap(err, "SignedString")
 	return
 }
 
 // CreateSession for username
-func (u *Users) CreateSession(username string) (claim model.Claims, expire time.Time, err error) {
-	// TODO load user information
-
+func (u *Users) CreateSession(ctx context.Context, username string) (claim model.Claims, expire time.Time, err error) {
 	expire = time.Now().Add(time.Duration(u.Config.TokenExpiry) * time.Minute)
 	claim = model.Claims{
 		Username: username,
@@ -48,13 +38,16 @@ func (u *Users) CreateSession(username string) (claim model.Claims, expire time.
 			ExpiresAt: expire.Unix(),
 		},
 	}
+	if err = u.database.GetUserLogin(ctx, &claim); err != nil {
+		err = errors.Wrap(err, "GetUserLogin")
+		return
+	}
 	return
 }
 
 // RefreshSession based on previous claim or session
-func (u *Users) RefreshSession(claim *model.Claims) (expire time.Time, ok bool) {
-	ok = time.Unix(claim.ExpiresAt, 0).Sub(time.Now()) < time.Duration(u.Config.RefreshToken)*time.Second
-	if !ok {
+func (u *Users) RefreshSession(ctx context.Context, claim *model.Claims) (expire time.Time, ok bool) {
+	if ok = time.Unix(claim.ExpiresAt, 0).Sub(time.Now()) < time.Duration(u.Config.RefreshToken)*time.Second; !ok {
 		return
 	}
 	expire = time.Now().Add(time.Duration(u.Config.TokenExpiry) * time.Minute)
@@ -63,20 +56,19 @@ func (u *Users) RefreshSession(claim *model.Claims) (expire time.Time, ok bool) 
 }
 
 // Verify username and password
-// TODO verify from database
-func (u *Users) Verify(username, password string) (ok bool, err error) {
-	var users = map[string]string{
-		"user1": "password1",
-		"user2": "password2",
-	}
-	expectedPassword, okDB := users[username]
-	if !okDB {
-		err = fmt.Errorf("not found")
+func (u *Users) Verify(ctx context.Context, username, password string) (ok bool, err error) {
+	if ok, err = u.database.VerifyUser(ctx, username, password); err != nil {
+		err = errors.Wrap(err, "VerifyUser")
 		return
 	}
-	if expectedPassword != password {
+	return
+}
+
+// Create new user
+func (u *Users) Create(ctx context.Context, data model.UserInfo, actionBy int64) (err error) {
+	if err = u.database.CreateUser(ctx, data, actionBy); err != nil {
+		err = errors.Wrap(err, "CreateUser")
 		return
 	}
-	ok = true
 	return
 }
