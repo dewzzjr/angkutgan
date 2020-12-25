@@ -16,6 +16,8 @@ type HTTP struct {
 	Static *httprouter.Router
 	Config model.Delivery
 	users  iUsers
+	items  iItems
+	ajax   iAjax
 }
 
 // New initiate delivery/http
@@ -26,6 +28,8 @@ func New(cfg model.Delivery, u *usecase.Usecase) *HTTP {
 		Config: cfg,
 		// users: u.Users,
 		users: bypass(u.Users, cfg.ByPass),
+		items: u.Items,
+		ajax:  u.Ajax,
 	}
 }
 
@@ -36,4 +40,17 @@ type iUsers interface {
 	GetByToken(ctx context.Context, token string) (user model.Claims, tkn *jwt.Token, err error)
 	RefreshSession(ctx context.Context, claim *model.Claims) (expire time.Time, ok bool)
 	Create(ctx context.Context, data model.UserInfo, actionBy int64) (err error)
+}
+
+type iItems interface {
+	GetList(ctx context.Context, page int, row int) (items []model.Item, err error)
+	GetByKeyword(ctx context.Context, page int, row int, key string) (items []model.Item, err error)
+	Get(ctx context.Context, code string) (item model.Item, err error)
+	Create(ctx context.Context, item model.Item, actionBy int64) (err error)
+	Update(ctx context.Context, item model.Item, actionBy int64) (err error)
+	Remove(ctx context.Context, code string) (err error)
+}
+
+type iAjax interface {
+	IsValidUsername(ctx context.Context, newUsername, oldUsername string) (ok bool, err error)
 }

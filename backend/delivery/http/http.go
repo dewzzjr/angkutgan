@@ -26,8 +26,8 @@ func (h *HTTP) Routing() {
 	h.Router.POST("/user/create", h.CreateUser)
 
 	h.Router.GET("/items", h.GetItems)
+	h.Router.POST("/item", h.PostItemByCode)
 	h.Router.GET("/item/:code", h.GetItemByCode)
-	h.Router.POST("/item/:code", h.PostItemByCode)
 	h.Router.PATCH("/item/:code", h.PatchItemByCode)
 	h.Router.DELETE("/item/:code", h.DeleteItemByCode)
 	h.Static.ServeFiles("/*filepath", http.Dir(h.Config.StaticPath))

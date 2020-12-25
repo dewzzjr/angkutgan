@@ -82,13 +82,6 @@ func (d *Database) CreateUser(ctx context.Context, data model.UserInfo, actionBy
 		tx.Rollback()
 		return
 	}
-	var user sql.NullInt64
-	if actionBy != 0 {
-		user = sql.NullInt64{
-			Int64: actionBy,
-			Valid: true,
-		}
-	}
 
 	if _, err = tx.ExecContext(ctx, qCreateInfo,
 		data.NIK,
@@ -98,7 +91,7 @@ func (d *Database) CreateUser(ctx context.Context, data model.UserInfo, actionBy
 		data.Phone,
 		data.Birthdate,
 		data.Religion,
-		user,
+		NullInt64(actionBy),
 	); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%v]", data)
 		tx.Rollback()
@@ -106,7 +99,6 @@ func (d *Database) CreateUser(ctx context.Context, data model.UserInfo, actionBy
 	}
 	if err = tx.Commit(); err != nil {
 		err = errors.Wrapf(err, "Commit [%v]", data)
-		return
 	}
 	return
 }
@@ -141,7 +133,6 @@ func (d *Database) EditUser(ctx context.Context, data model.UserInfo, actionBy i
 		data.ID,
 	); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%v]", data)
-		return
 	}
 	return
 }
@@ -163,7 +154,6 @@ func (d *Database) ChangePassword(ctx context.Context, username, newPassword str
 	}
 	if _, err = d.DB.ExecContext(ctx, qEditInfo, string(password), username); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s, %s]", username, password)
-		return
 	}
 	return
 }
@@ -184,7 +174,6 @@ func (d *Database) GetUserLogin(ctx context.Context, claim *model.Claims) (err e
 	}
 	if claim.UAM, err = d.GetUAM(ctx, claim.UserID); err != nil {
 		err = errors.Wrap(err, "GetUAM")
-		return
 	}
 	return
 }
@@ -215,4 +204,24 @@ func (d *Database) GetUAM(ctx context.Context, uid int64) (access []string, err 
 		access = append(access, uam)
 	}
 	return
+}
+
+const qIsValidUsername = `SELECT username
+FROM
+	users
+WHERE
+	username = ?
+`
+
+// IsValidUsername check is username is valid or not to be use
+func (d *Database) IsValidUsername(ctx context.Context, username string) (bool, error) {
+	err := d.DB.QueryRowxContext(ctx, qVerifyUser, username).Scan(&username)
+	if err == nil {
+		return false, nil
+	}
+	if err != sql.ErrNoRows {
+		err = errors.Wrapf(err, "QueryRowxContext [%s]", username)
+		return false, err
+	}
+	return true, nil
 }
