@@ -3,9 +3,13 @@ package model
 // Delivery injected to backend/delivery
 type Delivery struct {
 	Port       int    `yaml:"http_port"`
-	StaticPath string `yaml:"static_path"`
 	CookieName string `yaml:"cookie_name"`
 	ByPass     bool   `yaml:"bypass"`
+}
+
+// View injected to backend/view
+type View struct {
+	Path string `yaml:"static_path"`
 }
 
 // Repository injected to backend/repository

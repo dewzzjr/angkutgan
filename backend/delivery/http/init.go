@@ -13,7 +13,7 @@ import (
 // HTTP delivery object
 type HTTP struct {
 	Router *httprouter.Router
-	Static *httprouter.Router
+	View   *httprouter.Router
 	Config model.Delivery
 	users  iUsers
 	items  iItems
@@ -21,10 +21,10 @@ type HTTP struct {
 }
 
 // New initiate delivery/http
-func New(cfg model.Delivery, u *usecase.Usecase) *HTTP {
+func New(cfg model.Delivery, v *httprouter.Router, u *usecase.Usecase) *HTTP {
 	return &HTTP{
 		Router: httprouter.New(),
-		Static: httprouter.New(),
+		View:   v,
 		Config: cfg,
 		// users: u.Users,
 		users: bypass(u.Users, cfg.ByPass),

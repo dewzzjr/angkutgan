@@ -1,7 +1,15 @@
 delivery:
   http_port: 8000
+  cookie_name: HelloSession
+view:
+  static_path: ../frontend
+users:
+  jwt_key: [INSERT HERE]
+  token_expiry: 5 #inminutes
+  refresh_token: 1 #inseconds
 repository:
-  db_name: 
-  db_host: 
-  db_user: 
-  db_pass: 
+  db_host: [INSERT HERE]
+  db_name: [INSERT HERE]
+  db_user: [INSERT HERE]
+  db_pass: [INSERT HERE]
+  default_pass: [INSERT HERE]

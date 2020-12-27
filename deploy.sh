@@ -21,6 +21,6 @@ read -s password
 
 for i in $file
 do
-    `mysql --host=$host --user=$username --password=$password --database=$dbname --execute=./deploy/$i`
+    `mysql --host=$host --user=$username --password=$password --database=$dbname --execute=./queries/$i`
 done
 

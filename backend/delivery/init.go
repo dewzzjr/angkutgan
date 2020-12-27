@@ -3,6 +3,8 @@ package delivery
 import (
 	"flag"
 
+	"github.com/dewzzjr/angkutgan/backend/view"
+
 	"github.com/dewzzjr/angkutgan/backend/delivery/http"
 	"github.com/dewzzjr/angkutgan/backend/package/config"
 	"github.com/dewzzjr/angkutgan/backend/usecase"
@@ -10,16 +12,16 @@ import (
 
 // Delivery object
 type Delivery struct {
-	http    *http.HTTP
-	usecase *usecase.Usecase
+	http *http.HTTP
+	html *view.View
 }
 
 // New initiate delivery
-func New(u *usecase.Usecase) *Delivery {
+func New(v *view.View, u *usecase.Usecase) *Delivery {
 	cfg := config.Get()
 	return &Delivery{
-		http:    http.New(cfg.Delivery, u),
-		usecase: u,
+		http: http.New(cfg.Delivery, v.Router, u),
+		html: v,
 	}
 }
 
@@ -32,6 +34,7 @@ func (d *Delivery) Start() {
 
 	switch service {
 	case "http":
+		d.html.Run()
 		d.http.Run()
 	default:
 	}

@@ -30,6 +30,5 @@ func (h *HTTP) Routing() {
 	h.Router.GET("/item/:code", h.GetItemByCode)
 	h.Router.PATCH("/item/:code", h.PatchItemByCode)
 	h.Router.DELETE("/item/:code", h.DeleteItemByCode)
-	h.Static.ServeFiles("/*filepath", http.Dir(h.Config.StaticPath))
-	h.Router.NotFound = h.Static
+	h.Router.NotFound = h.View
 }

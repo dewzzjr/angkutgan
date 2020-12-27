@@ -1,0 +1,39 @@
+{{ define "barang/ubah" }}
+<!-- UBAH -->
+<div class="tab-pane fade" id="edit" role="tabpanel">
+    <form id="formEdit">
+        <div class="form-group ">
+            <label for="newCodeEdit">Kode</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary" type="button" id="setEdit">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+                <select name="code" class="form-control autocomplete" id="newCodeEdit" data-url="testdata/barang.json"
+                    autocomplete="off"></select>
+            </div>
+            <input type="hidden" id="codeEdit" />
+        </div>
+        <div class="form-group">
+            <label for="nameEdit">Nama Barang</label>
+            <input name="name" type="text" class="form-control" id="nameEdit" value="Mainframe">
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label for="stockEdit">Stok</label>
+                <input name="stock" type="number" class="form-control" id="stockEdit" value="100">
+                <small class="form-text text-muted">
+                    Jumlah barang yang sekarang sedang disewa adalah 10 batang
+                </small>
+            </div>
+            <div class="form-group col-6">
+                <label for="unitEdit">Satuan</label>
+                <input name="unit" type="text" class="form-control" id="unitEdit" value="Batang">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+</div>
+<!-- END UBAH -->
+{{ end }}

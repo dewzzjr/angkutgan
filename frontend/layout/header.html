@@ -1,0 +1,44 @@
+{{ define "header" }}
+<!-- HEADER -->
+<header class="navbar navbar-expand navbar-light flex-column flex-md-row">
+    <!-- GENERAL HEADER -->
+    <a class="navbar-brand text-title" href="#">
+        <img src="assets/img/logo.webp" />
+        <span class="bold">Scaffolding </span>Samarinda
+    </a>
+    <div class="navbar-nav-scroll">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link">Barang</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pelanggan.html">Pelanggan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="penyewaan.html">Penyewaan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="penjualan.html">Penjualan</a>
+            </li>
+        </ul>
+    </div>
+    <!-- END GENERAL HEADER -->
+
+    <!-- DYNAMIC HEADER -->
+    <ul class="navbar-nav ml-md-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="admin.html">Admin</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">[username]</a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item">Edit Profile</a>
+                <a class="dropdown-item">Ubah Password</a>
+                <a class="dropdown-item">Keluar</a>
+            </div>
+        </li>
+    </ul>
+    <!-- END DYNAMIC HEADER -->
+</header>
+<!-- END HEADER -->
+{{ end }}
