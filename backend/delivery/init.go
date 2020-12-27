@@ -20,7 +20,7 @@ type Delivery struct {
 func New(v *view.View, u *usecase.Usecase) *Delivery {
 	cfg := config.Get()
 	return &Delivery{
-		http: http.New(cfg.Delivery, v.Router, u),
+		http: http.New(cfg.Delivery, v, u),
 		html: v,
 	}
 }

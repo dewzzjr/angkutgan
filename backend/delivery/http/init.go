@@ -6,6 +6,7 @@ import (
 
 	"github.com/dewzzjr/angkutgan/backend/model"
 	"github.com/dewzzjr/angkutgan/backend/usecase"
+	"github.com/dewzzjr/angkutgan/backend/view"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 )
@@ -13,7 +14,7 @@ import (
 // HTTP delivery object
 type HTTP struct {
 	Router *httprouter.Router
-	View   *httprouter.Router
+	View   *view.View
 	Config model.Delivery
 	users  iUsers
 	items  iItems
@@ -21,11 +22,11 @@ type HTTP struct {
 }
 
 // New initiate delivery/http
-func New(cfg model.Delivery, v *httprouter.Router, u *usecase.Usecase) *HTTP {
+func New(cfg model.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
 	return &HTTP{
 		Router: httprouter.New(),
-		View:   v,
 		Config: cfg,
+		View:   v,
 		// users: u.Users,
 		users: bypass(u.Users, cfg.ByPass),
 		items: u.Items,

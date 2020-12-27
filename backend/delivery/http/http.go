@@ -19,7 +19,7 @@ func (h *HTTP) Run() {
 // Routing add routing pattern
 func (h *HTTP) Routing() {
 	h.Router.POST("/user/login", h.Login)
-	h.Router.POST("/user/logout", h.Login)
+	h.Router.POST("/user/logout", h.Logout)
 	h.Router.POST("/user/session", h.Refresh)
 	h.Router.GET("/user/info", h.GetUserInfo)
 
@@ -30,5 +30,5 @@ func (h *HTTP) Routing() {
 	h.Router.GET("/item/:code", h.GetItemByCode)
 	h.Router.PATCH("/item/:code", h.PatchItemByCode)
 	h.Router.DELETE("/item/:code", h.DeleteItemByCode)
-	h.Router.NotFound = h.View
+	h.Router.NotFound = h.View.Router
 }

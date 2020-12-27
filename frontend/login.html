@@ -2,16 +2,40 @@
 <html>
 
 <head>
-    <title>Login</title>
-    {{ template "css"}}
+	<title>Login</title>
+	{{ template "css"}}
 </head>
 
 <body>
-    <!-- CONTAINER -->
-    LOGIN
-    <!-- END CONTAINER -->
-    {{ template "js" }}
-    <script src="assets/js/login.js"></script>
+	<!-- CONTAINER -->
+	<div class="container-fluid d-flex justify-content-center fill">
+		<div class="row align-items-center">
+			<div class="card col">
+				<form id="login">
+					<div class="card-body">
+						<div class="form-group">
+							<label for="username">Username</label>
+							<input type="text" class="form-control" id="username">
+						</div>
+						<div class="form-group">
+							<label for="password">Password</label>
+							<input type="password" class="form-control" id="password">
+						</div>
+						<div class="alert alert-warning fade" role="alert">
+							<span id="message"></span>
+							<button type="button" class="close">
+								<span>&times;</span>
+							</button>
+						</div>
+						<button class="btn btn-primary" type="submit">Login</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- END CONTAINER -->
+	{{ template "js" }}
+	<script src="assets/js/login.js"></script>
 </body>
 
 </html>

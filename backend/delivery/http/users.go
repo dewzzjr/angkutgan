@@ -48,6 +48,18 @@ func (h *HTTP) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params
 	return
 }
 
+// Logout remove cookie
+func (h *HTTP) Logout(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	http.SetCookie(w, &http.Cookie{
+		Name:    h.Config.CookieName,
+		Expires: time.Now(),
+	})
+	response.JSON(w, map[string]interface{}{
+		"result": "OK",
+	})
+	return
+}
+
 // Refresh jwt token
 func (h *HTTP) Refresh(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	ctx := r.Context()
