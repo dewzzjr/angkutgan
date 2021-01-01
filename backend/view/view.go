@@ -21,6 +21,7 @@ func (v *View) Routing() {
 	v.Router.GET("/", v.HTML("index"))
 	v.Router.GET("/login", v.HTML("login"))
 	v.Router.GET("/barang", v.HTML("barang"))
+	v.Router.GET("/pelanggan", v.HTML("pelanggan"))
 	v.Static.ServeFiles("/assets/*filepath", http.Dir(v.Config.Path+"/assets"))
 	v.Router.NotFound = v.Static
 }
@@ -37,8 +38,11 @@ func (v *View) Load() {
 		"/barang/daftar.html",
 		"/barang/tambah.html",
 		"/barang/ubah.html",
-		"/barang/jual.html",
-		"/barang/sewa.html",
+		"/barang/harga.html",
+		"/pelanggan/index.html",
+		"/pelanggan/daftar.html",
+		"/pelanggan/tambah.html",
+		"/pelanggan/ubah.html",
 	)
 }
 

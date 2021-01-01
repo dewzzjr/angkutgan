@@ -163,7 +163,9 @@ const qGetUserLogin = `SELECT
 FROM
 	users
 JOIN
-	user_info ON user_info.user_id = users.id AND users.username = ?
+	user_info ON user_info.user_id = users.id
+WHERE
+	users.username = ?
 `
 
 // GetUserLogin get user login information
@@ -183,9 +185,11 @@ const qGetUAM = `SELECT
 FROM
 	users
 JOIN
-	user_access ON users.id = user_access.user_id AND users.id = ?
+	user_access ON users.id = user_access.user_id
 JOIN
 	access ON user_access.access_id = access.id
+WHERE
+	users.id = ?
 `
 
 // GetUAM get user access by username
@@ -195,6 +199,7 @@ func (d *Database) GetUAM(ctx context.Context, uid int64) (access []string, err 
 		err = errors.Wrapf(err, "QueryxContext [%d]", uid)
 		return
 	}
+	access = make([]string, 0)
 	for rows.Next() {
 		var uam string
 		if err = rows.Scan(&uam, &uid); err != nil {
@@ -206,7 +211,8 @@ func (d *Database) GetUAM(ctx context.Context, uid int64) (access []string, err 
 	return
 }
 
-const qIsValidUsername = `SELECT username
+const qIsValidUsername = `SELECT
+	username
 FROM
 	users
 WHERE

@@ -36,6 +36,36 @@ func (h *HTTP) AJAX(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 			})
 			return
 		}
+		if action == "validate_code_item" {
+			var message string
+			ok, err := h.ajax.IsValidItemCode(ctx, r.FormValue("new"))
+			if err != nil {
+				message = "gagal validasi"
+				log.Print(err)
+			}
+			if !ok {
+				message = "kode sudah dipakai"
+			}
+			if message != "" {
+				response.JSON(w, map[string]interface{}{
+					"valid":   false,
+					"message": message,
+				})
+				return
+			}
+			response.JSON(w, map[string]interface{}{
+				"valid": true,
+			})
+			return
+		}
+		if action == "items" {
+			result, err := h.ajax.GetItems(ctx, r.FormValue("q"))
+			if err != nil {
+				log.Print(err)
+			}
+			response.JSON(w, result)
+			return
+		}
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}

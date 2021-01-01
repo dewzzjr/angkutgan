@@ -40,6 +40,13 @@ func (i *Items) Get(ctx context.Context, code string) (item model.Item, err erro
 func (i *Items) Create(ctx context.Context, item model.Item, actionBy int64) (err error) {
 	if err = i.database.UpdateInsertItem(ctx, item, actionBy); err != nil {
 		err = errors.Wrap(err, "UpdateInsertItem")
+		return
+	}
+	if err = i.database.ReplaceStock(ctx, item.Code, model.Stock{
+		Inventory: item.Stock,
+		Asset:     item.Stock,
+	}, actionBy); err != nil {
+		err = errors.Wrap(err, "ReplaceStock")
 	}
 	return
 }
@@ -64,7 +71,19 @@ func (i *Items) Update(ctx context.Context, item model.Item, actionBy int64) (er
 		}
 	}
 	if item.Price.Rent != nil {
-		err = i.UpdatePriceRent(ctx, item.Code, get.Price.Rent, item.Price.Rent)
+		if err = i.UpdatePriceRent(ctx, item.Code, get.Price.Rent, item.Price.Rent); err != nil {
+			err = errors.Wrap(err, "UpdatePriceRent")
+			return
+		}
+	}
+	if item.Stock != 0 && get.Available.Asset != item.Stock {
+		if err = i.database.ReplaceStock(ctx, item.Code, model.Stock{
+			Asset:     item.Stock,
+			Inventory: get.Available.Inventory + item.Stock - get.Available.Asset,
+		}, actionBy); err != nil {
+			err = errors.Wrap(err, "ReplaceStock")
+			return
+		}
 	}
 	return
 }

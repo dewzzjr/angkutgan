@@ -54,4 +54,6 @@ type iItems interface {
 
 type iAjax interface {
 	IsValidUsername(ctx context.Context, newUsername, oldUsername string) (ok bool, err error)
+	IsValidItemCode(ctx context.Context, code string) (ok bool, err error)
+	GetItems(ctx context.Context, keyword string) (values []model.AutoComplete, err error)
 }

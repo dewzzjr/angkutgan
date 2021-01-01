@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"strings"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
@@ -10,42 +11,96 @@ import (
 )
 
 const qGetListItems = `SELECT
-	code, name, unit
+	items.code, 
+	name, 
+	unit, 
+	COALESCE(value, 0),
+	COALESCE(inventory, 0),
+	COALESCE(asset, 0)
 FROM
-	items
+	items 
+LEFT JOIN 
+	price_sell ON items.code = price_sell.code
+LEFT JOIN
+	stock ON items.code = stock.code
 ORDER BY 
-	create_time DESC
+	items.create_time DESC
 LIMIT ? OFFSET ?
 `
 
 // GetListItems using pagination
 func (d *Database) GetListItems(ctx context.Context, limit, offset int) (items []model.Item, err error) {
-	if err = d.DB.SelectContext(ctx, &items, qGetListItems, limit, offset); err != nil {
-		err = errors.Wrapf(err, "SelectContext [%d, %d]", limit, offset)
+	var rows *sqlx.Rows
+	if rows, err = d.DB.QueryxContext(ctx, qGetListItems, limit, offset); err != nil {
+		err = errors.Wrapf(err, "QueryxContext [%d, %d]", limit, offset)
+		return
+	}
+	items = make([]model.Item, 0)
+	for rows.Next() {
+		var item model.Item
+		if err = rows.Scan(
+			&item.Code,
+			&item.Name,
+			&item.Unit,
+			&item.Price.Sell,
+			&item.Available.Inventory,
+			&item.Available.Asset,
+		); err != nil {
+			err = errors.Wrapf(err, "Scan [%d, %d]", limit, offset)
+			continue
+		}
+		items = append(items, item)
 	}
 	return
 }
 
 const qGetListItemsByKeyword = `SELECT
-	code, name, unit
+	items.code, 
+	name, 
+	unit, 
+	COALESCE(value, 0),
+	COALESCE(inventory, 0),
+	COALESCE(asset, 0)
 FROM
-	items
+	items 
+LEFT JOIN 
+	price_sell ON items.code = price_sell.code
+LEFT JOIN
+	stock ON items.code = stock.code
 WHERE
-	code = ? OR UPPER(name) LIKE CONCAT('%', ?, '%')
-ORDER BY 
-	create_time DESC
+	items.code = ? OR UPPER(name) LIKE CONCAT('%', ?, '%')
+ORDER BY
+	items.create_time DESC
 LIMIT ? OFFSET ?
 `
 
 // GetListItemsByKeyword by keyword using pagination
 func (d *Database) GetListItemsByKeyword(ctx context.Context, keyword string, limit, offset int) (items []model.Item, err error) {
-	if err = d.DB.SelectContext(ctx, &items, qGetListItemsByKeyword,
+	var rows *sqlx.Rows
+	if rows, err = d.DB.QueryxContext(ctx, qGetListItemsByKeyword,
 		strings.ToUpper(keyword),
 		strings.ToUpper(keyword),
 		limit,
 		offset,
 	); err != nil {
-		err = errors.Wrapf(err, "SelectContext [%d, %d, %s]", limit, offset, keyword)
+		err = errors.Wrapf(err, "QueryxContext [%d, %d, %s]", limit, offset, keyword)
+		return
+	}
+	items = make([]model.Item, 0)
+	for rows.Next() {
+		var item model.Item
+		if err = rows.Scan(
+			&item.Code,
+			&item.Name,
+			&item.Unit,
+			&item.Price.Sell,
+			&item.Available.Inventory,
+			&item.Available.Asset,
+		); err != nil {
+			err = errors.Wrapf(err, "Scan [%d, %d, %s]", limit, offset, keyword)
+			continue
+		}
+		items = append(items, item)
 	}
 	return
 }
@@ -147,6 +202,7 @@ WHERE
 
 // GetPriceRent list of price rent by code item
 func (d *Database) GetPriceRent(ctx context.Context, code string) (prices []model.PriceRent, err error) {
+	prices = make([]model.PriceRent, 0)
 	if err = d.DB.SelectContext(ctx, &prices, qGetPrintRent, code); err != nil {
 		err = errors.Wrapf(err, "SelectContext [%s]", code)
 	}
@@ -184,11 +240,17 @@ const qGetItemDetail = `SELECT
 	items.code, 
 	name, 
 	unit, 
-	value
+	COALESCE(value, 0),
+	COALESCE(inventory, 0),
+	COALESCE(asset, 0)
 FROM
 	items 
 LEFT JOIN 
-	price_sell ON items.code = price_sell.code AND items.code = ?
+	price_sell ON items.code = price_sell.code
+LEFT JOIN
+	stock ON items.code = stock.code
+WHERE
+	items.code = ?
 `
 
 // GetItemDetail get item detail by code
@@ -199,6 +261,8 @@ func (d *Database) GetItemDetail(ctx context.Context, code string) (item model.I
 		&item.Name,
 		&item.Unit,
 		&item.Price.Sell,
+		&item.Available.Inventory,
+		&item.Available.Asset,
 	); err != nil {
 		err = errors.Wrapf(err, "QueryRowxContext [%s]", code)
 		return
@@ -256,4 +320,25 @@ func (d *Database) DeleteItem(ctx context.Context, code string) (err error) {
 		err = errors.Wrapf(err, "Commit [%s]", code)
 	}
 	return
+}
+
+const qIsValidItemCode = `SELECT
+	code
+FROM
+	items
+WHERE
+	code = ?
+`
+
+// IsValidItemCode check is code is valid or not to be use
+func (d *Database) IsValidItemCode(ctx context.Context, code string) (bool, error) {
+	err := d.DB.QueryRowxContext(ctx, qIsValidItemCode, code).Scan(&code)
+	if err == nil {
+		return false, nil
+	}
+	if err != sql.ErrNoRows {
+		err = errors.Wrapf(err, "QueryRowxContext [%s]", code)
+		return false, err
+	}
+	return true, nil
 }

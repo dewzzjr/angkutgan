@@ -1,0 +1,92 @@
+{{ define "pelanggan/daftar" }}
+<!-- DAFTAR -->
+<div class="tab-pane fade" id="list" role="tabpanel">
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown">Cari</button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" value="code">Kode</a>
+                <a class="dropdown-item" href="#" value="keyword">Nama</a>
+            </div>
+        </div>
+        <input type="text" class="form-control" placeholder="masukkan kata kunci">
+    </div>
+    <table class="table" id="tablePelanggan">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nama</th>
+                <th scope="col">Lokasi</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">SEJAH</th>
+                <td>PT. Sejahtera Indah</td>
+                <td>Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur
+                    75122</td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#SEJAH"
+                            data-parent="#tablePelanggan" class="collapsed">Detail</button>
+                        <button type="button" class="btn btn-warning">Ubah</button>
+                        <button type="button" class="btn btn-danger">Hapus</button>
+                    </div>
+                </td>
+            </tr>
+            <tr class="collapse" id="SEJAH">
+                <th class="text-right" scope="row" colspan="2">
+                    <p>Jenis: </p>
+                    <p>NIK: </p>
+                    <p>Nama: </p>
+                    <p>No. Telp: </p>
+                </th>
+                <td colspan="3">
+                    <p>PT</p>
+                    <p>3322181182780001</p>
+                    <p>Eko Patrio</p>
+                    <p>085-777-169-123</p>
+
+                    <button type="button" class="btn btn-info">
+                        Cetak Surat Perjanjian Kerja Sama
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">FADIL</th>
+                <td>Firman Adi Laksana</td>
+                <td>Jl. Siti Aisyah No.20, Tlk. Lerong Ilir, Kec. Samarinda Ulu, Kota Samarinda,
+                    Kalimantan Timur 75243</td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#FADIL"
+                            data-parent="#tablePelanggan" class="collapsed">Detail</button>
+                        <button type="button" class="btn btn-warning">Ubah</button>
+                        <button type="button" class="btn btn-danger">Hapus</button>
+                    </div>
+                </td>
+            </tr>
+            <tr class="collapse" id="FADIL">
+                <th class="text-right" scope="row" colspan="2">
+                    <p>Jenis: </p>
+                    <p>NIK: </p>
+                    <p>Nama: </p>
+                    <p>No. Telp: </p>
+                </th>
+                <td colspan="3">
+                    <p>Perorangan</p>
+                    <p>3322181182780002</p>
+                    <p>Firman Adi Laksana</p>
+                    <p>081-666-169-444</p>
+
+                    <button type="button" class="btn btn-info">
+                        Cetak Surat Perjanjian Kerja Sama
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- END DAFTAR -->
+{{ end }}

@@ -27,4 +27,6 @@ type iDatabase interface {
 	ReplacePriceSell(ctx context.Context, code string, value int, actionBy int64) (err error)
 	InsertDeleteRentPrice(ctx context.Context, code string, insert []model.PriceRent, delete []int64) (err error)
 	DeleteItem(ctx context.Context, code string) (err error)
+
+	ReplaceStock(ctx context.Context, code string, stock model.Stock, actionBy int64) (err error)
 }

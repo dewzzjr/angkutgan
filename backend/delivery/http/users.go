@@ -41,6 +41,7 @@ func (h *HTTP) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params
 		Name:    h.Config.CookieName,
 		Value:   tokenString,
 		Expires: expirationTime,
+		Path:    "/",
 	})
 	response.JSON(w, map[string]interface{}{
 		"result": claims,
@@ -81,6 +82,7 @@ func (h *HTTP) Refresh(w http.ResponseWriter, r *http.Request, p httprouter.Para
 		Name:    h.Config.CookieName,
 		Value:   tokenString,
 		Expires: expirationTime,
+		Path:    "/",
 	})
 	response.JSON(w, map[string]interface{}{
 		"result": claims,

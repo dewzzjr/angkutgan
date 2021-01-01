@@ -24,6 +24,7 @@ func (h *HTTP) Routing() {
 	h.Router.GET("/user/info", h.GetUserInfo)
 
 	h.Router.POST("/user/create", h.CreateUser)
+	h.Router.GET("/ajax", h.AJAX)
 
 	h.Router.GET("/items", h.GetItems)
 	h.Router.POST("/item", h.PostItemByCode)

@@ -53,13 +53,13 @@ func (h *HTTP) PatchItemByCode(w http.ResponseWriter, r *http.Request, p httprou
 	if !ok {
 		return
 	}
-	payload := model.Item{
-		Code: p.ByName("code"),
-	}
+	payload := model.Item{}
+	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	payload.Code = p.ByName("code")
 	if err := h.items.Update(ctx, payload, claims.UserID); err != nil {
 		response.Error(w, err)
 		return
@@ -78,6 +78,7 @@ func (h *HTTP) PostItemByCode(w http.ResponseWriter, r *http.Request, p httprout
 		return
 	}
 	payload := model.Item{}
+	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

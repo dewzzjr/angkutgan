@@ -2,6 +2,8 @@ package ajax
 
 import (
 	"context"
+
+	"github.com/dewzzjr/angkutgan/backend/model"
 )
 
 // Ajax usecase object
@@ -18,4 +20,6 @@ func New(database iDatabase) *Ajax {
 
 type iDatabase interface {
 	IsValidUsername(ctx context.Context, username string) (bool, error)
+	IsValidItemCode(ctx context.Context, code string) (bool, error)
+	GetListItemsByKeyword(ctx context.Context, keyword string, limit, offset int) (items []model.Item, err error)
 }
