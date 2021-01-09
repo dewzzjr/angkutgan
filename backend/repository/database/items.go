@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"reflect"
 	"strings"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
@@ -35,21 +36,8 @@ func (d *Database) GetListItems(ctx context.Context, limit, offset int) (items [
 		err = errors.Wrapf(err, "QueryxContext [%d, %d]", limit, offset)
 		return
 	}
-	items = make([]model.Item, 0)
-	for rows.Next() {
-		var item model.Item
-		if err = rows.Scan(
-			&item.Code,
-			&item.Name,
-			&item.Unit,
-			&item.Price.Sell,
-			&item.Available.Inventory,
-			&item.Available.Asset,
-		); err != nil {
-			err = errors.Wrapf(err, "Scan [%d, %d]", limit, offset)
-			continue
-		}
-		items = append(items, item)
+	if items, err = d.GetRentByCodes(ctx, rows); err != nil {
+		err = errors.Wrapf(err, "GetRentByCodes [%d, %d]", limit, offset)
 	}
 	return
 }
@@ -86,6 +74,31 @@ func (d *Database) GetListItemsByKeyword(ctx context.Context, keyword string, li
 		err = errors.Wrapf(err, "QueryxContext [%d, %d, %s]", limit, offset, keyword)
 		return
 	}
+	if items, err = d.GetRentByCodes(ctx, rows); err != nil {
+		err = errors.Wrapf(err, "GetRentByCodes [%d, %d, %s]", limit, offset, keyword)
+	}
+	return
+}
+
+const qGetRentByCodes = `SELECT
+	id,
+	code,
+	description,
+	duration,
+	time_unit,
+	value
+FROM
+	price_rent
+WHERE
+	code IN (?)
+ORDER BY 
+	code ASC
+`
+
+// GetRentByCodes bulk multiple code
+func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows) (items []model.Item, err error) {
+	var i int
+	index := make(map[string]int)
 	items = make([]model.Item, 0)
 	for rows.Next() {
 		var item model.Item
@@ -97,10 +110,42 @@ func (d *Database) GetListItemsByKeyword(ctx context.Context, keyword string, li
 			&item.Available.Inventory,
 			&item.Available.Asset,
 		); err != nil {
-			err = errors.Wrapf(err, "Scan [%d, %d, %s]", limit, offset, keyword)
+			err = errors.Wrapf(err, "Scan")
 			continue
 		}
+		item.Price.Rent = make([]model.PriceRent, 0)
 		items = append(items, item)
+		index[item.Code] = i
+		i++
+	}
+
+	if len(items) == 0 {
+		return
+	}
+
+	q, in, _ := sqlx.In(qGetRentByCodes, reflect.ValueOf(index).MapKeys())
+	if rows, err = d.DB.QueryxContext(ctx, q, in...); err != nil {
+		err = errors.Wrapf(err, "QueryxContext [%v]", in)
+		return
+	}
+
+	for rows.Next() {
+		var rent model.PriceRent
+		var code string
+		if err = rows.Scan(
+			&rent.ID,
+			&code,
+			&rent.Description,
+			&rent.Duration,
+			&rent.TimeUnit,
+			&rent.Value,
+		); err != nil {
+			err = errors.Wrapf(err, "Scan [%v]", in)
+			continue
+		}
+		if i, ok := index[code]; ok {
+			items[i].Price.Rent = append(items[i].Price.Rent, rent)
+		}
 	}
 	return
 }
@@ -149,14 +194,15 @@ INTO
 		description,
 		duration,
 		time_unit,
-		value
+		value,
+		modified_by
 	)
-VALUES ( ?, ?, ?, ?, ? )
+VALUES ( ?, ?, ?, ?, ?, ? )
 `
 )
 
 // InsertDeleteRentPrice insert and delete rent price transaction
-func (d *Database) InsertDeleteRentPrice(ctx context.Context, code string, insert []model.PriceRent, delete []int64) (err error) {
+func (d *Database) InsertDeleteRentPrice(ctx context.Context, code string, insert []model.PriceRent, delete []int64, actionBy int64) (err error) {
 	var tx *sqlx.Tx
 	if tx, err = d.DB.BeginTxx(ctx, nil); err != nil {
 		err = errors.Wrap(err, "BeginTxx")
@@ -176,6 +222,7 @@ func (d *Database) InsertDeleteRentPrice(ctx context.Context, code string, inser
 			i.Duration,
 			i.TimeUnit,
 			i.Value,
+			NullInt64(actionBy),
 		); err != nil {
 			err = errors.Wrapf(err, "ExecContext [%s, %v]", code, i)
 			tx.Rollback()
@@ -282,13 +329,13 @@ WHERE
 `
 	qDeleteSell = `DELETE
 FROM
-	items
+	price_sell
 WHERE
 	code = ?
 `
 	qDeleteRent = `DELETE
 FROM
-	items
+	price_rent
 WHERE
 	code = ?
 `
@@ -301,7 +348,7 @@ func (d *Database) DeleteItem(ctx context.Context, code string) (err error) {
 		err = errors.Wrap(err, "BeginTxx")
 		return
 	}
-	if _, err = tx.ExecContext(ctx, qDeleteItem, code); err != nil {
+	if _, err = tx.ExecContext(ctx, qDeleteRent, code); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s]", code)
 		tx.Rollback()
 		return
@@ -311,7 +358,7 @@ func (d *Database) DeleteItem(ctx context.Context, code string) (err error) {
 		tx.Rollback()
 		return
 	}
-	if _, err = tx.ExecContext(ctx, qDeleteRent, code); err != nil {
+	if _, err = tx.ExecContext(ctx, qDeleteItem, code); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s]", code)
 		tx.Rollback()
 		return

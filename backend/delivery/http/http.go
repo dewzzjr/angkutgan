@@ -31,5 +31,11 @@ func (h *HTTP) Routing() {
 	h.Router.GET("/item/:code", h.GetItemByCode)
 	h.Router.PATCH("/item/:code", h.PatchItemByCode)
 	h.Router.DELETE("/item/:code", h.DeleteItemByCode)
+
+	h.Router.GET("/customers", h.GetCustomers)
+	h.Router.POST("/customer", h.PostCustomerByCode)
+	h.Router.GET("/customer/:code", h.GetCustomerByCode)
+	h.Router.PATCH("/customer/:code", h.PatchCustomerByCode)
+	h.Router.DELETE("/customer/:code", h.DeleteCustomerByCode)
 	h.Router.NotFound = h.View.Router
 }

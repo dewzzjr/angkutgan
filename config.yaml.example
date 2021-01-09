@@ -1,12 +1,12 @@
 delivery:
   http_port: 8000
-  cookie_name: HelloSession
+  cookie_name: AngkutGan
 view:
   static_path: ../frontend
 users:
   jwt_key: [INSERT HERE]
   token_expiry: 5 #inminutes
-  refresh_token: 1 #inseconds
+  refresh_token: 30 #inseconds
 repository:
   db_host: [INSERT HERE]
   db_name: [INSERT HERE]

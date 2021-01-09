@@ -13,12 +13,13 @@ import (
 
 // HTTP delivery object
 type HTTP struct {
-	Router *httprouter.Router
-	View   *view.View
-	Config model.Delivery
-	users  iUsers
-	items  iItems
-	ajax   iAjax
+	Router    *httprouter.Router
+	View      *view.View
+	Config    model.Delivery
+	users     iUsers
+	items     iItems
+	customers iCustomers
+	ajax      iAjax
 }
 
 // New initiate delivery/http
@@ -28,9 +29,10 @@ func New(cfg model.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
 		Config: cfg,
 		View:   v,
 		// users: u.Users,
-		users: bypass(u.Users, cfg.ByPass),
-		items: u.Items,
-		ajax:  u.Ajax,
+		users:     bypass(u.Users, cfg.ByPass),
+		items:     u.Items,
+		customers: u.Customers,
+		ajax:      u.Ajax,
 	}
 }
 
@@ -52,6 +54,14 @@ type iItems interface {
 	Remove(ctx context.Context, code string) (err error)
 }
 
+type iCustomers interface {
+	GetList(ctx context.Context, page int, row int) (customers []model.Customer, err error)
+	GetByKeyword(ctx context.Context, page int, row int, key string) (customers []model.Customer, err error)
+	Get(ctx context.Context, code string) (customer model.Customer, err error)
+	Create(ctx context.Context, customer model.Customer, actionBy int64) (err error)
+	Update(ctx context.Context, customer model.Customer, actionBy int64) (err error)
+	Remove(ctx context.Context, code string) (err error)
+}
 type iAjax interface {
 	IsValidUsername(ctx context.Context, newUsername, oldUsername string) (ok bool, err error)
 	IsValidItemCode(ctx context.Context, code string) (ok bool, err error)

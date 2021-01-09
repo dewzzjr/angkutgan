@@ -12,3 +12,14 @@ func NullInt64(value int64) (result sql.NullInt64) {
 	}
 	return
 }
+
+// NullString use null if default value
+func NullString(value string) (result sql.NullString) {
+	if value != "" {
+		result = sql.NullString{
+			String: value,
+			Valid:  true,
+		}
+	}
+	return
+}

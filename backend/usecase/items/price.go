@@ -9,7 +9,7 @@ import (
 )
 
 // UpdatePriceRent update price rent by item code
-func (i *Items) UpdatePriceRent(ctx context.Context, code string, old, new []model.PriceRent) (err error) {
+func (i *Items) UpdatePriceRent(ctx context.Context, code string, old, new []model.PriceRent, actionBy int64) (err error) {
 	// LOAD INSERT WITH ALL NEW
 	insert := new
 	// LOAD DELETE WITH EMPTY SLICE
@@ -40,7 +40,7 @@ func (i *Items) UpdatePriceRent(ctx context.Context, code string, old, new []mod
 		insert[len(insert)-1], insert[n] = insert[n], insert[len(insert)-1]
 		insert = insert[:len(insert)-1]
 	}
-	if err = i.database.InsertDeleteRentPrice(ctx, code, insert, delete); err != nil {
+	if err = i.database.InsertDeleteRentPrice(ctx, code, insert, delete, actionBy); err != nil {
 		err = errors.Wrapf(err, "InsertDeleteRentPrice [%s]", code)
 	}
 	return

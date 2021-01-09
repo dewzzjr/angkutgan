@@ -355,10 +355,7 @@ $(document).ready(function () {
           Form.Message('success', 'berhasil menambah barang', $('#messageAdd'));
           Loading.End();
           Form.Reset($('#formAdd'), () => {
-            $('#formAdd [name="code"]').val('');
-            $('#formAdd [name="unit"]').val('');
-            $('#formAdd [name="name"]').val('');
-            $('#formAdd [name="stock"]').val('');
+            $('#formAdd input').val('');
           });
         }, () => {
           Form.Message('danger', 'gagal menambah barang', $('#messageAdd'));
