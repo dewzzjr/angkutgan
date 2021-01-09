@@ -1,7 +1,6 @@
 package view
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -22,6 +21,8 @@ func (v *View) Routing() {
 	v.Router.GET("/login", v.HTML("login"))
 	v.Router.GET("/barang", v.HTML("barang"))
 	v.Router.GET("/pelanggan", v.HTML("pelanggan"))
+	v.Router.GET("/penjualan", v.HTML("penjualan"))
+	v.Router.GET("/persewaan", v.HTML("persewaan"))
 	v.Static.ServeFiles("/assets/*filepath", http.Dir(v.Config.Path+"/assets"))
 	v.Router.NotFound = v.Static
 }
@@ -34,6 +35,7 @@ func (v *View) Load() {
 		"/layout/header.html",
 		"/layout/script.html",
 		"/layout/sidebar.html",
+		"/layout/modal.html",
 		"/barang/index.html",
 		"/barang/daftar.html",
 		"/barang/tambah.html",
@@ -43,6 +45,14 @@ func (v *View) Load() {
 		"/pelanggan/daftar.html",
 		"/pelanggan/tambah.html",
 		"/pelanggan/ubah.html",
+		"/persewaan/index.html",
+		"/persewaan/daftar.html",
+		"/persewaan/buat.html",
+		"/penjualan/index.html",
+		"/penjualan/daftar.html",
+		"/penjualan/buat.html",
+		"/pengiriman/keluar.html",
+		"/pengiriman/masuk.html",
 	)
 }
 
@@ -55,19 +65,6 @@ func (v *View) files(path ...string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func (v View) dir(path ...string) {
-	var err error
-	for _, p := range path {
-		pattern := v.root(p) + "/*.html"
-		fmt.Print(pattern)
-		v.Template, err = template.ParseGlob(pattern)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
 }
 
 func (v *View) root(path string) string {

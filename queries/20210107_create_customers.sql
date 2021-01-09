@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS customers (
     code VARCHAR(20) NOT NULL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    -- INDIVIDU (1), GROUP (2),
     type INT NOT NULL,
     address VARCHAR(255) NOT NULL,
     phone VARCHAR(255) NOT NULL,

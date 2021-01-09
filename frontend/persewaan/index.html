@@ -1,0 +1,31 @@
+{{ define "persewaan" }}
+<html>
+
+<head>
+	<title>Persewaan</title>
+	{{ template "css"}}
+</head>
+
+<body>
+	{{ template "header" }}
+	<div class="container-fluid">
+		<div class="row flex-xl-nowrap">
+			{{ template "sidebar/pelanggan" }}
+			<main class="col-md-9">
+				<div class="tab-content" id="tabContent">
+					{{ template "persewaan/daftar" }}
+					{{ template "persewaan/buat" }}
+					{{ template "pengiriman/keluar" }}
+					{{ template "pengiriman/masuk" }}
+				</div>
+			</main>
+		</div>
+	</div>
+	{{ template "modal/perpanjangan" }}
+	{{ template "modal/masuk" }}
+	{{ template "js" }}
+	<script src="/assets/js/persewaan.js"> </script>
+</body>
+
+</html>
+{{ end }}
