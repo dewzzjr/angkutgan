@@ -23,3 +23,14 @@ func NullString(value string) (result sql.NullString) {
 	}
 	return
 }
+
+// NullInt use null if default value
+func NullInt(value int) (result sql.NullInt64) {
+	if value != 0 {
+		result = sql.NullInt64{
+			Int64: int64(value),
+			Valid: true,
+		}
+	}
+	return
+}

@@ -115,7 +115,7 @@ func (h *HTTP) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.P
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	payload.Birthdate, _ = time.Parse("02/01/2006", payload.BirthdateStr)
+	payload.Birthdate, _ = time.Parse(model.DateFormat, payload.BirthdateStr)
 	if err := h.users.Create(ctx, payload, claims.UserID); err != nil {
 		response.Error(w, err)
 		return

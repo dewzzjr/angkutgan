@@ -24,22 +24,6 @@ type PriceRent struct {
 	Value       int      `json:"value" db:"value"`
 }
 
-// A RentUnit specified unit used for rent (Week = 1, Month = 2).
-type RentUnit int
-
-// Rent unit type
-const (
-	Week RentUnit = 1 + iota
-	Month
-)
-
-func (r RentUnit) String() string {
-	return [...]string{
-		"Minggu",
-		"Bulan",
-	}[r-1]
-}
-
 // Stock availability
 type Stock struct {
 	Inventory int `json:"inventory" db:"inventory"`
