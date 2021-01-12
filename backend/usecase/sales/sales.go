@@ -38,6 +38,8 @@ func (i *Sales) CreateTransaction(ctx context.Context, tx model.CreateTransactio
 		items = append(items, item.Code)
 		total += item.Amount * discountedPrice
 	}
+	// TODO check items code is valid
+	_ = items
 	// TODO insert transaction, snapshot, snapshot_item
 	_, _, _ = model.Sales, tx, total
 	return

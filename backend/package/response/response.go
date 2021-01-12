@@ -16,7 +16,7 @@ func JSON(w http.ResponseWriter, object interface{}) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(b)
+	_, _ = w.Write(b)
 }
 
 // Error response when error from internal server

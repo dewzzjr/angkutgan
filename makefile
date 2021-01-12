@@ -39,6 +39,7 @@ config:
 	@echo "please set value in config.yaml"
 
 build:
+	@go mod vendor
 	@./go-build.sh
 
 check:

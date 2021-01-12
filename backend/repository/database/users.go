@@ -79,7 +79,7 @@ func (d *Database) CreateUser(ctx context.Context, data model.UserInfo, actionBy
 	}
 	if _, err = tx.ExecContext(ctx, qCreateUser, data.Username, string(password)); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s]", data.Username)
-		tx.Rollback()
+		_ = tx.Rollback()
 		return
 	}
 
@@ -94,7 +94,7 @@ func (d *Database) CreateUser(ctx context.Context, data model.UserInfo, actionBy
 		NullInt64(actionBy),
 	); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%v]", data)
-		tx.Rollback()
+		_ = tx.Rollback()
 		return
 	}
 	if err = tx.Commit(); err != nil {
@@ -152,7 +152,7 @@ func (d *Database) ChangePassword(ctx context.Context, username, newPassword str
 		err = errors.Wrapf(err, "GenerateFromPassword [%s]", newPassword)
 		return
 	}
-	if _, err = d.DB.ExecContext(ctx, qEditInfo, string(password), username); err != nil {
+	if _, err = d.DB.ExecContext(ctx, qChangePassword, string(password), username); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s, %s]", username, password)
 	}
 	return
@@ -221,7 +221,7 @@ WHERE
 
 // IsValidUsername check is username is valid or not to be use
 func (d *Database) IsValidUsername(ctx context.Context, username string) (bool, error) {
-	err := d.DB.QueryRowxContext(ctx, qVerifyUser, username).Scan(&username)
+	err := d.DB.QueryRowxContext(ctx, qIsValidUsername, username).Scan(&username)
 	if err == nil {
 		return false, nil
 	}

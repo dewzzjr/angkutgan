@@ -211,7 +211,7 @@ func (d *Database) InsertDeleteRentPrice(ctx context.Context, code string, inser
 	for _, d := range delete {
 		if _, err = tx.ExecContext(ctx, qDeleteRentPrice, d, code); err != nil {
 			err = errors.Wrapf(err, "ExecContext [%s, %d]", code, d)
-			tx.Rollback()
+			_ = tx.Rollback()
 			return
 		}
 	}
@@ -225,7 +225,7 @@ func (d *Database) InsertDeleteRentPrice(ctx context.Context, code string, inser
 			NullInt64(actionBy),
 		); err != nil {
 			err = errors.Wrapf(err, "ExecContext [%s, %v]", code, i)
-			tx.Rollback()
+			_ = tx.Rollback()
 			return
 		}
 	}
@@ -350,17 +350,17 @@ func (d *Database) DeleteItem(ctx context.Context, code string) (err error) {
 	}
 	if _, err = tx.ExecContext(ctx, qDeleteRent, code); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s]", code)
-		tx.Rollback()
+		_ = tx.Rollback()
 		return
 	}
 	if _, err = tx.ExecContext(ctx, qDeleteSell, code); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s]", code)
-		tx.Rollback()
+		_ = tx.Rollback()
 		return
 	}
 	if _, err = tx.ExecContext(ctx, qDeleteItem, code); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s]", code)
-		tx.Rollback()
+		_ = tx.Rollback()
 		return
 	}
 	if err = tx.Commit(); err != nil {

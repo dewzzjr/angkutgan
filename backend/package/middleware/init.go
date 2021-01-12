@@ -39,5 +39,4 @@ func (s *statusRecorder) Write(b []byte) (int, error) {
 func (s *statusRecorder) WriteHeader(statusCode int) {
 	s.status = statusCode
 	s.w.WriteHeader(statusCode)
-	return
 }
