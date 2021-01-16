@@ -19,6 +19,7 @@ type HTTP struct {
 	users     iUsers
 	items     iItems
 	customers iCustomers
+	sales     iSales
 	ajax      iAjax
 }
 
@@ -32,6 +33,7 @@ func New(cfg model.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
 		users:     bypass(u.Users, cfg.ByPass),
 		items:     u.Items,
 		customers: u.Customers,
+		sales:     u.Sales,
 		ajax:      u.Ajax,
 	}
 }
@@ -66,4 +68,10 @@ type iAjax interface {
 	IsValidUsername(ctx context.Context, newUsername, oldUsername string) (ok bool, err error)
 	IsValidItemCode(ctx context.Context, code string) (ok bool, err error)
 	GetItems(ctx context.Context, keyword string) (values []model.AutoComplete, err error)
+}
+
+type iSales interface {
+	GetDetail(ctx context.Context, code string, date time.Time) (tx model.Transaction, err error)
+	CreateTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
+	EditTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
 }

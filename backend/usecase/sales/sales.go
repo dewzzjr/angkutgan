@@ -8,9 +8,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// GetSalesDetail by customer code and transaction date
-func (i *Sales) GetSalesDetail(ctx context.Context, code string, date time.Time) (tx model.Transaction, err error) {
-	// TODO get transaction, snapshot, snapshot_item
+// GetDetail by customer code and transaction date
+func (i *Sales) GetDetail(ctx context.Context, code string, date time.Time) (tx model.Transaction, err error) {
+	if tx, err = i.database.GetTransaction(ctx, date, code, model.Sales); err != nil {
+		err = errors.Wrap(err, "GetTransaction")
+		return
+	}
 	if tx.Payment, err = i.payments.GetPayments(ctx, tx.ID); err != nil {
 		err = errors.Wrap(err, "GetPayments")
 		return
@@ -24,23 +27,50 @@ func (i *Sales) GetSalesDetail(ctx context.Context, code string, date time.Time)
 
 // CreateTransaction sales transaction
 func (i *Sales) CreateTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error) {
-	if _, err = time.Parse(model.DateFormat, tx.Date); err != nil {
+	var date time.Time
+	if date, err = time.Parse(model.DateFormat, tx.Date); err != nil {
 		return
 	}
-	var items []string
-	var total int
-	for i, item := range tx.Items {
-		discountedPrice := (100 - tx.Discount) / 100 * item.Price
-		tx.Items[i].Claim = 0
-		tx.Items[i].TimeUnit = 0
-		tx.Items[i].Duration = 0
-		tx.Items[i].Price = discountedPrice
-		items = append(items, item.Code)
-		total += item.Amount * discountedPrice
+	var txID int64
+	if txID, err = i.database.GetTransactionID(ctx, date, tx.Customer, model.Sales); err != nil {
+		err = errors.Wrap(err, "GetTransactionID")
+		return
 	}
-	// TODO check items code is valid
-	_ = items
-	// TODO insert transaction, snapshot, snapshot_item
-	_, _, _ = model.Sales, tx, total
+	if txID != 0 {
+		err = errors.New("transaksi sudah dibuat")
+		return
+	}
+	if err = (&tx).Calculate(model.Sales); err != nil {
+		return
+	}
+	if err = i.database.InsertTransaction(ctx, model.Sales, tx, actionBy); err != nil {
+		err = errors.Wrap(err, "UpdateInsertTransaction")
+		return
+	}
+	return
+}
+
+// EditTransaction sales transaction
+func (i *Sales) EditTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error) {
+	var date time.Time
+	if date, err = time.Parse(model.DateFormat, tx.Date); err != nil {
+		return
+	}
+	var txID int64
+	if txID, err = i.database.GetTransactionID(ctx, date, tx.Customer, model.Sales); err != nil {
+		err = errors.Wrap(err, "GetTransactionID")
+		return
+	}
+	if txID == 0 {
+		err = errors.New("transaksi belum dibuat")
+		return
+	}
+	if err = (&tx).Calculate(model.Sales); err != nil {
+		return
+	}
+	if err = i.database.UpdateTransaction(ctx, txID, model.Sales, tx, actionBy); err != nil {
+		err = errors.Wrap(err, "UpdateInsertTransaction")
+		return
+	}
 	return
 }

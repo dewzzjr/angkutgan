@@ -5,6 +5,9 @@ import "github.com/pkg/errors"
 // DateFormat date format standarization
 const DateFormat = "02/01/2006"
 
+// ParamFormat date format when used as parameter
+const ParamFormat = "20060102"
+
 // CustomerType specified type for customer (Individu = 1, Group = 2).
 type CustomerType int
 
@@ -51,12 +54,20 @@ func (r RentUnit) String() string {
 	}[r-1]
 }
 
+// Valid check rent unit is valid
+func (r RentUnit) Valid() bool {
+	if r == Week || r == Month {
+		return true
+	}
+	return false
+}
+
 // TransactionType specified type for transaction (Sales = 1, Rental = 2).
 type TransactionType int
 
 // Transaction type
 const (
-	Sales CustomerType = 1 + iota
+	Sales TransactionType = 1 + iota
 	Rental
 )
 
