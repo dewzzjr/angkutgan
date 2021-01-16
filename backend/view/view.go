@@ -1,10 +1,12 @@
 package view
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 
+	"github.com/dewzzjr/angkutgan/backend/package/middleware"
 	"github.com/dewzzjr/angkutgan/backend/package/response"
 	"github.com/julienschmidt/httprouter"
 )
@@ -13,6 +15,9 @@ import (
 func (v *View) Run() {
 	v.Load()
 	v.Routing()
+	port := fmt.Sprintf(":%d", v.Config.Port)
+	log.Println("Listening on", port)
+	log.Fatal(http.ListenAndServe(port, middleware.NewLogger(v.Router)))
 }
 
 // Routing add routing pattern
@@ -24,7 +29,9 @@ func (v *View) Routing() {
 	v.Router.GET("/penjualan", v.HTML("penjualan"))
 	v.Router.GET("/persewaan", v.HTML("persewaan"))
 	v.Static.ServeFiles("/assets/*filepath", http.Dir(v.Config.Path+"/assets"))
+	v.Files.ServeFiles("/*filepath", http.Dir(v.Config.Path+"/html"))
 	v.Router.NotFound = v.Static
+	v.Static.NotFound = v.Files
 }
 
 // Load template

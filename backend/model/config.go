@@ -9,6 +9,7 @@ type Delivery struct {
 
 // View injected to backend/view
 type View struct {
+	Port int    `yaml:"http_port"`
 	Path string `yaml:"static_path"`
 }
 

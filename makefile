@@ -40,7 +40,7 @@ config:
 
 build:
 	@go mod vendor
-	@./go-build.sh
+	@./script/go-build.sh
 
 check:
 	@echo $(OSFLAG)

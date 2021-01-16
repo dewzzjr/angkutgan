@@ -1,0 +1,145 @@
+h1,
+h2,
+h3,
+h4,
+h5{
+  font-family: 'Arial', serif !important;
+  font-weight: 700;
+  color: white;
+}
+h6 {
+  font-family: 'Saira Extra Condensed', serif !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+}
+
+p {
+  font-family: 'Arial', sans-serif !important;
+}
+
+small {
+  font-family: 'Saira Extra Condensed', serif !important;
+}
+
+
+h2 {
+  font-size: 3rem !important;
+}
+
+h3 {
+  font-size: 1.5rem !important;
+}
+
+.img-profile {
+  width: 20%;
+  border: 0.5rem solid rgba(255, 255, 255, 0.2);
+}
+
+.address {
+  padding-top: 40px;
+  margin: 10px 20px;
+}
+
+.title-letter {
+  margin: 10px 15px;
+  margin-left: 10%;
+  text-align: -webkit-center;
+}
+
+.title-letter-number{
+  position: relative;
+  bottom: -20px;
+}
+
+/* Styles go here */
+
+.page-header {
+  position: fixed;
+  top: 0;
+  background: white;
+  z-index: 3;
+  display: inline-flex;
+  left:50px;
+  right: 10%;
+  border-bottom: 3px #000 double;
+}
+
+.page-header, .page-header-space {
+  height: 10rem;
+}
+
+.page-header .img{
+  margin: 15px 30px;
+}
+
+.page-footer, .page-footer-space {
+  height: 8rem;
+}
+
+.page-footer {
+  display: none;
+  padding-top: 2mm;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid gray;
+  z-index: 3;
+  font-family: Helvetica, sans-serif;
+}
+
+.page {
+  display: none;
+  page-break-after: always !important;
+}
+
+.resume-section {
+  z-index: 0;
+}
+
+#SuratKirimBiodata table td{
+  height: 60px;
+}
+
+
+#SuratKirimBarang table th{
+  border: 1px solid black;
+  text-align: center;
+}
+
+#SuratKirimBarang table td{
+  border: 1px solid black;
+  text-align: center;
+}
+.vr {
+  border-right: 1px solid #ccc !important;
+}
+
+.fa.white {
+  color: white;
+}
+
+.subheading {
+  font-family: 'Saira Extra Condensed', serif !important;
+  color: rgb(30, 30, 30);
+}
+
+@page {
+  background: white;
+  width: 21cm;
+  height: 29.7cm;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 0.5cm;
+  box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);
+}
+
+@media print {
+   thead {display: table-header-group;} 
+   tfoot {display: table-footer-group; position: fixed;}
+   body {margin: 0;}
+   a {text-decoration: none !important;}
+   .print {display: none !important;}
+   .page {display: block}
+   .page-footer {display: block}
+}
