@@ -67,7 +67,6 @@ func (h *HTTP) PatchCustomerByCode(w http.ResponseWriter, r *http.Request, p htt
 	response.JSON(w, map[string]interface{}{
 		"result": "OK",
 	})
-	return
 }
 
 // PostCustomerByCode create customer detail
@@ -90,7 +89,6 @@ func (h *HTTP) PostCustomerByCode(w http.ResponseWriter, r *http.Request, p http
 	response.JSON(w, map[string]interface{}{
 		"result": "OK",
 	})
-	return
 }
 
 // DeleteCustomerByCode delete customer detail
@@ -109,5 +107,4 @@ func (h *HTTP) DeleteCustomerByCode(w http.ResponseWriter, r *http.Request, p ht
 		"result": "OK",
 	})
 	log.Printf("TRACE %s %s %s", r.Method, r.RequestURI, claims.Username)
-	return
 }

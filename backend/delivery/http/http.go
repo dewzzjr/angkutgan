@@ -37,5 +37,9 @@ func (h *HTTP) Routing() {
 	h.Router.GET("/customer/:code", h.GetCustomerByCode)
 	h.Router.PATCH("/customer/:code", h.PatchCustomerByCode)
 	h.Router.DELETE("/customer/:code", h.DeleteCustomerByCode)
+
+	h.Router.POST("/sales", h.PostSalesTransaction)
+	h.Router.PATCH("/sales", h.PatchSalesTransaction)
+	h.Router.GET("/sales/:customer/:date", h.GetSalesByCustomerDate)
 	h.Router.NotFound = h.View.Router
 }

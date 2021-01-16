@@ -6,6 +6,7 @@ import (
 	"github.com/dewzzjr/angkutgan/backend/usecase/ajax"
 	"github.com/dewzzjr/angkutgan/backend/usecase/customers"
 	"github.com/dewzzjr/angkutgan/backend/usecase/items"
+	"github.com/dewzzjr/angkutgan/backend/usecase/sales"
 	"github.com/dewzzjr/angkutgan/backend/usecase/users"
 )
 
@@ -14,6 +15,7 @@ type Usecase struct {
 	Items     *items.Items
 	Users     *users.Users
 	Customers *customers.Customers
+	Sales     *sales.Sales
 	Ajax      *ajax.Ajax
 }
 
@@ -24,6 +26,7 @@ func New(r *repository.Repository) *Usecase {
 		Items:     items.New(r.Database),
 		Users:     users.New(r.Database, cfg.Users),
 		Customers: customers.New(r.Database),
-		Ajax:      ajax.New(r.Database),
+		// Sales:     sales.New(r.Database),
+		Ajax: ajax.New(r.Database),
 	}
 }

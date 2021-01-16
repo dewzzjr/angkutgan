@@ -257,12 +257,12 @@ func (d *Database) DeleteCustomer(ctx context.Context, code string) (err error) 
 	}
 	if _, err = tx.ExecContext(ctx, qDeleteCustomer, code); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s]", code)
-		tx.Rollback()
+		_ = tx.Rollback()
 		return
 	}
 	if _, err = tx.ExecContext(ctx, qDeleteProjects, code); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%s]", code)
-		tx.Rollback()
+		_ = tx.Rollback()
 		return
 	}
 	if err = tx.Commit(); err != nil {
@@ -300,7 +300,7 @@ func (d *Database) InsertDeleteProject(ctx context.Context, code string, insert 
 	for _, d := range delete {
 		if _, err = tx.ExecContext(ctx, qDeleteProject, d, code); err != nil {
 			err = errors.Wrapf(err, "ExecContext [%s, %d]", code, d)
-			tx.Rollback()
+			_ = tx.Rollback()
 			return
 		}
 	}
@@ -312,7 +312,7 @@ func (d *Database) InsertDeleteProject(ctx context.Context, code string, insert 
 			NullInt64(actionBy),
 		); err != nil {
 			err = errors.Wrapf(err, "ExecContext [%s, %v]", code, i)
-			tx.Rollback()
+			_ = tx.Rollback()
 			return
 		}
 	}

@@ -67,7 +67,6 @@ func (h *HTTP) PatchItemByCode(w http.ResponseWriter, r *http.Request, p httprou
 	response.JSON(w, map[string]interface{}{
 		"result": "OK",
 	})
-	return
 }
 
 // PostItemByCode create item detail
@@ -90,7 +89,6 @@ func (h *HTTP) PostItemByCode(w http.ResponseWriter, r *http.Request, p httprout
 	response.JSON(w, map[string]interface{}{
 		"result": "OK",
 	})
-	return
 }
 
 // DeleteItemByCode delete item detail
@@ -109,5 +107,4 @@ func (h *HTTP) DeleteItemByCode(w http.ResponseWriter, r *http.Request, p httpro
 		"result": "OK",
 	})
 	log.Printf("TRACE %s %s %s", r.Method, r.RequestURI, claims.Username)
-	return
 }

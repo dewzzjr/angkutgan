@@ -11,10 +11,10 @@ Based on Scaffolding Samarinda Project.
 
 ## Run Service
 - make sure `config.yaml` is ready
-- run command `cd backend`
+- run command `go mod vendor`
 - run command `go run .`
 
 ## Deployment
 - make sure `config.yaml` is ready
 - run command `make build`
-- run one of binary from `executable` directory based on environtment 
+- run one of binary from `executable` directory based on environment, run `make check` to make sure the current environment.

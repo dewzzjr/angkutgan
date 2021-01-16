@@ -46,7 +46,6 @@ func (h *HTTP) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params
 	response.JSON(w, map[string]interface{}{
 		"result": claims,
 	})
-	return
 }
 
 // Logout remove cookie
@@ -58,7 +57,6 @@ func (h *HTTP) Logout(w http.ResponseWriter, r *http.Request, p httprouter.Param
 	response.JSON(w, map[string]interface{}{
 		"result": "OK",
 	})
-	return
 }
 
 // Refresh jwt token
@@ -87,7 +85,6 @@ func (h *HTTP) Refresh(w http.ResponseWriter, r *http.Request, p httprouter.Para
 	response.JSON(w, map[string]interface{}{
 		"result": claims,
 	})
-	return
 }
 
 // GetUserInfo get user information
@@ -100,7 +97,6 @@ func (h *HTTP) GetUserInfo(w http.ResponseWriter, r *http.Request, p httprouter.
 	response.JSON(w, map[string]interface{}{
 		"result": claims,
 	})
-	return
 }
 
 // CreateUser add new user information
@@ -123,5 +119,4 @@ func (h *HTTP) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.P
 	response.JSON(w, map[string]interface{}{
 		"result": "OK",
 	})
-	return
 }

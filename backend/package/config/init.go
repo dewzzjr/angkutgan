@@ -28,9 +28,16 @@ func load(path ...string) {
 		if err = yaml.NewDecoder(f).Decode(&config); err != nil {
 			continue
 		}
+		initSameValue()
 	}
 	if config == nil {
 		log.Println("no config loaded")
+	}
+}
+
+func initSameValue() {
+	if config.View.Port == 0 {
+		config.View.Port = config.Delivery.Port
 	}
 }
 

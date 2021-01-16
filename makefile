@@ -39,7 +39,8 @@ config:
 	@echo "please set value in config.yaml"
 
 build:
-	@./go-build.sh
+	@go mod vendor
+	@./script/go-build.sh
 
 check:
 	@echo $(OSFLAG)

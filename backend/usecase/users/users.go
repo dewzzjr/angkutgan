@@ -47,7 +47,7 @@ func (u *Users) CreateSession(ctx context.Context, username string) (claim model
 
 // RefreshSession based on previous claim or session
 func (u *Users) RefreshSession(ctx context.Context, claim *model.Claims) (expire time.Time, ok bool) {
-	if ok = time.Unix(claim.ExpiresAt, 0).Sub(time.Now()) < time.Duration(u.Config.RefreshToken)*time.Second; !ok {
+	if ok = time.Until(time.Unix(claim.ExpiresAt, 0)) < time.Duration(u.Config.RefreshToken)*time.Second; !ok {
 		return
 	}
 	expire = time.Now().Add(time.Duration(u.Config.TokenExpiry) * time.Minute)

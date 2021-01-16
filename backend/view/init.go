@@ -11,6 +11,7 @@ import (
 // View object
 type View struct {
 	Static   *httprouter.Router
+	Files    *httprouter.Router
 	Router   *httprouter.Router
 	Config   model.View
 	Template *template.Template
@@ -22,6 +23,7 @@ func New() *View {
 	return &View{
 		Router: httprouter.New(),
 		Static: httprouter.New(),
+		Files:  httprouter.New(),
 		Config: cfg.View,
 	}
 }

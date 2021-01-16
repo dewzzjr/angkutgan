@@ -1,5 +1,7 @@
 package model
 
+import "errors"
+
 // Transaction is model for Transaksi Penjualan/Persewaan
 type Transaction struct {
 	ID       int64    `json:"id"`
@@ -35,19 +37,6 @@ type SnapshotItem struct {
 	Claim    int      `json:"claim,omitempty" db:"claim"`
 	TimeUnit RentUnit `json:"time_unit,omitempty" db:"time_unit"`
 	Duration int      `json:"duration,omitempty" db:"duration"`
-}
-
-// Payment is model for Pembayaran
-type Payment struct {
-	ID          int64         `json:"id"`
-	Name        string        `json:"name"`
-	Date        string        `json:"date"`
-	Amount      int           `json:"amount"`
-	Method      PaymentMethod `json:"method"`
-	MethodDesc  string        `json:"method_desc"`
-	Account     AccountType   `json:"account"`
-	AccountDesc string        `json:"account_desc"`
-	AcceptBy    string        `json:"accept_by"`
 }
 
 // Shipment is model for Pengiriman
@@ -91,4 +80,40 @@ type CreateTransaction struct {
 	ShippingFee int            `json:"shipping_fee"`
 	Items       []SnapshotItem `json:"items"`
 	TotalPrice  int            `json:"-"`
+}
+
+// Calculate total price transaction by type
+func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
+	var total int
+	switch txType {
+	case Sales:
+		for i, item := range tx.Items {
+			tx.Items[i].Claim = 0
+			tx.Items[i].TimeUnit = 0
+			tx.Items[i].Duration = 0
+
+			price := (100 - tx.Discount) / 100 * item.Price
+			subTotal := item.Amount * price
+
+			tx.Items[i].Price = price
+			total += subTotal
+		}
+	case Rental:
+		for i, item := range tx.Items {
+			if !item.TimeUnit.Valid() {
+				err = errors.New("satuan waktu tidak valid")
+				return
+			}
+			price := (100 - tx.Discount) / 100 * item.Price
+			subTotal := item.Amount * item.Duration * price
+
+			tx.Items[i].Price = price
+			total += subTotal
+		}
+	default:
+		err = errors.New("jenis transaksi tidak valid")
+		return
+	}
+	tx.TotalPrice = total
+	return
 }
