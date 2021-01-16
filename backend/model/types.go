@@ -1,7 +1,5 @@
 package model
 
-import "github.com/pkg/errors"
-
 // DateFormat date format standarization
 const DateFormat = "02/01/2006"
 
@@ -22,20 +20,6 @@ func (c CustomerType) String() string {
 		"Perorangan",
 		"Perusahaan",
 	}[c-1]
-}
-
-// Validate customer
-func (c *Customer) Validate() (err error) {
-	switch c.Type {
-	case Individu:
-		c.Role = ""
-		c.GroupName = ""
-		c.Projects = nil
-	case Group:
-	default:
-		err = errors.Errorf("tipe pelanggan salah")
-	}
-	return
 }
 
 // A RentUnit specified unit used for rent (Week = 1, Month = 2).

@@ -362,6 +362,7 @@ func (d *Database) UpdatePaidDate(ctx context.Context, txID int64, date time.Tim
 }
 
 const qGetTotalPayment = `SELECT
+	(total_price + deposit + shipping_fee) AS amount
 FROM
 	snapshot
 WHERE
@@ -370,7 +371,7 @@ WHERE
 
 // GetTotalPayment get total payment by transaction id
 func (d *Database) GetTotalPayment(ctx context.Context, txID int64) (amount int, err error) {
-	if err = d.DB.QueryRowxContext(ctx, qGetTxID, txID).Scan(&txID); err != nil {
+	if err = d.DB.QueryRowxContext(ctx, qGetTotalPayment, txID).Scan(&amount); err != nil {
 		err = errors.Wrapf(err, "QueryRowxContext [%d]", txID)
 		return
 	}

@@ -20,20 +20,21 @@ type HTTP struct {
 	items     iItems
 	customers iCustomers
 	sales     iSales
+	payments  iPayments
 	ajax      iAjax
 }
 
 // New initiate delivery/http
 func New(cfg model.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
 	return &HTTP{
-		Router: httprouter.New(),
-		Config: cfg,
-		View:   v,
-		// users: u.Users,
+		Router:    httprouter.New(),
+		Config:    cfg,
+		View:      v,
 		users:     bypass(u.Users, cfg.ByPass),
 		items:     u.Items,
 		customers: u.Customers,
 		sales:     u.Sales,
+		payments:  u.Payments,
 		ajax:      u.Ajax,
 	}
 }
@@ -74,4 +75,10 @@ type iSales interface {
 	GetDetail(ctx context.Context, code string, date time.Time) (tx model.Transaction, err error)
 	CreateTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
 	EditTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
+}
+
+type iPayments interface {
+	Add(ctx context.Context, txID int64, pay model.Payment, actionBy int64) (err error)
+	Edit(ctx context.Context, txID int64, pay model.Payment, actionBy int64) (err error)
+	Delete(ctx context.Context, txID int64) (err error)
 }

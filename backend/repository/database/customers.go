@@ -104,6 +104,7 @@ func (d *Database) GetProjectsByCodes(ctx context.Context, rows *sqlx.Rows) (cus
 		index[customer.Code] = i
 		i++
 	}
+	rows.Close()
 
 	if len(customers) == 0 {
 		return
@@ -130,6 +131,7 @@ func (d *Database) GetProjectsByCodes(ctx context.Context, rows *sqlx.Rows) (cus
 			customers[i].Projects = append(customers[i].Projects, project)
 		}
 	}
+	rows.Close()
 	return
 }
 

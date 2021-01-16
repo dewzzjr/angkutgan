@@ -32,9 +32,9 @@ type iDatabase interface {
 }
 
 type iShipment interface {
-	GetShipments(ctx context.Context, txID int64) (ship []model.Shipment, err error)
+	GetByTransactionID(ctx context.Context, txID int64) (ship []model.Shipment, err error)
 }
 
 type iPayments interface {
-	GetPayments(ctx context.Context, txID int64) (pay []model.Payment, err error)
+	GetByTransactionID(ctx context.Context, txID int64) (pay []model.Payment, err error)
 }

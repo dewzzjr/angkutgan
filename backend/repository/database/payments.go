@@ -52,7 +52,7 @@ LIMIT 1
 
 // GetLastPayment last payment in a transaction
 func (d *Database) GetLastPayment(ctx context.Context, txID int64) (payment model.Payment, err error) {
-	if err = d.DB.QueryRowxContext(ctx, qGetLastPayment, txID).StructScan(&txID); err != nil {
+	if err = d.DB.QueryRowxContext(ctx, qGetLastPayment, txID).StructScan(&payment); err != nil {
 		err = errors.Wrapf(err, "QueryRowxContext [%d]", txID)
 		return
 	}
@@ -158,17 +158,12 @@ func (d *Database) DeletePayment(ctx context.Context, txID int64) (err error) {
 }
 
 const qPaidAmount = `SELECT 
-	COALESCE(SUM(
-		CASE account
-			WHEN 100 THEN amount  
-			WHEN 200 THEN amount * -1
-		END
-	), 0) AS paid_amount,
+	COALESCE(SUM(amount), 0) AS paid_amount,
 	COALESCE(DATE_FORMAT(MAX(date), '%d/%m/%Y'), '') AS last_payment
 FROM
 	payments
 WHERE
-	t_id = ?
+	t_id = ? AND account = 100
 `
 
 // GetLastPaidAmount get last date payment and total amount paid

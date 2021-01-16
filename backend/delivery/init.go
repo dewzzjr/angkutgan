@@ -34,7 +34,8 @@ func (d *Delivery) Start() {
 
 	switch service {
 	case "http":
-		d.html.Run()
+		d.html.Load()
+		d.html.Routing()
 		d.http.Run()
 	default:
 	}

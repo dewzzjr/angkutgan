@@ -25,5 +25,7 @@ type iDatabase interface {
 	UpdatePayment(ctx context.Context, txID int64, payment model.Payment, actionBy int64) (err error)
 	DeletePayment(ctx context.Context, txID int64) (err error)
 
+	GetTotalPayment(ctx context.Context, txID int64) (amount int, err error)
 	UpdatePaidDate(ctx context.Context, txID int64, date time.Time) (err error)
+	GetLastPaidAmount(ctx context.Context, txID int64) (amount int, date string, err error)
 }

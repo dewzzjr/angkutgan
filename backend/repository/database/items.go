@@ -118,6 +118,7 @@ func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows) (items [
 		index[item.Code] = i
 		i++
 	}
+	rows.Close()
 
 	if len(items) == 0 {
 		return
@@ -147,6 +148,7 @@ func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows) (items [
 			items[i].Price.Rent = append(items[i].Price.Rent, rent)
 		}
 	}
+	rows.Close()
 	return
 }
 

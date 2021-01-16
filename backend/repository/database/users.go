@@ -199,6 +199,8 @@ func (d *Database) GetUAM(ctx context.Context, uid int64) (access []string, err 
 		err = errors.Wrapf(err, "QueryxContext [%d]", uid)
 		return
 	}
+	defer rows.Close()
+
 	access = make([]string, 0)
 	for rows.Next() {
 		var uam string

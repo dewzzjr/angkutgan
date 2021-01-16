@@ -14,12 +14,12 @@ func (i *Sales) GetDetail(ctx context.Context, code string, date time.Time) (tx 
 		err = errors.Wrap(err, "GetTransaction")
 		return
 	}
-	if tx.Payment, err = i.payments.GetPayments(ctx, tx.ID); err != nil {
-		err = errors.Wrap(err, "GetPayments")
+	if tx.Payment, err = i.payments.GetByTransactionID(ctx, tx.ID); err != nil {
+		err = errors.Wrap(err, "GetByTransactionID")
 		return
 	}
-	if tx.Shipment, err = i.shipment.GetShipments(ctx, tx.ID); err != nil {
-		err = errors.Wrap(err, "GetShipments")
+	if tx.Shipment, err = i.shipment.GetByTransactionID(ctx, tx.ID); err != nil {
+		err = errors.Wrap(err, "GetByTransactionID")
 		return
 	}
 	return

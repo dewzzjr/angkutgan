@@ -1,6 +1,6 @@
 package model
 
-import "errors"
+import "github.com/pkg/errors"
 
 // Transaction is model for Transaksi Penjualan/Persewaan
 type Transaction struct {
@@ -39,24 +39,10 @@ type SnapshotItem struct {
 	Duration int      `json:"duration,omitempty" db:"duration"`
 }
 
-// Shipment is model for Pengiriman
-type Shipment struct {
-	Date  string         `json:"date"`
-	Items []ShipmentItem `json:"items"`
-}
-
 // Return is model for Pengembalian
 type Return struct {
 	Date  string       `json:"date"`
 	Items []ReturnItem `json:"items"`
-}
-
-// ShipmentItem is model for Barang dalam Pengiriman
-type ShipmentItem struct {
-	ID       int64  `json:"id"`
-	Code     string `json:"code"`
-	Amount   int    `json:"amount"`
-	Deadline string `json:"daadline"`
 }
 
 // ReturnItem is model for Barang dalam Pengembalian
