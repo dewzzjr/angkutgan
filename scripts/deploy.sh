@@ -1,6 +1,6 @@
 #!/bin/bash
 
-file=`ls deploy | grep ".sql"`
+file=`ls queries | grep ".sql"`
 
 # Read Username
 echo -n "Host: "

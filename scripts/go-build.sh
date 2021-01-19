@@ -24,6 +24,6 @@ build_package () {
     done
 }
 
-cd script
-build_package "github.com/dewzzjr/angkutgan/backend"
-build_package "github.com/dewzzjr/angkutgan/fileserver"
+cd scripts
+build_package "github.com/dewzzjr/angkutgan/cmd/backend"
+build_package "github.com/dewzzjr/angkutgan/cmd/fileserver"

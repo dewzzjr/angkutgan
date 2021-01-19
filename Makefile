@@ -35,12 +35,12 @@ help:
 	@echo "check: check os type and architechture"
 
 config:
-	@cp -n config.yaml.example config.yaml
+	@cp -n ./configs/angkutgan.yaml.example ./configs/angkutgan.yaml
 	@echo "please set value in config.yaml"
 
 build:
 	@go mod vendor
-	@./script/go-build.sh
+	@./scripts/go-build.sh
 
 check:
 	@echo $(OSFLAG)

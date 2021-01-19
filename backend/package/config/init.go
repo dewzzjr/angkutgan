@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -14,6 +15,9 @@ func init() {
 		load(
 			"./config.yaml",
 			"../config.yaml",
+			"../../config.yaml",
+			"./configs/angkutgan.yaml",
+			"../configs/angkutgan.yaml",
 			"/etc/conf/angkutgan.yaml",
 		)
 	}
@@ -28,17 +32,26 @@ func load(path ...string) {
 		if err = yaml.NewDecoder(f).Decode(&config); err != nil {
 			continue
 		}
-		initSameValue()
+		validate()
 	}
 	if config == nil {
 		log.Println("no config loaded")
 	}
 }
 
-func initSameValue() {
+func validate() {
 	if config.View.Port == 0 {
 		config.View.Port = config.Delivery.Port
 	}
+	config.View.Path = check(config.View.Path, 0)
+}
+
+func check(path string, tries int) string {
+	if _, err := os.Stat(path); os.IsNotExist(err) && tries < 3 {
+		path = "../" + strings.TrimPrefix(path, "/")
+		return check(path, tries+1)
+	}
+	return path
 }
 
 // Load config from specific
