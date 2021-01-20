@@ -18,6 +18,7 @@ func init() {
 			"../../config.yaml",
 			"./configs/angkutgan.yaml",
 			"../configs/angkutgan.yaml",
+			"../../configs/angkutgan.yaml",
 			"/etc/conf/angkutgan.yaml",
 		)
 	}

@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"reflect"
 	"strings"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
@@ -98,6 +97,7 @@ ORDER BY
 // GetRentByCodes bulk multiple code
 func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows) (items []model.Item, err error) {
 	var i int
+	codes := make([]interface{}, 0)
 	index := make(map[string]int)
 	items = make([]model.Item, 0)
 	for rows.Next() {
@@ -115,6 +115,7 @@ func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows) (items [
 		}
 		item.Price.Rent = make([]model.PriceRent, 0)
 		items = append(items, item)
+		codes = append(codes, item.Code)
 		index[item.Code] = i
 		i++
 	}
@@ -123,9 +124,8 @@ func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows) (items [
 	if len(items) == 0 {
 		return
 	}
-
-	q, in, _ := sqlx.In(qGetRentByCodes, reflect.ValueOf(index).MapKeys())
-	if rows, err = d.DB.QueryxContext(ctx, q, in...); err != nil {
+	q, in, _ := sqlx.In(qGetRentByCodes, codes)
+	if rows, err = d.DB.QueryxContext(ctx, d.DB.Rebind(q), in...); err != nil {
 		err = errors.Wrapf(err, "QueryxContext [%v]", in)
 		return
 	}
