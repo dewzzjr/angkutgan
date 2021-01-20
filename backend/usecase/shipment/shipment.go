@@ -19,6 +19,14 @@ func (s *Shipment) GetByTransactionID(ctx context.Context, txID int64) (ship []m
 
 // Add shipment to the transaction by date
 func (s *Shipment) Add(ctx context.Context, txID int64, ship model.Shipment, actionBy int64) (err error) {
+	var items []model.SnapshotItem
+	if items, err = s.database.GetSnapshotItems(ctx, txID); err != nil {
+		err = errors.Wrap(err, "GetSnapshotItems")
+		return
+	}
+	if err = (&ship).Validate(items); err != nil {
+		return
+	}
 	if err = s.database.DeleteInsertShipment(ctx, txID, ship, false, actionBy); err != nil {
 		err = errors.Wrap(err, "DeleteInsertShipment")
 		return
@@ -28,6 +36,20 @@ func (s *Shipment) Add(ctx context.Context, txID int64, ship model.Shipment, act
 
 // Edit the shipment in transaction by date
 func (s *Shipment) Edit(ctx context.Context, txID int64, ship model.Shipment, actionBy int64) (err error) {
+	var items []model.SnapshotItem
+	if items, err = s.database.GetSnapshotItems(ctx, txID); err != nil {
+		err = errors.Wrap(err, "GetSnapshotItems")
+		return
+	}
+	date, _ := time.Parse(model.DateFormat, ship.Date)
+	var get model.Shipment
+	if get, err = s.database.GetShipmentByDate(ctx, txID, date); err != nil {
+		err = errors.Wrap(err, "GetShipmentByDate")
+		return
+	}
+	if err = (&ship).Validate(items, get.Items...); err != nil {
+		return
+	}
 	if err = s.database.DeleteInsertShipment(ctx, txID, ship, true, actionBy); err != nil {
 		err = errors.Wrap(err, "DeleteInsertShipment")
 		return

@@ -10,8 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	qGetTransaction = `SELECT
+const qGetTransaction = `SELECT
 	tx.id,
 	ss.address,
 	ss.total_price,
@@ -43,21 +42,6 @@ JOIN
 LEFT JOIN
 	projects AS pr ON ss.project = pr.id
 `
-	qGetSnapshotItems = `SELECT
-	s.id,
-	s.item,
-	i.name,
-	s.amount,
-	s.price,
-	s.claim,
-	s.time_unit,
-	s.duration
-FROM
-	snapshot_item AS s
-JOIN
-	items AS i ON s.item = i.code AND s.t_id = ?
-`
-)
 
 // GetTransaction by customer code, date, and transaction type
 func (d *Database) GetTransaction(ctx context.Context, date time.Time, code string, txType model.TransactionType) (tx model.Transaction, err error) {
@@ -85,12 +69,39 @@ func (d *Database) GetTransaction(ctx context.Context, date time.Time, code stri
 		&tx.Customer.Role,
 		&tx.Customer.GroupName,
 	); err != nil {
-		err = errors.Wrapf(err, "QueryRowxContext [%s, %s, %v]", txType.String(), code, date)
+		err = errors.Wrapf(err, "QueryRowxContext [%s, %v]", code, date)
 		return
 	}
-	tx.Items = make([]model.SnapshotItem, 0)
-	if err = d.DB.SelectContext(ctx, &tx.Items, qGetSnapshotItems, tx.ID); err != nil {
-		err = errors.Wrapf(err, "SelectContext [%s, %s, %v]", txType.String(), code, date)
+	if tx.Items, err = d.GetSnapshotItems(ctx, tx.ID); err != nil {
+		err = errors.Wrapf(err, "GetSnapshotItems [%s, %v]", code, date)
+	}
+	return
+}
+
+const qGetSnapshotItems = `SELECT
+	s.id,
+	s.item,
+	i.name,
+	s.amount,
+	s.price,
+	s.claim,
+	s.time_unit,
+	s.duration,
+	s.amount - SUM(t.amount) AS need_shipment
+FROM
+	snapshot_item AS s
+JOIN
+	items AS i ON s.item = i.code AND s.t_id = ?
+LEFT JOIN
+	shipment AS t ON t.i_id = s.id
+GROUP BY s.id
+`
+
+// GetSnapshotItems by transaction id
+func (d *Database) GetSnapshotItems(ctx context.Context, txID int64) (items []model.SnapshotItem, err error) {
+	items = make([]model.SnapshotItem, 0)
+	if err = d.DB.SelectContext(ctx, &items, qGetSnapshotItems, txID); err != nil {
+		err = errors.Wrapf(err, "SelectContext [%d]", txID)
 	}
 	return
 }

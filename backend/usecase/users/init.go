@@ -4,17 +4,18 @@ import (
 	"context"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
+	"github.com/dewzzjr/angkutgan/backend/package/config"
 )
 
 // Users usecase object
 type Users struct {
 	database iDatabase
-	Config   model.Users
+	Config   config.Users
 	Key      []byte
 }
 
 // New initiate usecase/users
-func New(database iDatabase, cfg model.Users) *Users {
+func New(database iDatabase, cfg config.Users) *Users {
 	return &Users{
 		database: database,
 		Config:   cfg,

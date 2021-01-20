@@ -18,13 +18,13 @@ func (h *HTTP) Run() {
 
 // Routing add routing pattern
 func (h *HTTP) Routing() {
+	h.Router.GET("/ajax", h.AJAX)
+
+	h.Router.GET("/user/info", h.GetUserInfo)
 	h.Router.POST("/user/login", h.Login)
 	h.Router.POST("/user/logout", h.Logout)
 	h.Router.POST("/user/session", h.Refresh)
-	h.Router.GET("/user/info", h.GetUserInfo)
-
 	h.Router.POST("/user/create", h.CreateUser)
-	h.Router.GET("/ajax", h.AJAX)
 
 	h.Router.GET("/items", h.GetItems)
 	h.Router.POST("/item", h.PostItemByCode)
@@ -42,8 +42,16 @@ func (h *HTTP) Routing() {
 	h.Router.POST("/sales", h.PostSalesTransaction)
 	h.Router.PATCH("/sales", h.PatchSalesTransaction)
 
+	h.Router.GET("/rental/:customer/:date", h.GetRentalByCustomerDate)
+	h.Router.POST("/rental", h.PostRentalTransaction)
+	h.Router.PATCH("/rental", h.PatchRentalTransaction)
+
 	h.Router.POST("/payment/:txid", h.PostPaymentByTxID)
 	h.Router.PATCH("/payment/:txid", h.PatchPaymentByTxID)
 	h.Router.DELETE("/payment/:txid", h.DeletePaymentByTxID)
+
+	h.Router.POST("/shipment/:txid", h.PostShipmentByTxID)
+	h.Router.PATCH("/shipment/:txid", h.PatchShipmentByTxID)
+	h.Router.DELETE("/shipment/:txid", h.DeleteShipmentByTxID)
 	h.Router.NotFound = h.View.Router
 }

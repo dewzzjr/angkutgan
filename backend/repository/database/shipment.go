@@ -84,8 +84,7 @@ func (d *Database) GetShipments(ctx context.Context, txID int64) (shipment []mod
 	return
 }
 
-const (
-	qGetShipmentByDate = `SELECT
+const qGetShipmentByDate = `SELECT
 	s.id AS id,
 	s.i_id AS i_id,
 	i.item AS code,
@@ -95,24 +94,9 @@ FROM
 	shipment s JOIN snapshot_item i ON s.i_id = i.id
 WHERE s.t_id ? AND s.date = ?
 `
-	qGetLastShipmentDate = `SELECT DISTINCT
-	date
-FROM
-	shipment
-WHERE
-	t_id = ?
-ORDER BY date DESC
-LIMIT 1
-`
-)
 
-// GetLastShipment last shipment in a transaction
-func (d *Database) GetLastShipment(ctx context.Context, txID int64) (shipment model.Shipment, err error) {
-	var date time.Time
-	if err = d.DB.QueryRowxContext(ctx, qGetLastShipmentDate, txID).Scan(&date); err != nil {
-		err = errors.Wrapf(err, "QueryRowxContext [%d]", txID)
-		return
-	}
+// GetShipmentByDate shipment by date in a transaction
+func (d *Database) GetShipmentByDate(ctx context.Context, txID int64, date time.Time) (shipment model.Shipment, err error) {
 	shipment = model.Shipment{
 		Date:  date.Format(model.DateFormat),
 		Items: make([]model.ShipmentItem, 0),

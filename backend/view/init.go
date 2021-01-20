@@ -3,7 +3,6 @@ package view
 import (
 	"html/template"
 
-	"github.com/dewzzjr/angkutgan/backend/model"
 	"github.com/dewzzjr/angkutgan/backend/package/config"
 	"github.com/julienschmidt/httprouter"
 )
@@ -13,7 +12,7 @@ type View struct {
 	Static   *httprouter.Router
 	Files    *httprouter.Router
 	Router   *httprouter.Router
-	Config   model.View
+	Config   config.View
 	Template *template.Template
 }
 

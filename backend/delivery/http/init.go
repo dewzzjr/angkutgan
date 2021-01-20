@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
+	"github.com/dewzzjr/angkutgan/backend/package/config"
 	"github.com/dewzzjr/angkutgan/backend/usecase"
 	"github.com/dewzzjr/angkutgan/backend/view"
 	"github.com/dgrijalva/jwt-go"
@@ -15,17 +16,19 @@ import (
 type HTTP struct {
 	Router    *httprouter.Router
 	View      *view.View
-	Config    model.Delivery
+	Config    config.Delivery
 	users     iUsers
 	items     iItems
 	customers iCustomers
 	sales     iSales
+	rental    iRental
 	payments  iPayments
+	shipment  iShipment
 	ajax      iAjax
 }
 
 // New initiate delivery/http
-func New(cfg model.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
+func New(cfg config.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
 	return &HTTP{
 		Router:    httprouter.New(),
 		Config:    cfg,
@@ -34,7 +37,9 @@ func New(cfg model.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
 		items:     u.Items,
 		customers: u.Customers,
 		sales:     u.Sales,
+		rental:    u.Rental,
 		payments:  u.Payments,
+		shipment:  u.Shipment,
 		ajax:      u.Ajax,
 	}
 }
@@ -47,7 +52,6 @@ type iUsers interface {
 	RefreshSession(ctx context.Context, claim *model.Claims) (expire time.Time, ok bool)
 	Create(ctx context.Context, data model.UserInfo, actionBy int64) (err error)
 }
-
 type iItems interface {
 	GetList(ctx context.Context, page int, row int) (items []model.Item, err error)
 	GetByKeyword(ctx context.Context, page int, row int, key string) (items []model.Item, err error)
@@ -56,7 +60,6 @@ type iItems interface {
 	Update(ctx context.Context, item model.Item, actionBy int64) (err error)
 	Remove(ctx context.Context, code string) (err error)
 }
-
 type iCustomers interface {
 	GetList(ctx context.Context, page int, row int) (customers []model.Customer, err error)
 	GetByKeyword(ctx context.Context, page int, row int, key string) (customers []model.Customer, err error)
@@ -70,15 +73,21 @@ type iAjax interface {
 	IsValidItemCode(ctx context.Context, code string) (ok bool, err error)
 	GetItems(ctx context.Context, keyword string) (values []model.AutoComplete, err error)
 }
-
 type iSales interface {
 	GetDetail(ctx context.Context, code string, date time.Time) (tx model.Transaction, err error)
 	CreateTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
 	EditTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
 }
-
+type iRental interface {
+	iSales
+}
 type iPayments interface {
 	Add(ctx context.Context, txID int64, pay model.Payment, actionBy int64) (err error)
 	Edit(ctx context.Context, txID int64, pay model.Payment, actionBy int64) (err error)
 	Delete(ctx context.Context, txID int64) (err error)
+}
+type iShipment interface {
+	Add(ctx context.Context, txID int64, pay model.Shipment, actionBy int64) (err error)
+	Edit(ctx context.Context, txID int64, pay model.Shipment, actionBy int64) (err error)
+	Delete(ctx context.Context, txID int64, date time.Time, actionBy int64) (err error)
 }

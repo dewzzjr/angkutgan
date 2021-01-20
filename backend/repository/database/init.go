@@ -5,18 +5,18 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/dewzzjr/angkutgan/backend/model"
+	"github.com/dewzzjr/angkutgan/backend/package/config"
 	"github.com/jmoiron/sqlx"
 )
 
 // Database repository object
 type Database struct {
 	DB     iDatabase
-	Config model.Repository
+	Config config.Repository
 }
 
 // New initiate repository/database
-func New(cfg model.Repository) *Database {
+func New(cfg config.Repository) *Database {
 	return &Database{
 		DB:     sqlx.MustConnect("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", cfg.DatabaseUser, cfg.DatabasePassword, cfg.DatabaseHost, cfg.DatabaseName)),
 		Config: cfg,

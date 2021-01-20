@@ -29,30 +29,15 @@ type Snapshot struct {
 
 // SnapshotItem is model for Barang dalam Transaksi
 type SnapshotItem struct {
-	ID       int64    `json:"id" db:"id"`
-	Code     string   `json:"code" db:"item"`
-	Name     string   `json:"name" db:"name"`
-	Amount   int      `json:"amount" db:"amount"`
-	Price    int      `json:"price" db:"price"`
-	Claim    int      `json:"claim,omitempty" db:"claim"`
-	TimeUnit RentUnit `json:"time_unit,omitempty" db:"time_unit"`
-	Duration int      `json:"duration,omitempty" db:"duration"`
-}
-
-// Return is model for Pengembalian
-type Return struct {
-	Date  string       `json:"date"`
-	Items []ReturnItem `json:"items"`
-}
-
-// ReturnItem is model for Barang dalam Pengembalian
-type ReturnItem struct {
-	ID         int64      `json:"id"`
-	Code       string     `json:"code"`
-	Amount     int        `json:"amount"`
-	Status     ItemStatus `json:"status"`
-	StatusDesc string     `json:"status_desc"`
-	Claim      int        `json:"claim,omitempty"`
+	ID           int64    `json:"id" db:"id"`
+	Code         string   `json:"code" db:"item"`
+	Name         string   `json:"name" db:"name"`
+	Amount       int      `json:"amount" db:"amount"`
+	Price        int      `json:"price" db:"price"`
+	Claim        int      `json:"claim,omitempty" db:"claim"`
+	TimeUnit     RentUnit `json:"time_unit,omitempty" db:"time_unit"`
+	Duration     int      `json:"duration,omitempty" db:"duration"`
+	NeedShipment int      `json:"need_shipment,omitempty" db:"need_shipment"`
 }
 
 // CreateTransaction payload to create transaction
@@ -73,6 +58,7 @@ func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
 	var total int
 	switch txType {
 	case Sales:
+		tx.Deposit = 0
 		for i, item := range tx.Items {
 			tx.Items[i].Claim = 0
 			tx.Items[i].TimeUnit = 0
