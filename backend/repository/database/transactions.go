@@ -79,22 +79,27 @@ func (d *Database) GetTransaction(ctx context.Context, date time.Time, code stri
 }
 
 const qGetSnapshotItems = `SELECT
-	s.id,
-	s.item,
+	t.id,
+	t.item,
 	i.name,
-	s.amount,
-	s.price,
-	s.claim,
-	s.time_unit,
-	s.duration,
-	s.amount - SUM(t.amount) AS need_shipment
+	t.amount,
+	t.price,
+	t.claim,
+	t.time_unit,
+	t.duration,
+	t.amount - SUM(p.amount) - SUM(s.amount) AS need_shipment
 FROM
-	snapshot_item AS s
+	snapshot_item AS t
 JOIN
-	items AS i ON s.item = i.code AND s.t_id = ?
+	items AS i ON t.item = i.code AND t.t_id = ?
 LEFT JOIN
-	shipment AS t ON t.i_id = s.id
-GROUP BY s.id
+	shipment AS s ON s.i_id = t.id
+LEFT JOIN
+	extends AS n ON t.id = n.next_snapshot
+LEFT JOIN
+	extends AS p ON t.id = p.prev_snapshot
+WHERE n.next_snapshot IS NULL
+GROUP BY t.id
 `
 
 // GetSnapshotItems by transaction id
@@ -111,7 +116,7 @@ const qGetTxID = `SELECT
 FROM
 	transactions
 WHERE
-	date = STR_TO_DATE(?, '%d/%m/%Y') AND customer = ? AND type = ?
+	date = ? AND customer = ? AND type = ?
 LIMIT 1
 `
 

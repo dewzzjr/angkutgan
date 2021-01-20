@@ -12,14 +12,16 @@ type Rental struct {
 	database iDatabase
 	payments iPayments
 	shipment iShipment
+	returns  iReturns
 }
 
 // New initiate usecase/rental
-func New(database iDatabase, payments iPayments, shipment iShipment) *Rental {
+func New(database iDatabase, payments iPayments, shipment iShipment, returns iReturns) *Rental {
 	return &Rental{
 		database: database,
 		payments: payments,
 		shipment: shipment,
+		returns:  returns,
 	}
 }
 
@@ -37,4 +39,8 @@ type iShipment interface {
 
 type iPayments interface {
 	GetByTransactionID(ctx context.Context, txID int64) (pay []model.Payment, err error)
+}
+
+type iReturns interface {
+	GetByTransactionID(ctx context.Context, txID int64) (returns []model.Return, err error)
 }

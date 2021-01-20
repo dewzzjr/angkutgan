@@ -22,6 +22,10 @@ func (i *Rental) GetDetail(ctx context.Context, code string, date time.Time) (tx
 		err = errors.Wrap(err, "GetByTransactionID")
 		return
 	}
+	if tx.Return, err = i.returns.GetByTransactionID(ctx, tx.ID); err != nil {
+		err = errors.Wrap(err, "GetByTransactionID")
+		return
+	}
 	return
 }
 

@@ -16,11 +16,19 @@ const (
 	s.i_id AS i_id,
 	i.item AS code,
 	s.amount AS amount,
-	COALESCE(DATE_FORMAT(s.deadline, '%d/%m/%Y'), '') AS deadline
+	COALESCE(DATE_FORMAT(s.deadline, '%d/%m/%Y'), '') AS deadline,
+	i.amount - SUM(p.amount) - SUM(r.amount) AS need_return
 FROM
 	shipment s JOIN snapshot_item i ON s.i_id = i.id
+LEFT JOIN
+	returns AS r ON r.s_id = s.id
+LEFT JOIN
+	extends AS n ON i.id = n.next_snapshot
+LEFT JOIN
+	extends AS p ON i.id = p.prev_snapshot
 WHERE
-	s.t_id = ?
+	s.t_id = ? AND n.next_snapshot IS NULL
+GROUP BY s.id
 ORDER BY s.date DESC
 `
 	qGetDateShipments = `SELECT DISTINCT
@@ -73,6 +81,7 @@ func (d *Database) GetShipments(ctx context.Context, txID int64) (shipment []mod
 			&item.Code,
 			&item.Amount,
 			&item.Deadline,
+			&item.NeedReturn,
 		); err != nil {
 			err = errors.Wrapf(err, "Scan [qGetShipments, %d]", txID)
 			continue
@@ -89,10 +98,19 @@ const qGetShipmentByDate = `SELECT
 	s.i_id AS i_id,
 	i.item AS code,
 	s.amount AS amount,
-	COALESCE(DATE_FORMAT(s.deadline, '%d/%m/%Y'), '') AS deadline
+	COALESCE(DATE_FORMAT(s.deadline, '%d/%m/%Y'), '') AS deadline,
+	i.amount - SUM(p.amount) - SUM(r.amount) AS need_return
 FROM
 	shipment s JOIN snapshot_item i ON s.i_id = i.id
-WHERE s.t_id ? AND s.date = ?
+LEFT JOIN
+	returns AS r ON r.s_id = s.id
+LEFT JOIN
+	extends AS n ON i.id = n.next_snapshot
+LEFT JOIN
+	extends AS p ON i.id = p.prev_snapshot
+WHERE
+	s.t_id ? AND s.date = ? AND n.next_snapshot IS NULL
+GROUP BY s.id
 `
 
 // GetShipmentByDate shipment by date in a transaction
@@ -155,7 +173,7 @@ func (d *Database) DeleteInsertShipment(ctx context.Context, txID int64, shipmen
 			_ = tx.Rollback()
 			return
 		}
-		if _, err = tx.ExecContext(ctx, qInsertPayment,
+		if _, err = tx.ExecContext(ctx, qInsertShipment,
 			txID,
 			date,
 			item.ItemID,
@@ -163,7 +181,7 @@ func (d *Database) DeleteInsertShipment(ctx context.Context, txID int64, shipmen
 			deadline,
 			NullInt64(actionBy),
 		); err != nil {
-			err = errors.Wrapf(err, "ExecContext [qInsertPayment, %d]", txID)
+			err = errors.Wrapf(err, "ExecContext [qInsertShipment, %d]", txID)
 			_ = tx.Rollback()
 			return
 		}

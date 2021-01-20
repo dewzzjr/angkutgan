@@ -67,19 +67,3 @@ CREATE TABLE IF NOT EXISTS shipment (
     FOREIGN KEY ( t_id ) REFERENCES transactions( id ),
     FOREIGN KEY ( i_id ) REFERENCES snapshot_item( id )
 );
-
-CREATE TABLE IF NOT EXISTS returns (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    t_id INT NOT NULL,
-    i_id INT NOT NULL,
-    amount INT NOT NULL,
-    date DATE NOT NULL,
-    -- GOOD (300), LOW_BROKEN (402), MID_BROKEN (405), LOST (410),
-    status INT NOT NULL,
-    claim INT,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    modified_by INT,
-    FOREIGN KEY ( modified_by ) REFERENCES users( id ) ON DELETE SET NULL,
-    FOREIGN KEY ( t_id ) REFERENCES transactions( id ),
-    FOREIGN KEY ( i_id ) REFERENCES snapshot_item( id )
-);
