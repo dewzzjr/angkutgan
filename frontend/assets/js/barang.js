@@ -2,13 +2,24 @@ const Daftar = {
   Page: 1,
   Rows: 10,
   Data: [],
+  Keyword: '',
   SetData: function (data) {
-    this.Data = data;
+    Daftar.Data = data;
+  },
+  CacheFunc: {},
+  SetFunc: function (name, callback, failedCallback) {
+    this.CacheFunc[name] = {
+      callback: callback,
+      failedCallback: failedCallback,
+    };
   },
   GetData: function (callback, failedCallback) {
     let page = this.Page;
     let rows = this.Rows;
+    let keyword = this.Keyword;
     let set = this.SetData;
+    let retries = false;
+    this.SetFunc('GetData', callback, failedCallback);
     $.ajax({
       type: 'GET',
       url: '/items',
@@ -16,6 +27,7 @@ const Daftar = {
       data: {
         page: page,
         row: rows,
+        keyword: keyword,
       },
       success: function (data, status, xhr) {
         if (status === 'success') {
@@ -30,18 +42,46 @@ const Daftar = {
         if (failedCallback) {
           failedCallback(error);
         }
+        if (xhr.status == 403 && !retries) {
+          retries = true;
+          Auth.Refresh(function() {
+            $.ajax(this);
+          });
+        }
       },
     });
+  },
+  Apply: function(callback) {
+    let func = this.CacheFunc['GetData']
+    if (func) {
+      this.GetData(function(data) {
+        if (func.callback) {
+          func.callback(data);
+        }
+        if (callback) {
+          callback();
+        }
+      }, func.failedCallback);
+    }
+  },
+  Reload: function() {
+    Daftar.Page = 1;
+    Daftar.Rows = 10;
+    Daftar.Keyword = '';
+    let func = this.CacheFunc['GetData']
+    if (func) {
+      this.GetData(func.callback, func.failedCallback);
+    }
   }
 };
 
 const Barang = {
   Form: {},
   Set: function (data) {
-    this.Form = data;
+    Barang.Form = data;
   },
   Clear: function (callback) {
-    this.Form = {};
+    Barang.Form = {};
     if (callback) {
       callback();
     }
@@ -60,6 +100,8 @@ const Barang = {
           name: "code",
           text: "kode tidak boleh kosong"
         });
+      } else {
+        data.code = data.code.toUpperCase();
       }
       if (!data.name) {
         ok.valid = false;
@@ -74,6 +116,8 @@ const Barang = {
           name: "unit",
           text: "satuan tidak boleh kosong"
         });
+      } else {
+        data.unit = data.unit.toLowerCase();
       }
       if (!isInt(data.stock)) {
         ok.valid = false;
@@ -119,6 +163,7 @@ const Barang = {
   Create: function (callback, failedCallback) {
     let data = this.Form;
     let set = this.Set;
+    let retries = 0;
     $.ajax({
       type: 'POST',
       url: '/item',
@@ -129,6 +174,7 @@ const Barang = {
           set(data.result);
           if (callback) {
             callback(data.result);
+            Daftar.Reload();
           }
         }
       },
@@ -137,12 +183,19 @@ const Barang = {
         if (failedCallback) {
           failedCallback(error);
         }
+        if (xhr.status == 403 && retries < 3) {
+          retries++;
+          Auth.Refresh(function() {
+            $.ajax(this);
+          });
+        }
       },
     });
   },
   Edit: function (callback, failedCallback) {
     let data = this.Form;
     let set = this.Set;
+    let retries = false;
     $.ajax({
       type: 'PATCH',
       url: `/item/${data.code}`,
@@ -153,6 +206,7 @@ const Barang = {
           set(data.result);
           if (callback) {
             callback(data.result);
+            Daftar.Reload();
           }
         }
       },
@@ -160,6 +214,12 @@ const Barang = {
         console.log(status, error);
         if (failedCallback) {
           failedCallback(error);
+        }
+        if (xhr.status == 403 && !retries) {
+          retries = true;
+          Auth.Refresh(function() {
+            $.ajax(this);
+          });
         }
       },
     });
@@ -195,13 +255,13 @@ const Harga = {
     }
   },
   Set: function (form) {
-    this.Form = form;
+    Harga.Form = form;
   },
   AppendRent: function (rent) {
-    this.Form.price.rent.push(rent);
+    Harga.Form.price.rent.push(rent);
   },
   EditRent: function (index, rent) {
-    this.Form.price.rent[index] = rent;
+    Harga.Form.price.rent[index] = rent;
   },
   LenRent: function () {
     return this.Form.price.rent.length;
@@ -308,8 +368,10 @@ $(document).ready(function () {
           var format = formatPrice(r.value);
           irent += `<li>${r.time_unit} ${r.unit}: Rp${format}</li>`
         });
-        rentLabel = `<p>Harga Sewa: </p>`
-        rent = `<p><ul>${irent}</ul></p>`
+        if (irent) {
+          rentLabel = `<p>Harga Sewa: </p>`
+          rent = `<p><ul>${irent}</ul></p>`
+        }
       }
       var format = formatPrice(e.price.sell);
       var row = `<tr>
@@ -338,6 +400,53 @@ $(document).ready(function () {
     </tr>`
       $('#tableBarang tbody').append(row);
     });
+  });
+
+  $('#search').on('keypress', function(e) {
+    var value = $(this).val();
+    if (e.keyCode == 13) {
+      Daftar.Page = 1;
+      Daftar.Keyword = value;
+      Daftar.Apply();
+      $(this).val('');
+    }
+  });
+
+  $('#nextPage').on('click', function(e) {
+    console.log(Daftar.Data.length, Daftar.Rows)
+    if (Daftar.Data.length == Daftar.Rows) {
+      Daftar.Page = Daftar.Page + 1;
+      Daftar.Apply(function() {
+        if (Daftar.Data.length == Daftar.Rows) {
+          $('#nextPage').parent().removeClass('disabled');
+        } else {
+          $('#nextPage').parent().addClass('disabled');
+        }
+        if (Daftar.Page > 1) {
+          $('#prevPage').parent().removeClass('disabled');
+        } else {
+          $('#prevPage').parent().addClass('disabled');
+        }
+      });
+    }
+  });
+
+  $('#prevPage').on('click', function(e) {
+    if (Daftar.Page > 1) {
+      Daftar.Page = Daftar.Page - 1;
+      Daftar.Apply(function() {
+        if (Daftar.Data.length == Daftar.Rows) {
+          $('#nextPage').parent().removeClass('disabled');
+        } else {
+          $('#nextPage').parent().addClass('disabled');
+        }
+        if (Daftar.Page > 1) {
+          $('#prevPage').parent().removeClass('disabled');
+        } else {
+          $('#prevPage').parent().addClass('disabled');
+        }
+      });
+    }
   });
 
   // TAMBAH

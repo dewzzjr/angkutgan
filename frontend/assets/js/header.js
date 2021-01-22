@@ -1,7 +1,7 @@
 $.ajaxSetup({
   xhrFields: {
     withCredentials: true
-  },
+  }
 });
 
 var Auth = {
@@ -74,7 +74,7 @@ var Auth = {
           }
         },
         error: function (xhr, status, error) {
-          if (error == 'Unauthorized') {
+          if (xhr.status == 403) {
             refresh();
           }
           console.log(status, error);
@@ -97,7 +97,7 @@ var Auth = {
         }
       },
       error: function (xhr, status, error) {
-        if (error == 'Unauthorized') {
+        if (xhr.status == 403) {
           let tab = $(".tab-content .tab-pane.active.show").attr('id');
           let redirect = window.location.pathname + "?action=" + (tab ? tab : '');
           window.location.replace(`/login?redirect=${redirect}`);

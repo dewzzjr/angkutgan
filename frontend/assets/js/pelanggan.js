@@ -1,10 +1,10 @@
 const Pelanggan = {
   Form: {},
   Set: function (data) {
-    this.Form = data;
+    Pelanggan.Form = data;
   },
   Clear: function (callback) {
-    this.Form = {};
+    Pelanggan.Form = {};
     if (callback) {
       callback();
     }
