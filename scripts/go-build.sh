@@ -3,7 +3,7 @@
 build_package () {
     package=$1
     package_split=(${package//\// })
-    package_name="../executable/${package_split[-1]}"
+    package_name="../bin/${package_split[-1]}"
     platforms=("windows/amd64" "windows/386" "linux/amd64")
 
     for platform in "${platforms[@]}"
