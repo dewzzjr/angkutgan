@@ -15,7 +15,7 @@ import (
 func (v *View) Run() {
 	v.Load()
 	v.Routing()
-	port := fmt.Sprintf(":%d", v.Config.Port)
+	port := fmt.Sprintf(":%d", v.Config.ViewPort)
 	log.Println("Listening on", port)
 	log.Fatal(http.ListenAndServe(port, middleware.NewLogger(v.Router)))
 }

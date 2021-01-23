@@ -2,8 +2,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    status VARCHAR(20) NOT NULL,
-    PRIMARY KEY ( id )
+    status VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_info (
@@ -35,7 +34,6 @@ CREATE TABLE IF NOT EXISTS user_access (
     user_id INT NOT NULL,
     access_id INT NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ( id ),
     FOREIGN KEY ( user_id ) REFERENCES users( id ),
     FOREIGN KEY ( access_id ) REFERENCES access( id ),
     UNIQUE ( user_id, access_id )

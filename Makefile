@@ -40,7 +40,11 @@ config:
 
 build:
 	@go mod vendor
-	@./scripts/go-build.sh
+	@./scripts/build.sh
 
 check:
 	@echo $(OSFLAG)
+	@golangci-lint run ./...
+
+deploy:
+	@./scripts/deploy.sh

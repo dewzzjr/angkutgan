@@ -48,6 +48,7 @@ func (d *Database) GetShipments(ctx context.Context, txID int64) (shipment []mod
 		err = errors.Wrapf(err, "QueryxContext [qGetDateShipments, %d]", txID)
 		return
 	}
+	defer rows.Close()
 
 	mapIndex := make(map[string]int)
 	shipment = make([]model.Shipment, 0)
@@ -55,7 +56,7 @@ func (d *Database) GetShipments(ctx context.Context, txID int64) (shipment []mod
 		var date time.Time
 		if err = rows.Scan(&date); err != nil {
 			err = errors.Wrapf(err, "Scan [qGetDateShipments, %d]", txID)
-			continue
+			return
 		}
 		s := model.Shipment{
 			Date:  date.Format(model.DateFormat),
@@ -89,7 +90,6 @@ func (d *Database) GetShipments(ctx context.Context, txID int64) (shipment []mod
 		index := mapIndex[date]
 		shipment[index].Items = append(shipment[index].Items, item)
 	}
-	rows.Close()
 	return
 }
 

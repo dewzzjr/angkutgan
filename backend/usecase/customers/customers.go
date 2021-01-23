@@ -65,9 +65,9 @@ func (i *Customers) Update(ctx context.Context, customer model.Customer, actionB
 		err = errors.Wrapf(err, "Get")
 		return
 	}
-	if get.Type == model.Group && customer.Type == model.Individu {
-		// TODO check is remove project eligible
-	}
+	// TODO check is remove project eligible
+	// if get.Type == model.Group && customer.Type == model.Individu {
+	// }
 	if customer.Name != get.Name ||
 		customer.Type != get.Type ||
 		customer.Address != get.Address ||

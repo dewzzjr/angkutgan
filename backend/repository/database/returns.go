@@ -76,6 +76,7 @@ func (d *Database) GetReturns(ctx context.Context, txID int64) (returns []model.
 		err = errors.Wrapf(err, "QueryxContext [qGetDateReturns, %d]", txID)
 		return
 	}
+	defer rows.Close()
 
 	mapIndex := make(map[string]int)
 	returns = make([]model.Return, 0)
@@ -83,7 +84,7 @@ func (d *Database) GetReturns(ctx context.Context, txID int64) (returns []model.
 		var date time.Time
 		if err = rows.Scan(&date); err != nil {
 			err = errors.Wrapf(err, "Scan [qGetDateReturns, %d]", txID)
-			continue
+			return
 		}
 		r := model.Return{
 			Date:  date.Format(model.DateFormat),
@@ -118,7 +119,6 @@ func (d *Database) GetReturns(ctx context.Context, txID int64) (returns []model.
 		index := mapIndex[date]
 		returns[index].Items = append(returns[index].Items, item)
 	}
-	rows.Close()
 	return
 }
 

@@ -17,12 +17,14 @@ type Delivery struct {
 
 // View injected to backend/view
 type View struct {
-	Port int    `yaml:"-" ignored:"true"`
-	Path string `yaml:"static_path" envconfig:"STATIC_PATH"`
+	ViewPort int    `yaml:"-" ignored:"true"`
+	Path     string `yaml:"static_path" envconfig:"STATIC_PATH"`
 }
 
 // Repository injected to backend/repository
 type Repository struct {
+	DatabaseEnvKey   string `yaml:"-" envconfig:"DB_KEY"`
+	DatabaseURL      string `yaml:"db_url" ignored:"true"`
 	DatabaseHost     string `yaml:"db_host" envconfig:"DB_HOST"`
 	DatabaseUser     string `yaml:"db_user" envconfig:"DB_USER"`
 	DatabaseName     string `yaml:"db_name" envconfig:"DB_NAME"`

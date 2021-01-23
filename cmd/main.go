@@ -9,6 +9,7 @@ import (
 	"github.com/dewzzjr/angkutgan/backend/usecase"
 	"github.com/dewzzjr/angkutgan/backend/view"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/heroku/x/hmetrics/onload"
 )
 
 func init() {
