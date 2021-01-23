@@ -48,7 +48,7 @@ func loadFile() {
 }
 
 func loadEnv(env string) {
-	if err := envconfig.Process("APP", config); err != nil {
+	if err := envconfig.Process("APP", &config); err != nil {
 		log.Fatalln("envconfig.Process", env, err)
 	}
 }
