@@ -50,7 +50,10 @@ func loadEnv() {
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalln(err)
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			log.Fatalln(err)
+		}
+		log.Println("no config file found")
 	}
 
 	if err := viper.Unmarshal(&config); err != nil {
