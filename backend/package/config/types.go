@@ -10,14 +10,14 @@ type Config struct {
 
 // Delivery injected to backend/delivery
 type Delivery struct {
-	Port       int    `yaml:"http_port" envconfig:"HTTP_PORT"`
+	Port       int    `yaml:"http_port" ignored:"true"`
 	CookieName string `yaml:"cookie_name" envconfig:"COOKIE_NAME"`
 	ByPass     bool   `yaml:"bypass"`
 }
 
 // View injected to backend/view
 type View struct {
-	Port int    `yaml:"-"`
+	Port int    `yaml:"-" ignored:"true"`
 	Path string `yaml:"static_path" envconfig:"STATIC_PATH"`
 }
 

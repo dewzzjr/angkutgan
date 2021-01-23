@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/kelseyhightower/envconfig"
@@ -61,6 +62,7 @@ func loadEnv(env string) {
 	if err := envconfig.Process("APP", &config.Repository); err != nil {
 		log.Fatalln("config.Repository", env, err)
 	}
+	config.Delivery.Port, _ = strconv.Atoi(os.Getenv("PORT"))
 }
 
 func validate() {
