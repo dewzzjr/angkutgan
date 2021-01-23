@@ -48,8 +48,18 @@ func loadFile() {
 }
 
 func loadEnv(env string) {
-	if err := envconfig.Process("APP", &config); err != nil {
-		log.Fatalln("envconfig.Process", env, err)
+	config = &Config{}
+	if err := envconfig.Process("APP", &config.Delivery); err != nil {
+		log.Fatalln("config.Delivery", env, err)
+	}
+	if err := envconfig.Process("APP", &config.Users); err != nil {
+		log.Fatalln("config.Users", env, err)
+	}
+	if err := envconfig.Process("APP", &config.View); err != nil {
+		log.Fatalln("config.View", env, err)
+	}
+	if err := envconfig.Process("APP", &config.Repository); err != nil {
+		log.Fatalln("config.Repository", env, err)
 	}
 }
 
