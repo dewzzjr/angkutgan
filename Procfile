@@ -1,1 +1,1 @@
-web: bin/backend-linux-amd64
+web: bin/cmd-linux-amd64

@@ -4,7 +4,7 @@ build_package () {
     package=$1
     package_split=(${package//\// })
     package_name="../bin/${package_split[-1]}"
-    platforms=("windows/amd64" "windows/386" "linux/amd64")
+    platforms=("windows/amd64" "linux/amd64")
 
     for platform in "${platforms[@]}"
     do
@@ -24,6 +24,6 @@ build_package () {
     done
 }
 
+rm -rf bin/*
 cd scripts
-build_package "github.com/dewzzjr/angkutgan/cmd/backend"
-build_package "github.com/dewzzjr/angkutgan/cmd/fileserver"
+build_package "github.com/dewzzjr/angkutgan/cmd"

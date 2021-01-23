@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
 
@@ -12,19 +13,20 @@ var config *Config
 
 func init() {
 	if config == nil {
-		load(
-			"./config.yaml",
-			"../config.yaml",
-			"../../config.yaml",
-			"./configs/angkutgan.yaml",
-			"../configs/angkutgan.yaml",
-			"../../configs/angkutgan.yaml",
-			"/etc/conf/angkutgan.yaml",
-		)
+		loadEnv()
 	}
 }
 
-func load(path ...string) {
+func load() {
+	path := []string{
+		"./config.yaml",
+		"../config.yaml",
+		"../../config.yaml",
+		"./configs/angkutgan.yaml",
+		"../configs/angkutgan.yaml",
+		"../../configs/angkutgan.yaml",
+		"/etc/conf/angkutgan.yaml",
+	}
 	for _, p := range path {
 		f, err := os.Open(p)
 		if err != nil {
@@ -38,6 +40,27 @@ func load(path ...string) {
 	if config == nil {
 		log.Println("no config loaded")
 	}
+}
+
+func loadEnv() {
+	viper.AddConfigPath(".")
+	viper.AddConfigPath("./configs/")
+	viper.AddConfigPath("../configs/")
+	viper.SetConfigName("angkutgan")
+	viper.SetConfigType("env")
+	viper.AutomaticEnv()
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := viper.Unmarshal(&config); err != nil {
+		log.Fatalln(err)
+	}
+	if config == nil {
+		log.Println("no config loaded")
+		return
+	}
+	validate()
 }
 
 func validate() {

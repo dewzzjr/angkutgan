@@ -35,7 +35,7 @@ help:
 	@echo "check: check os type and architechture"
 
 config:
-	@cp -n ./configs/angkutgan.yaml.example ./configs/angkutgan.yaml
+	@cp -n ./configs/env.example ./configs/angkutgan.env
 	@echo "please set value in config.yaml"
 
 build:
