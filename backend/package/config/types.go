@@ -2,37 +2,37 @@ package config
 
 // Config configuration yaml structure
 type Config struct {
-	Delivery   `yaml:"delivery" mapstructure:",squash"`
-	View       `yaml:"view" mapstructure:",squash"`
-	Repository `yaml:"repository" mapstructure:",squash"`
-	Users      `yaml:"users" mapstructure:",squash"`
+	Delivery   `yaml:",inline"`
+	View       `yaml:",inline"`
+	Repository `yaml:",inline"`
+	Users      `yaml:",inline"`
 }
 
 // Delivery injected to backend/delivery
 type Delivery struct {
-	Port       int    `yaml:"http_port" mapstructure:"HTTP_PORT"`
-	CookieName string `yaml:"cookie_name" mapstructure:"COOKIE_NAME"`
+	Port       int    `yaml:"http_port" envconfig:"HTTP_PORT"`
+	CookieName string `yaml:"cookie_name" envconfig:"COOKIE_NAME"`
 	ByPass     bool   `yaml:"bypass"`
 }
 
 // View injected to backend/view
 type View struct {
-	Port int    `yaml:"http_port"`
-	Path string `yaml:"static_path" mapstructure:"STATIC_PATH"`
+	Port int    `yaml:"-"`
+	Path string `yaml:"static_path" envconfig:"STATIC_PATH"`
 }
 
 // Repository injected to backend/repository
 type Repository struct {
-	DatabaseHost     string `yaml:"db_host" mapstructure:"DB_HOST"`
-	DatabaseUser     string `yaml:"db_user" mapstructure:"DB_USER"`
-	DatabaseName     string `yaml:"db_name" mapstructure:"DB_NAME"`
-	DatabasePassword string `yaml:"db_pass" mapstructure:"DB_PASS"`
-	DefaultPassword  string `yaml:"default_pass" mapstructure:"DEFAULT_PASS"`
+	DatabaseHost     string `yaml:"db_host" envconfig:"DB_HOST"`
+	DatabaseUser     string `yaml:"db_user" envconfig:"DB_USER"`
+	DatabaseName     string `yaml:"db_name" envconfig:"DB_NAME"`
+	DatabasePassword string `yaml:"db_pass" envconfig:"DB_PASS"`
+	DefaultPassword  string `yaml:"default_pass" envconfig:"DEFAULT_PASS"`
 }
 
 // Users injected to backend/usecase/users
 type Users struct {
-	JWTKey       string `yaml:"jwt_key" mapstructure:"JWT_KEY"`
-	TokenExpiry  int64  `yaml:"token_expiry" mapstructure:"TOKEN_EXPIRY"`
-	RefreshToken int64  `yaml:"refresh_token" mapstructure:"REFRESH_TOKEN"`
+	JWTKey       string `yaml:"jwt_key" envconfig:"JWT_KEY"`
+	TokenExpiry  int64  `yaml:"token_expiry" envconfig:"TOKEN_EXPIRY"`
+	RefreshToken int64  `yaml:"refresh_token" envconfig:"REFRESH_TOKEN"`
 }
