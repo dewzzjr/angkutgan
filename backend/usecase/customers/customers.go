@@ -14,6 +14,9 @@ func (i *Customers) GetList(ctx context.Context, page int, row int) (customers [
 	if customers, err = i.database.GetListCustomers(ctx, row, pagination.Offset(page, row)); err != nil {
 		err = errors.Wrap(err, "GetListCustomers")
 	}
+	for i, v := range customers {
+		customers[i].TypeDesc = v.Type.String()
+	}
 	return
 }
 
@@ -23,8 +26,12 @@ func (i *Customers) GetByKeyword(ctx context.Context, page int, row int, key str
 		strings.TrimSpace(key),
 		row,
 		pagination.Offset(page, row),
+		model.ColumnProjects,
 	); err != nil {
 		err = errors.Wrap(err, "GetListCustomersByKeyword")
+	}
+	for i, v := range customers {
+		customers[i].TypeDesc = v.Type.String()
 	}
 	return
 }
@@ -34,6 +41,7 @@ func (i *Customers) Get(ctx context.Context, code string) (customer model.Custom
 	if customer, err = i.database.GetCustomerDetail(ctx, code); err != nil {
 		err = errors.Wrap(err, "GetCustomerDetail")
 	}
+	customer.TypeDesc = customer.Type.String()
 	return
 }
 

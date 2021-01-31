@@ -21,7 +21,7 @@ func New(database iDatabase) *Items {
 type iDatabase interface {
 	GetItemDetail(ctx context.Context, code string) (item model.Item, err error)
 	GetListItems(ctx context.Context, limit, offset int) (items []model.Item, err error)
-	GetListItemsByKeyword(ctx context.Context, keyword string, limit, offset int) (items []model.Item, err error)
+	GetListItemsByKeyword(ctx context.Context, keyword string, limit, offset int, column ...string) (items []model.Item, err error)
 	UpdateInsertItem(ctx context.Context, item model.Item, actionBy int64) (err error)
 	GetPriceRent(ctx context.Context, code string) (prices []model.PriceRent, err error)
 	ReplacePriceSell(ctx context.Context, code string, value int, actionBy int64) (err error)

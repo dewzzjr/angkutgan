@@ -20,7 +20,7 @@ func New(database iDatabase) *Customers {
 
 type iDatabase interface {
 	GetListCustomers(ctx context.Context, limit, offset int) (customers []model.Customer, err error)
-	GetListCustomersByKeyword(ctx context.Context, keyword string, limit, offset int) (customers []model.Customer, err error)
+	GetListCustomersByKeyword(ctx context.Context, keyword string, limit, offset int, column ...string) (customers []model.Customer, err error)
 	GetCustomerDetail(ctx context.Context, code string) (customer model.Customer, err error)
 	UpdateInsertCustomer(ctx context.Context, customer model.Customer, actionBy int64) (err error)
 	DeleteCustomer(ctx context.Context, code string) (err error)

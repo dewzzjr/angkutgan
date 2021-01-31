@@ -25,20 +25,7 @@
 			<!-- POPULATE BY JS -->
 		</tbody>
 	</table>
-	<nav>
-		<ul class="pagination">
-		  <li class="page-item disabled">
-			<button class="page-link" id="prevPage">
-			  <span>&laquo; sebelumnya</span>
-			</button>
-		  </li>
-		  <li class="page-item">
-			<button class="page-link" id="nextPage">
-			  <span>berikutnya &raquo;</span>
-			</button>
-		  </li>
-		</ul>
-	  </nav>
+    {{ template "pagination/barang" }}
 </div>
 <!-- END DAFTAR -->
 {{ end }}

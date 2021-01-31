@@ -17,11 +17,12 @@ type Item struct {
 
 // PriceRent is model for Harga Sewa Barang
 type PriceRent struct {
-	ID          int64    `json:"id" db:"id"`
-	Description string   `json:"desc" db:"description"`
-	Duration    int      `json:"duration" db:"duration"`
-	TimeUnit    RentUnit `json:"unit" db:"time_unit"`
-	Value       int      `json:"value" db:"value"`
+	ID           int64    `json:"id" db:"id"`
+	Description  string   `json:"desc" db:"description"`
+	Duration     int      `json:"duration" db:"duration"`
+	TimeUnit     RentUnit `json:"unit" db:"time_unit"`
+	TimeUnitDesc string   `json:"unit_desc" db:"-"`
+	Value        int      `json:"value" db:"value"`
 }
 
 // Stock availability

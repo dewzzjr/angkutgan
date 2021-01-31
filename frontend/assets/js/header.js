@@ -9,6 +9,12 @@ var Auth = {
   setUser: function (user) {
     this.User = user;
   },
+  unauthorized: function () {
+    let tab = $(".tab-content .tab-pane.active.show").attr('id');
+    let redirect = window.location.pathname + "?action=" + (tab ? tab : '');
+    redirect = encodeURIComponent(redirect);
+    window.location.replace(`/login?redirect=${redirect}`);
+  },
   Login: function (username, password, callback, failedCallback) {
     let set = this.setUser
     $.ajax({
@@ -56,38 +62,88 @@ var Auth = {
     });
   },
   Get: function (callback) {
-    let refresh = this.Refresh 
     if (this.User == {}) {
       window.location.replace('/login');
     } else {
-      let set = this.setUser
       $.ajax({
         type: 'GET',
         url: 'user/info',
         contentType: 'application/json',
         success: function (data, status, xhr) {
           if (status === 'success') {
-            set(data.result);
+            Auth.setUser(data.result);
             if (callback) {
               callback(data.result);
             }
           }
         },
         error: function (xhr, status, error) {
-          if (xhr.status == 403) {
-            refresh();
+          if (xhr.status == 401) {
+            Auth.Refresh(callback);
+            return
           }
+          Auth.unauthorized();
           console.log(status, error);
         },
       });
     }
   },
   Refresh: function (callback) {
-    let set = this.setUser
+    $.ajax({
+      type: 'POST',
+      url: 'user/session',
+      contentType: 'application/json',
+      success: function (data, status, xhr) {
+        if (status === 'success') {
+          Auth.setUser(data.result);
+          if (callback) {
+            callback(data.result);
+          }
+        }
+      },
+      error: function (xhr, status, error) {
+        Auth.unauthorized();
+        console.log(status, error);
+      },
+    });
+  },
+};
+
+const Daftar = {
+  Page: 1,
+  Rows: 10,
+  Data: [],
+  Keyword: '',
+  URL: '',
+  Init: function(url) {
+    Daftar.URL = url;
+  },
+  SetData: function (data) {
+    Daftar.Data = data;
+  },
+  CacheFunc: {},
+  SetFunc: function (name, callback, failedCallback) {
+    this.CacheFunc[name] = {
+      callback: callback,
+      failedCallback: failedCallback,
+    };
+  },
+  GetData: function (callback, failedCallback) {
+    let page = this.Page;
+    let rows = this.Rows;
+    let keyword = this.Keyword;
+    let set = this.SetData;
+    let retries = false;
+    this.SetFunc('GetData', callback, failedCallback);
     $.ajax({
       type: 'GET',
-      url: 'user/info',
+      url: this.URL,
       contentType: 'application/json',
+      data: {
+        page: page,
+        row: rows,
+        keyword: keyword,
+      },
       success: function (data, status, xhr) {
         if (status === 'success') {
           set(data.result);
@@ -97,15 +153,41 @@ var Auth = {
         }
       },
       error: function (xhr, status, error) {
-        if (xhr.status == 403) {
-          let tab = $(".tab-content .tab-pane.active.show").attr('id');
-          let redirect = window.location.pathname + "?action=" + (tab ? tab : '');
-          window.location.replace(`/login?redirect=${redirect}`);
-        }
         console.log(status, error);
+        if (failedCallback) {
+          failedCallback(error);
+        }
+        if (xhr.status == 401 && !retries) {
+          retries = true;
+          Auth.Refresh(function() {
+            $.ajax(this);
+          });
+        }
       },
     });
   },
+  Apply: function(callback) {
+    let func = this.CacheFunc['GetData']
+    if (func) {
+      this.GetData(function(data) {
+        if (func.callback) {
+          func.callback(data);
+        }
+        if (callback) {
+          callback();
+        }
+      }, func.failedCallback);
+    }
+  },
+  Reload: function() {
+    Daftar.Page = 1;
+    Daftar.Rows = 10;
+    Daftar.Keyword = '';
+    let func = this.CacheFunc['GetData']
+    if (func) {
+      this.GetData(func.callback, func.failedCallback);
+    }
+  }
 };
 
 function alert() {
@@ -127,26 +209,23 @@ function header() {
   
   $('#logout').click(function () {
     Auth.Logout(function () {
-      console.log("OK")
-      window.location.replace('/login')
+      Auth.unauthorized();
     });
   });
   Menu.Init();
   alert();
 }
 
-function formatPrice(number, decPlaces = 2, decSep = ',', thouSep = '.') {
-  decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-    decSep = typeof decSep === "undefined" ? "." : decSep;
-  thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-  var sign = number < 0 ? "-" : "";
-  var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
-  var j = (j = i.length) > 3 ? j % 3 : 0;
-
-  return sign +
-    (j ? i.substr(0, j) + thouSep : "") +
-    i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
-    (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "");
+function formatPrice(number) {
+  var formatter = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  
+    // These options are needed to round to whole numbers if that's what you want.
+    minimumFractionDigits: 2, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+    maximumFractionDigits: 2, // (causes 2500.99 to be printed as $2,501)
+  });
+  return formatter.format(number);
 }
 
 function isInt(value) {
@@ -233,8 +312,10 @@ const Form = {
 const Menu = {
   Query: getUrlVars(),
   Init: function() {
-    let action = this.Query['action']
-    $(`#${action}`).tab('show');
-    $(`[href="#${action}"]`).addClass('active');
+    let action = this.Query['action'];
+    if (action) {
+      $(`#${action}`).tab('show');
+      $(`[href="#${action}"]`).addClass('active');
+    }
   }
 }

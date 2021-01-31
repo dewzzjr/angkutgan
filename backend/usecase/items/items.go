@@ -14,6 +14,11 @@ func (i *Items) GetList(ctx context.Context, page int, row int) (items []model.I
 	if items, err = i.database.GetListItems(ctx, row, pagination.Offset(page, row)); err != nil {
 		err = errors.Wrap(err, "GetListItems")
 	}
+	for i, item := range items {
+		for j, rent := range item.Price.Rent {
+			items[i].Price.Rent[j].TimeUnitDesc = rent.TimeUnit.String()
+		}
+	}
 	return
 }
 
@@ -23,8 +28,14 @@ func (i *Items) GetByKeyword(ctx context.Context, page int, row int, key string)
 		strings.TrimSpace(key),
 		row,
 		pagination.Offset(page, row),
+		model.ColumnRents,
 	); err != nil {
 		err = errors.Wrap(err, "GetListItemsByKeyword")
+	}
+	for i, item := range items {
+		for j, rent := range item.Price.Rent {
+			items[i].Price.Rent[j].TimeUnitDesc = rent.TimeUnit.String()
+		}
 	}
 	return
 }
@@ -33,6 +44,9 @@ func (i *Items) GetByKeyword(ctx context.Context, page int, row int, key string)
 func (i *Items) Get(ctx context.Context, code string) (item model.Item, err error) {
 	if item, err = i.database.GetItemDetail(ctx, code); err != nil {
 		err = errors.Wrap(err, "GetItemDetail")
+	}
+	for j, rent := range item.Price.Rent {
+		item.Price.Rent[j].TimeUnitDesc = rent.TimeUnit.String()
 	}
 	return
 }
@@ -59,7 +73,7 @@ func (i *Items) Update(ctx context.Context, item model.Item, actionBy int64) (er
 		err = errors.Wrapf(err, "Get")
 		return
 	}
-	if item.Name != get.Name || item.Unit != get.Unit {
+	if (item.Name != "" || item.Unit != "") && (item.Name != get.Name || item.Unit != get.Unit) {
 		if err = i.database.UpdateInsertItem(ctx, item, actionBy); err != nil {
 			err = errors.Wrap(err, "UpdateInsertItem")
 			return

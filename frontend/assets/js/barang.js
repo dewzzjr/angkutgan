@@ -1,80 +1,3 @@
-const Daftar = {
-  Page: 1,
-  Rows: 10,
-  Data: [],
-  Keyword: '',
-  SetData: function (data) {
-    Daftar.Data = data;
-  },
-  CacheFunc: {},
-  SetFunc: function (name, callback, failedCallback) {
-    this.CacheFunc[name] = {
-      callback: callback,
-      failedCallback: failedCallback,
-    };
-  },
-  GetData: function (callback, failedCallback) {
-    let page = this.Page;
-    let rows = this.Rows;
-    let keyword = this.Keyword;
-    let set = this.SetData;
-    let retries = false;
-    this.SetFunc('GetData', callback, failedCallback);
-    $.ajax({
-      type: 'GET',
-      url: '/items',
-      contentType: 'application/json',
-      data: {
-        page: page,
-        row: rows,
-        keyword: keyword,
-      },
-      success: function (data, status, xhr) {
-        if (status === 'success') {
-          set(data.result);
-          if (callback) {
-            callback(data.result);
-          }
-        }
-      },
-      error: function (xhr, status, error) {
-        console.log(status, error);
-        if (failedCallback) {
-          failedCallback(error);
-        }
-        if (xhr.status == 403 && !retries) {
-          retries = true;
-          Auth.Refresh(function() {
-            $.ajax(this);
-          });
-        }
-      },
-    });
-  },
-  Apply: function(callback) {
-    let func = this.CacheFunc['GetData']
-    if (func) {
-      this.GetData(function(data) {
-        if (func.callback) {
-          func.callback(data);
-        }
-        if (callback) {
-          callback();
-        }
-      }, func.failedCallback);
-    }
-  },
-  Reload: function() {
-    Daftar.Page = 1;
-    Daftar.Rows = 10;
-    Daftar.Keyword = '';
-    let func = this.CacheFunc['GetData']
-    if (func) {
-      this.GetData(func.callback, func.failedCallback);
-    }
-  }
-};
-
 const Barang = {
   Form: {},
   Set: function (data) {
@@ -163,7 +86,7 @@ const Barang = {
   Create: function (callback, failedCallback) {
     let data = this.Form;
     let set = this.Set;
-    let retries = 0;
+    let retries = false;
     $.ajax({
       type: 'POST',
       url: '/item',
@@ -183,8 +106,8 @@ const Barang = {
         if (failedCallback) {
           failedCallback(error);
         }
-        if (xhr.status == 403 && retries < 3) {
-          retries++;
+        if (xhr.status == 401 && !retries) {
+          retries = true;
           Auth.Refresh(function() {
             $.ajax(this);
           });
@@ -215,7 +138,7 @@ const Barang = {
         if (failedCallback) {
           failedCallback(error);
         }
-        if (xhr.status == 403 && !retries) {
+        if (xhr.status == 401 && !retries) {
           retries = true;
           Auth.Refresh(function() {
             $.ajax(this);
@@ -267,7 +190,7 @@ const Harga = {
     return this.Form.price.rent.length;
   },
   RemoveRent: function (index, callback) {
-    let pop = this.Form.price.rent.splice(index, 1);
+    let pop = Harga.Form.price.rent.splice(index, 1);
     if (callback) {
       callback(pop);
     }
@@ -276,7 +199,7 @@ const Harga = {
     if (before) {
       before();
     }
-    this.Form.price.rent.forEach(function (r, i) {
+    Harga.Form.price.rent.forEach(function (r, i) {
       func(i, r);
     });
     if (after) {
@@ -289,7 +212,6 @@ const Harga = {
       valid: true
     };
     let data = this.Form;
-    let set = this.Set;
     let check = function () {
       if (!isInt(data.price.sell)) {
         ok.valid = false;
@@ -345,7 +267,7 @@ const Harga = {
         callback(ok);
       }
       console.log(data);
-      set(data);
+      Harga.Set(data);
     }
 
     check();
@@ -357,49 +279,58 @@ $(document).ready(function () {
   header();
 
   // DAFTAR
+  Daftar.Init('/items');
   Daftar.GetData(function (data) {
     $('#tableBarang tbody').html('');
     data.forEach(e => {
       let rent = '';
       let rentLabel = ''
       if (e.price.rent) {
-        let irent
-        e.price.rent.forEach(r => {
+        let irent = ''
+        e.price.rent.forEach((r) => {
           var format = formatPrice(r.value);
-          irent += `<li>${r.time_unit} ${r.unit}: Rp${format}</li>`
+          let duration = '';
+          if (r.duration > 1) {
+            duration = `/ ${r.duration} ${r.unit_desc}`
+          } else if (r.duration == 1) {
+            duration = `/ ${r.unit_desc}`
+          }
+          irent += `<li>${r.desc} : ${format} ${duration}</li>`
         });
         if (irent) {
           rentLabel = `<p>Harga Sewa: </p>`
-          rent = `<p><ul>${irent}</ul></p>`
+          rent = `<ul>${irent}</ul>`
         }
       }
       var format = formatPrice(e.price.sell);
-      var row = `<tr>
-      <th scope="row">${e.code}</th>
-      <td>${e.name}</td>
-      <td>${e.avail.inventory}/${e.avail.asset}</td>
-      <td>${e.unit}</td>
-      <td>
-        <div class="btn-group">
-          <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#${e.code}"
-            data-parent="#tableBarang" class="collapsed">Detail</button>
-          <button type="button" class="btn btn-warning">Ubah</button>
-          <button type="button" class="btn btn-danger">Hapus</button>
-        </div>
-      </td>
-    </tr>
-    <tr class="collapse" id="${e.code}">
-      <th class="text-right" scope="row" colspan="2">
-        <p>Harga Jual: </p>
-        ${rentLabel}
-      </th>
-      <td colspan="3">
-        <p>Rp${format}</p>
-        ${rent}
-      </td>
-    </tr>`
+      var row = `
+      <tr>
+        <th scope="row">${e.code}</th>
+        <td>${e.name}</td>
+        <td>${e.avail.inventory}/${e.avail.asset}</td>
+        <td>${e.unit}</td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#${e.code}"
+              data-parent="#tableBarang" class="collapsed">Detail</button>
+            <button type="button" class="btn btn-warning">Ubah</button>
+            <button type="button" class="btn btn-danger">Hapus</button>
+          </div>
+        </td>
+      </tr>
+      <tr class="collapse" id="${e.code}">
+        <th class="text-right" scope="row" colspan="2">
+          <p>Harga Jual: </p>
+          ${rentLabel}
+        </th>
+        <td colspan="3">
+          <p>${format}</p>
+          ${rent}
+        </td>
+      </tr>`
       $('#tableBarang tbody').append(row);
     });
+    // TODO listener button edit and delete, cetak surat
   });
 
   $('#search').on('keypress', function(e) {
@@ -709,7 +640,6 @@ $(document).ready(function () {
     let harga = $(this).serializeObject();
     harga.price.rent = Harga.Form.price.rent;
     Harga.Set(harga);
-    console.log(harga);
     Harga.Validate((ok) => {
       Form.Reset();
       if (ok.valid) {

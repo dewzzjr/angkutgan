@@ -4,19 +4,23 @@
     <form id="formAdd">
         <div class="form-group">
             <label for="codeAdd">Kode</label>
-            <input name="code" type="text" class="form-control" id="codeAdd"
-                style="text-transform:uppercase" />
+            <input name="code" type="text" class="form-control" id="codeAdd" style="text-transform:uppercase" />
         </div>
         <div class="form-group">
             <label for="typeAdd">Jenis</label>
-            <select name="type" class="form-control" id="typeAdd">
-                <option value="group">PT</option>
-                <option value="individu" selected>Perseorangan</option>
+            <select name="type" class="form-control" id="typeAdd" required>
+                <option selected>-- Pilih salah satu --</option>
+                <option value="1">Perseorangan</option>
+                <option value="2">Perusahaan</option>
             </select>
         </div>
         <div hidden class="form-group">
             <label for="groupAdd">Nama Perusahaan</label>
-            <input name="group" type="text" class="form-control" id="groupAdd">
+            <input name="group_name" type="text" class="form-control" id="groupAdd">
+        </div>
+        <div hidden class="form-group">
+            <label for="roleAdd">Jabatan</label>
+            <input name="role" type="text" class="form-control" id="roleAdd">
         </div>
         <div class="form-group">
             <label for="nikAdd">NIK</label>
@@ -24,16 +28,26 @@
         </div>
         <div class="form-group">
             <label for="nameAdd">Nama Pelanggan</label>
-            <input name="name" type="text" class="form-control" id="nameAdd">
+            <input name="name" type="text" class="form-control" id="nameAdd" required>
         </div>
         <div class="form-group">
             <label for="phoneAdd">Nomor Telepon</label>
-            <input name="phone" type="text" class="form-control" id="phoneAdd">
+            <input name="phone" type="tel" class="form-control" id="phoneAdd" required>
         </div>
         <div class="form-group">
-            <label for="addressAdd">Lokasi Proyek</label>
-            <textarea name="address" type="text" class="form-control" id="addressAdd"></textarea>
+            <label for="addressAdd">Alamat</label>
+            <textarea name="address" type="text" class="form-control" id="addressAdd" required></textarea>
         </div>
+        <div id="projectRowsAdd" class="projectRows">
+            <!-- POPULATE BY JS -->
+        </div>
+		<div class="alert alert-success fade none" role="alert">
+			<span id="messageAdd"></span>
+			<button type="button" class="close">
+				<span>&times;</span>
+			</button>
+		</div>
+        <button type="button" class="btn btn-warning projectButton" id="addProjectNew" disabled>Tambah Proyek</button>
         <button type="submit" class="btn btn-success">Submit</button>
     </form>
 </div>

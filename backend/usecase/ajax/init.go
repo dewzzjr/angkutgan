@@ -21,5 +21,7 @@ func New(database iDatabase) *Ajax {
 type iDatabase interface {
 	IsValidUsername(ctx context.Context, username string) (bool, error)
 	IsValidItemCode(ctx context.Context, code string) (bool, error)
-	GetListItemsByKeyword(ctx context.Context, keyword string, limit, offset int) (items []model.Item, err error)
+	GetListItemsByKeyword(ctx context.Context, keyword string, limit, offset int, column ...string) (items []model.Item, err error)
+	IsValidCustomerCode(ctx context.Context, code string) (bool, error)
+	GetListCustomersByKeyword(ctx context.Context, keyword string, limit, offset int, column ...string) (items []model.Customer, err error)
 }

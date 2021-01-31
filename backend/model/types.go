@@ -6,6 +6,15 @@ const DateFormat = "02/01/2006"
 // ParamFormat date format when used as parameter
 const ParamFormat = "20060102"
 
+// MaxAutoComplete number of autocomplete search result
+const MaxAutoComplete = 3
+
+// ColumnProjects additional data for customers
+const ColumnProjects = "projects"
+
+// ColumnRents additional data for items
+const ColumnRents = "rents"
+
 // CustomerType specified type for customer (Individu = 1, Group = 2).
 type CustomerType int
 

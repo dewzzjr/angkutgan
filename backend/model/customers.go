@@ -7,6 +7,7 @@ type Customer struct {
 	Code      string       `json:"code" db:"code"`
 	Name      string       `json:"name" db:"name"`
 	Type      CustomerType `json:"type" db:"type"`
+	TypeDesc  string       `json:"type_desc" db:"-"`
 	Address   string       `json:"address" db:"address"`
 	Phone     string       `json:"phone" db:"phone"`
 	NIK       string       `json:"nik" db:"nik"`

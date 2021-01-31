@@ -12,6 +12,7 @@ $(document).ready(function () {
     let username = $('#username').val();
     Auth.Login(username, password, function () {
       let url = getUrlVars()['redirect'];
+      url = decodeURIComponent(url);
       window.location.replace(url ? url : '/');
     }, function (e) {
       if (e == 'Unauthorized') {

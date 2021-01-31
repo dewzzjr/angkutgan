@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
+	"github.com/dewzzjr/angkutgan/backend/package/search"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -14,9 +15,9 @@ const qGetListItems = `SELECT
 	items.code, 
 	name, 
 	unit, 
-	COALESCE(value, 0),
-	COALESCE(inventory, 0),
-	COALESCE(asset, 0)
+	COALESCE(value, 0) AS value,
+	COALESCE(inventory, 0) AS inventory,
+	COALESCE(asset, 0) AS asset
 FROM
 	items 
 LEFT JOIN 
@@ -35,7 +36,7 @@ func (d *Database) GetListItems(ctx context.Context, limit, offset int) (items [
 		err = errors.Wrapf(err, "QueryxContext [%d, %d]", limit, offset)
 		return
 	}
-	if items, err = d.GetRentByCodes(ctx, rows); err != nil {
+	if items, err = d.GetRentByCodes(ctx, rows, model.ColumnRents); err != nil {
 		err = errors.Wrapf(err, "GetRentByCodes [%d, %d]", limit, offset)
 	}
 	return
@@ -45,9 +46,9 @@ const qGetListItemsByKeyword = `SELECT
 	items.code, 
 	name, 
 	unit, 
-	COALESCE(value, 0),
-	COALESCE(inventory, 0),
-	COALESCE(asset, 0)
+	COALESCE(value, 0) AS value,
+	COALESCE(inventory, 0) AS inventory,
+	COALESCE(asset, 0) AS asset
 FROM
 	items 
 LEFT JOIN 
@@ -62,7 +63,7 @@ LIMIT ? OFFSET ?
 `
 
 // GetListItemsByKeyword by keyword using pagination
-func (d *Database) GetListItemsByKeyword(ctx context.Context, keyword string, limit, offset int) (items []model.Item, err error) {
+func (d *Database) GetListItemsByKeyword(ctx context.Context, keyword string, limit, offset int, column ...string) (items []model.Item, err error) {
 	var rows *sqlx.Rows
 	if rows, err = d.DB.QueryxContext(ctx, qGetListItemsByKeyword,
 		strings.ToUpper(keyword),
@@ -73,7 +74,7 @@ func (d *Database) GetListItemsByKeyword(ctx context.Context, keyword string, li
 		err = errors.Wrapf(err, "QueryxContext [%d, %d, %s]", limit, offset, keyword)
 		return
 	}
-	if items, err = d.GetRentByCodes(ctx, rows); err != nil {
+	if items, err = d.GetRentByCodes(ctx, rows, column...); err != nil {
 		err = errors.Wrapf(err, "GetRentByCodes [%d, %d, %s]", limit, offset, keyword)
 	}
 	return
@@ -95,7 +96,7 @@ ORDER BY
 `
 
 // GetRentByCodes bulk multiple code
-func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows) (items []model.Item, err error) {
+func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows, column ...string) (items []model.Item, err error) {
 	var i int
 	codes := make([]interface{}, 0)
 	index := make(map[string]int)
@@ -121,7 +122,7 @@ func (d *Database) GetRentByCodes(ctx context.Context, rows *sqlx.Rows) (items [
 	}
 	rows.Close()
 
-	if len(items) == 0 {
+	if len(items) == 0 || !search.ArrayString(model.ColumnRents, column) {
 		return
 	}
 	q, in, _ := sqlx.In(qGetRentByCodes, codes)
@@ -289,9 +290,9 @@ const qGetItemDetail = `SELECT
 	items.code, 
 	name, 
 	unit, 
-	COALESCE(value, 0),
-	COALESCE(inventory, 0),
-	COALESCE(asset, 0)
+	COALESCE(value, 0) AS value,
+	COALESCE(inventory, 0) AS inventory,
+	COALESCE(asset, 0) AS asset
 FROM
 	items 
 LEFT JOIN 

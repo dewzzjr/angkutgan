@@ -10,43 +10,51 @@
                         <i class="fas fa-check"></i>
                     </button>
                 </div>
-                <select name="code" class="form-control autocomplete" id="newCodeEdit"
-                    data-url="testdata/pelanggan.json" autocomplete="off"></select>
+                <select name="code" class="form-control autocomplete" id="newCodeEdit" autocomplete="off"></select>
             </div>
-            <input type="hidden" id="codeEdit" />
         </div>
         <div class="form-group">
             <label for="typeEdit">Jenis</label>
-            <select name="type" class="form-control" id="typeEdit">
-                <option value="group" selected>PT</option>
-                <option value="individu">Perseorangan</option>
+            <select name="type" class="form-control" id="typeEdit" disabled>
+                <option value="1">Perseorangan</option>
+                <option value="2">Perusahaan</option>
             </select>
         </div>
-        <div class="form-group">
+        <div hidden class="form-group">
             <label for="groupEdit">Nama Perusahaan</label>
-            <input name="group" type="text" class="form-control" id="groupEdit"
-                value="PT. Sejahtera Indah">
+            <input name="group_name" type="text" class="form-control" id="groupEdit" disabled>
+        </div>
+        <div hidden class="form-group">
+            <label for="rolepAdd">Jabatan</label>
+            <input name="role" type="text" class="form-control" id="roleEdit">
         </div>
         <div class="form-group">
             <label for="nikEdit">NIK</label>
-            <input name="nik" type="text" class="form-control" id="nikEdit"
-                value="3322181182780001">
+            <input name="nik" type="text" class="form-control" id="nikEdit" disabled>
         </div>
         <div class="form-group">
             <label for="nameEdit">Nama Pelanggan</label>
-            <input name="name" type="text" class="form-control" id="nameEdit" value="Eko Patrio">
+            <input name="name" type="text" class="form-control" id="nameEdit" disabled>
         </div>
         <div class="form-group">
             <label for="phoneEdit">Nomor Telepon</label>
-            <input name="phone" type="text" class="form-control" id="phoneEdit"
-                value="085-777-169-123">
+            <input name="phone" type="tel" class="form-control" id="phoneEdit" disabled>
         </div>
         <div class="form-group">
-            <label for="addressEdit">Lokasi Proyek</label>
-            <textarea name="address" type="text" class="form-control"
-                id="addressEdit">Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75122</textarea>
+            <label for="addressEdit">Alamat</label>
+            <textarea name="address" type="text" class="form-control" id="addressEdit" disabled></textarea>
         </div>
-        <button type="submit" class="btn btn-success">Submit</button>
+        <div id="projectRowsEdit" class="projectRows">
+            <!-- POPULATE BY JS -->
+        </div>
+		<div class="alert alert-success fade none" role="alert">
+			<span id="messageEdit"></span>
+			<button type="button" class="close">
+				<span>&times;</span>
+			</button>
+		</div>
+        <button type="button" class="btn btn-warning projectButton" id="addProjectEdit" disabled>Tambah Proyek</button>
+        <button type="submit" class="btn btn-success" disabled>Submit</button>
     </form>
 </div>
 <!-- END UBAH -->

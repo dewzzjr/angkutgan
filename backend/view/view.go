@@ -22,12 +22,9 @@ func (v *View) Run() {
 
 // Routing add routing pattern
 func (v *View) Routing() {
-	v.Router.GET("/", v.HTML("index"))
-	v.Router.GET("/login", v.HTML("login"))
-	v.Router.GET("/barang", v.HTML("barang"))
-	v.Router.GET("/pelanggan", v.HTML("pelanggan"))
-	v.Router.GET("/penjualan", v.HTML("penjualan"))
-	v.Router.GET("/persewaan", v.HTML("persewaan"))
+	for name, url := range URLs {
+		v.Router.GET(url, v.HTML(name))
+	}
 	v.Static.ServeFiles("/assets/*filepath", http.Dir(v.Config.Path+"/assets"))
 	v.Files.ServeFiles("/*filepath", http.Dir(v.Config.Path+"/html"))
 	v.Router.NotFound = v.Static
@@ -36,31 +33,7 @@ func (v *View) Routing() {
 
 // Load template
 func (v *View) Load() {
-	v.files(
-		"/index.html",
-		"/login.html",
-		"/layout/header.html",
-		"/layout/script.html",
-		"/layout/sidebar.html",
-		"/layout/modal.html",
-		"/barang/index.html",
-		"/barang/daftar.html",
-		"/barang/tambah.html",
-		"/barang/ubah.html",
-		"/barang/harga.html",
-		"/pelanggan/index.html",
-		"/pelanggan/daftar.html",
-		"/pelanggan/tambah.html",
-		"/pelanggan/ubah.html",
-		"/persewaan/index.html",
-		"/persewaan/daftar.html",
-		"/persewaan/buat.html",
-		"/penjualan/index.html",
-		"/penjualan/daftar.html",
-		"/penjualan/buat.html",
-		"/pengiriman/keluar.html",
-		"/pengiriman/masuk.html",
-	)
+	v.files(Templates...)
 }
 
 func (v *View) files(path ...string) {

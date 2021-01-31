@@ -2,10 +2,11 @@ package database
 
 import (
 	"context"
-	"reflect"
+	"database/sql"
 	"strings"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
+	"github.com/dewzzjr/angkutgan/backend/package/search"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -16,9 +17,9 @@ const qGetListCustomers = `SELECT
 	type, 
 	address, 
 	phone, 
-	COALESCE(nik, ''),
-	COALESCE(role, ''),
-	COALESCE(group_name, '')
+	COALESCE(nik, '') AS nik,
+	COALESCE(role, '') AS role,
+	COALESCE(group_name, '') AS group_name
 FROM
 	customers 
 ORDER BY 
@@ -45,22 +46,25 @@ const qGetListCustomersByKeyword = `SELECT
 	type, 
 	address, 
 	phone, 
-	COALESCE(nik, ''),
-	COALESCE(role, ''),
-	COALESCE(group_name, '')
+	COALESCE(nik, '') AS nik,
+	COALESCE(role, '') AS role,
+	COALESCE(group_name, '') AS group_name
 FROM
 	customers 
 WHERE
-	code = ? OR UPPER(name) LIKE CONCAT('%', ?, '%')
+	code = ? 
+	OR UPPER(name) LIKE CONCAT('%', ?, '%') 
+	OR UPPER(group_name) LIKE CONCAT('%', ?, '%')
 ORDER BY 
 	create_time DESC
 LIMIT ? OFFSET ?
 `
 
 // GetListCustomersByKeyword by keyword using pagination
-func (d *Database) GetListCustomersByKeyword(ctx context.Context, keyword string, limit, offset int) (customers []model.Customer, err error) {
+func (d *Database) GetListCustomersByKeyword(ctx context.Context, keyword string, limit, offset int, column ...string) (customers []model.Customer, err error) {
 	var rows *sqlx.Rows
 	if rows, err = d.DB.QueryxContext(ctx, qGetListCustomersByKeyword,
+		strings.ToUpper(keyword),
 		strings.ToUpper(keyword),
 		strings.ToUpper(keyword),
 		limit,
@@ -70,7 +74,7 @@ func (d *Database) GetListCustomersByKeyword(ctx context.Context, keyword string
 		return
 	}
 
-	if customers, err = d.GetProjectsByCodes(ctx, rows); err != nil {
+	if customers, err = d.GetProjectsByCodes(ctx, rows, column...); err != nil {
 		err = errors.Wrapf(err, "GetProjectsByCodes [%d, %d]", limit, offset)
 	}
 	return
@@ -81,7 +85,7 @@ const qGetProjectByCodes = `SELECT
 	name, 
 	location
 FROM
-	project 
+	projects 
 WHERE
 	code IN (?)
 ORDER BY 
@@ -89,9 +93,10 @@ ORDER BY
 `
 
 // GetProjectsByCodes bulk multiple code
-func (d *Database) GetProjectsByCodes(ctx context.Context, rows *sqlx.Rows) (customers []model.Customer, err error) {
+func (d *Database) GetProjectsByCodes(ctx context.Context, rows *sqlx.Rows, column ...string) (customers []model.Customer, err error) {
 	var i int
 	index := make(map[string]int)
+	codes := make([]interface{}, 0)
 	customers = make([]model.Customer, 0)
 	for rows.Next() {
 		var customer model.Customer
@@ -101,16 +106,17 @@ func (d *Database) GetProjectsByCodes(ctx context.Context, rows *sqlx.Rows) (cus
 		}
 		customer.Projects = make([]model.Project, 0)
 		customers = append(customers, customer)
+		codes = append(codes, customer.Code)
 		index[customer.Code] = i
 		i++
 	}
 	rows.Close()
 
-	if len(customers) == 0 {
+	if len(customers) == 0 || !search.ArrayString(model.ColumnProjects, column) {
 		return
 	}
 
-	q, in, _ := sqlx.In(qGetProjectByCodes, reflect.ValueOf(index).MapKeys())
+	q, in, _ := sqlx.In(qGetProjectByCodes, codes)
 	if rows, err = d.DB.QueryxContext(ctx, q, in...); err != nil {
 		err = errors.Wrapf(err, "QueryxContext [%v]", in)
 		return
@@ -141,9 +147,9 @@ const qGetCustomerDetail = `SELECT
 	type, 
 	address, 
 	phone, 
-	COALESCE(nik, ''),
-	COALESCE(role, ''),
-	COALESCE(group_name, '')
+	COALESCE(nik, '') AS nik,
+	COALESCE(role, '') AS role,
+	COALESCE(group_name, '') AS group_name
 FROM
 	customers 
 WHERE
@@ -167,7 +173,7 @@ const qGetProjects = `SELECT
 	name, 
 	location
 FROM
-	project 
+	projects 
 WHERE
 	code = ?
 `
@@ -322,4 +328,25 @@ func (d *Database) InsertDeleteProject(ctx context.Context, code string, insert 
 		err = errors.Wrapf(err, "Commit [%s, %v, %v]", code, delete, insert)
 	}
 	return
+}
+
+const qIsValidCustomerCode = `SELECT
+	code
+FROM
+	customers
+WHERE
+	code = ?
+`
+
+// IsValidCustomerCode check is code is valid or not to be use
+func (d *Database) IsValidCustomerCode(ctx context.Context, code string) (bool, error) {
+	err := d.DB.QueryRowxContext(ctx, qIsValidCustomerCode, code).Scan(&code)
+	if err == nil {
+		return false, nil
+	}
+	if err != sql.ErrNoRows {
+		err = errors.Wrapf(err, "QueryRowxContext [%s]", code)
+		return false, err
+	}
+	return true, nil
 }

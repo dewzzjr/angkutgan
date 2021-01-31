@@ -72,6 +72,8 @@ type iAjax interface {
 	IsValidUsername(ctx context.Context, newUsername, oldUsername string) (ok bool, err error)
 	IsValidItemCode(ctx context.Context, code string) (ok bool, err error)
 	GetItems(ctx context.Context, keyword string) (values []model.AutoComplete, err error)
+	IsValidCustomerCode(ctx context.Context, code string) (ok bool, err error)
+	GetCustomers(ctx context.Context, keyword string) (values []model.AutoComplete, err error)
 }
 type iSales interface {
 	GetDetail(ctx context.Context, code string, date time.Time) (tx model.Transaction, err error)
