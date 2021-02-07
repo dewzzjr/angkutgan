@@ -263,10 +263,12 @@ $(document).ready(function () {
         <td>${e.address}</td>
         <td>
             <div class="btn-group">
-                <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#${e.code}"
-                    data-parent="#tablePelanggan" class="collapsed">Detail</button>
-                <button type="button" class="btn btn-warning">Ubah</button>
-                <button type="button" class="btn btn-danger">Hapus</button>
+                <button type="button" class="btn btn-success collapsed" 
+                  data-toggle="collapse" 
+                  data-target="#${e.code}"
+                  data-parent="#tablePelanggan">Detail</button>
+                <button type="button" class="btn btn-warning editBtn" data-index="${e.code}">Ubah</button>
+                <button type="button" class="btn btn-danger deleteBtn" data-index="${e.code}">Hapus</button>
             </div>
         </td>
       </tr>
@@ -294,7 +296,17 @@ $(document).ready(function () {
       </tr>`
       $('#tablePelanggan tbody').append(row);
     });
-    // TODO listener button edit and delete
+
+    $('.editBtn').on('click', function (e) {
+      var code = $(this).data('index');
+      var query = {
+        code: code,
+        action: 'edit'
+      };
+      var url = window.location.pathname + '?' + $.param(query);
+      window.location.replace(url);
+    });
+    // TODO listener button delete
   });
 
   $('#search').on('keypress', function (e) {
@@ -499,45 +511,7 @@ $(document).ready(function () {
   });
 
   // UBAH
-  $('#formEdit').on('submit', function (e) {
-    e.preventDefault();
-    Form.Reset($(this));
-    let ubah = $(this).serializeObject();
-    ubah.project = Pelanggan.Form.project;
-    Pelanggan.Set(ubah);
-    Pelanggan.Validate(true, (ok) => {
-      Form.Reset($(this));
-      if (ok.valid) {
-        Loading.Start($('#formEdit [type="submit"]'));
-        Pelanggan.Edit(() => {
-          Form.Message('success', 'berhasil mengubah pelanggan', $('#messageEdit'));
-          Loading.End();
-          Form.Reset($('#formEdit'));
-        }, () => {
-          Form.Message('danger', 'gagal mengubah pelanggan', $('#messageEdit'));
-          Loading.End();
-        });
-      } else {
-        Form.Validate(ok.message, $('#formEdit'));
-      }
-    });
-  });
-
-  $('.autocomplete').autoComplete({
-    resolverSettings: {
-      url: '/ajax?action=customers',
-      fail: () => {}
-    },
-    preventEnter: true,
-    noResultsText: 'Tidak ditemukan'
-  });
-
-  $('#typeEdit').on('change', function () {
-    let type = $(this).val();
-    setByType($('#formEdit'), type);
-  });
-
-  $('#formEdit .autocomplete').on('autocomplete.select', (e, cust) => {
+  var initCust = function(cust) {
     let name = $('#formEdit [name="name"]');
     let type = $('#formEdit [name="type"]');
     let groupName = $('#formEdit [name="group_name"]');
@@ -589,6 +563,54 @@ $(document).ready(function () {
       $(submit).removeAttr('disabled');
 
     });
+  }
+  $('#formEdit').on('submit', function (e) {
+    e.preventDefault();
+    Form.Reset($(this));
+    let ubah = $(this).serializeObject();
+    ubah.project = Pelanggan.Form.project;
+    Pelanggan.Set(ubah);
+    Pelanggan.Validate(true, (ok) => {
+      Form.Reset($(this));
+      if (ok.valid) {
+        Loading.Start($('#formEdit [type="submit"]'));
+        Pelanggan.Edit(() => {
+          Form.Message('success', 'berhasil mengubah pelanggan', $('#messageEdit'));
+          Loading.End();
+          Form.Reset($('#formEdit'));
+        }, () => {
+          Form.Message('danger', 'gagal mengubah pelanggan', $('#messageEdit'));
+          Loading.End();
+        });
+      } else {
+        Form.Validate(ok.message, $('#formEdit'));
+      }
+    });
   });
 
+  $('.autocomplete').autoComplete({
+    resolverSettings: {
+      minLength: 2,
+      url: '/ajax?action=customers',
+      fail: () => {}
+    },
+    preventEnter: true,
+    noResultsText: 'Tidak ditemukan'
+  });
+
+  $('#typeEdit').on('change', function () {
+    let type = $(this).val();
+    setByType($('#formEdit'), type);
+  });
+
+  $('#formEdit .autocomplete').on('autocomplete.select', (e, select) => {
+    initCust(select);
+  });
+
+  var code = Menu.Query['code'];
+  if (code) {
+    var data = { value: code, text: code };
+    $('#formEdit .autocomplete').autoComplete('set', data);
+    initCust(data);
+  }
 });

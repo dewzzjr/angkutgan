@@ -11,7 +11,7 @@ var Auth = {
   },
   unauthorized: function () {
     let tab = $(".tab-content .tab-pane.active.show").attr('id');
-    let redirect = window.location.pathname + "?action=" + (tab ? tab : '');
+    let redirect = window.location.pathname + (tab ? "?action=" + tab : '');
     redirect = encodeURIComponent(redirect);
     window.location.replace(`/login?redirect=${redirect}`);
   },

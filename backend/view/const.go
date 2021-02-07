@@ -28,7 +28,7 @@ var Templates = []string{
 	"/pengiriman/masuk.html",
 	"/admin/index.html",
 	"/admin/daftar.html",
-	"/admin/buat.html",
+	"/admin/tambah.html",
 	"/admin/ubah.html",
 }
 

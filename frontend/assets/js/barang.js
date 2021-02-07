@@ -311,10 +311,12 @@ $(document).ready(function () {
         <td>${e.unit}</td>
         <td>
           <div class="btn-group">
-            <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#${e.code}"
-              data-parent="#tableBarang" class="collapsed">Detail</button>
-            <button type="button" class="btn btn-warning">Ubah</button>
-            <button type="button" class="btn btn-danger">Hapus</button>
+            <button type="button" class="btn btn-info collapsed" 
+              data-toggle="collapse"
+              data-target="#${e.code}"
+              data-parent="#tableBarang">Detail</button>
+            <button type="button" class="btn btn-warning editBtn" data-index="${e.code}">Ubah</button>
+            <button type="button" class="btn btn-danger deleteBtn" data-index="${e.code}">Hapus</button>
           </div>
         </td>
       </tr>
@@ -330,7 +332,17 @@ $(document).ready(function () {
       </tr>`
       $('#tableBarang tbody').append(row);
     });
-    // TODO listener button edit and delete, cetak surat
+
+    $('.editBtn').on('click', function (e) {
+      var code = $(this).data('index');
+      var query = {
+        code: code,
+        action: 'edit'
+      };
+      var url = window.location.pathname + '?' + $.param(query);
+      window.location.replace(url);
+    });
+    // TODO listener button delete, cetak surat
   });
 
   $('#search').on('keypress', function(e) {
@@ -408,15 +420,7 @@ $(document).ready(function () {
   });
 
   // UBAH
-  $('.autocomplete').autoComplete({
-    resolverSettings: {
-      url: '/ajax?action=items',
-      fail: () => {}
-    },
-    preventEnter: true,
-    noResultsText: 'Tidak ditemukan'
-  });
-  $('#formEdit .autocomplete').on('autocomplete.select', (e, item) => {
+  var initItem = function(item) {
     let name = $('#formEdit [name="name"]');
     let unit = $('#formEdit [name="unit"]');
     let stock = $('#formEdit [name="stock"]');
@@ -446,6 +450,18 @@ $(document).ready(function () {
 
       $(submit).removeAttr('disabled');
     });
+  }
+  $('.autocomplete').autoComplete({
+    resolverSettings: {
+      minLength: 2,
+      url: '/ajax?action=items',
+      fail: () => {}
+    },
+    preventEnter: true,
+    noResultsText: 'Tidak ditemukan'
+  });
+  $('#formEdit .autocomplete').on('autocomplete.select', (e, select) => {
+    initItem(select);
   });
   $('#formEdit').on('submit', function (e) {
     e.preventDefault();
@@ -469,6 +485,12 @@ $(document).ready(function () {
       }
     });
   });
+  var code = Menu.Query['code'];
+  if (code) {
+    var data = { value: code, text: code };
+    $('#formEdit .autocomplete').autoComplete('set', data);
+    initItem(data);
+  }
 
   // HARGA
   var addRent = function (index, row) {
@@ -659,16 +681,4 @@ $(document).ready(function () {
     });
   });
 
-  // TAB
-  // let code = Menu.Query['code'];
-  // if (Menu.Query['action'] == 'edit') {
-  //   if (code) {
-  //     console.log(code);
-  //     $('#formEdit .autocomplete').autoComplete('set', {
-  //       value: code,
-  //       text: code,
-  //     });
-  //     $('#formEdit .autocomplete').trigger('autocomplete.select');
-  //   }
-  // }
 });
