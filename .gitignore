@@ -3,4 +3,3 @@ configs/angkutgan.*
 vendor/
 main
 cmd/__debug_bin
-bin/

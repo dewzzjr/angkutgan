@@ -1,0 +1,28 @@
+{{ define "admin" }}
+<html>
+
+<head>
+	<title>Admin</title>
+	{{ template "css"}}
+</head>
+
+<body>
+	{{ template "header" }}
+	<div class="container-fluid">
+		<div class="row flex-xl-nowrap">
+			{{ template "sidebar/admin" }}
+			<main class="col-md-9">
+				<div class="tab-content" id="tabContent">
+					{{ template "admin/daftar" }}
+					{{ template "admin/tambah" }}
+					{{ template "admin/ubah" }}
+				</div>
+			</main>
+		</div>
+	</div>
+	{{ template "js" }}
+	<script src="/assets/js/admin.js"> </script>
+</body>
+
+</html>
+{{ end }}
