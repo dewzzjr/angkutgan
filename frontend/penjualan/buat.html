@@ -14,7 +14,7 @@
             <input name="name" class="form-control" type="text" disabled id="customerName">
         </div>
     </div>
-    <table class="table" id="tableBarang">
+    <table class="table" id="list">
         <thead>
             <tr>
                 <th scope="col">Kode</th>
@@ -24,6 +24,11 @@
                 <th scope="col"></th>
             </tr>
         </thead>
+        <tbody id="listItem">
+            <!-- JS Event -->
+        </tbody>
+    </table>
+    <table class="table" id="form">
         <tbody>
             <tr>
                 <td colspan="6">
@@ -92,11 +97,10 @@
         <div class="card-body">
             <div id="ringkasan"></div>
             <div id="list">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item text-right" id="item">Mainframe &times; 3 Batang =
-                        Rp300.000</li>
-                    <li class="list-group-item text-right" id="item">Baut &times; 2 Buah = Rp10.000
-                    </li>
+                <ul class="list-group list-group-flush" id="ringkasanItem">
+                    <!-- JS Event -->
+                </ul>
+                <ul class="list-group list-group-flush"></ul>
                     <li class="list-group-item text-right" id="ongkir">Ongkos Kirim = Rp0
                     </li>
                 </ul>
