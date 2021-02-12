@@ -16,46 +16,68 @@ const Pelanggan = {
       callback();
     }
   },
-  AppendProject: function (project) {
-    Pelanggan.Form.project.push(project);
+  New: {
+    Project: [],
+    Append: function (project) {
+      Pelanggan.New.Project.push(project);
+    },
+    Edit: function (index, project) {
+      Pelanggan.New.Project[index] = project;
+    },
+    Len: function () {
+      return Pelanggan.New.Project.length;
+    },
+    Remove: function (index, callback) {
+      let pop = Pelanggan.New.Project.splice(index, 1);
+      if (callback) {
+        callback(pop);
+      }
+    },
   },
-  EditProject: function (index, project) {
-    Pelanggan.Form.project[index] = project;
-  },
-  LenProject: function () {
-    return this.Form.project.length;
-  },
-  RemoveProject: function (index, callback) {
-    let pop = Pelanggan.Form.project.splice(index, 1);
-    if (callback) {
-      callback(pop);
-    }
-  },
-  SetProject: function (form, func, before, after) {
-    if (before) {
-      before();
-    }
-    Pelanggan.Form.project.forEach(function (p, i) {
-      console.log(i, p);
-      func($(form), i, p);
-    });
-    if (after) {
-      after();
-    }
+  Old: {
+    Project: [],
+    Append: function (project) {
+      Pelanggan.Old.Project.push(project);
+    },
+    Edit: function (index, project) {
+      Pelanggan.Old.Project[index] = project;
+    },
+    Len: function () {
+      return Pelanggan.Old.Project.length;
+    },
+    Remove: function (index, callback) {
+      let pop = Pelanggan.Old.Project.splice(index, 1);
+      if (callback) {
+        callback(pop);
+      }
+    },
+    Set: function (project, form, func, before, after) {
+      if (before) {
+        before();
+      }
+      Pelanggan.Old.Project = project;
+      if (project) {
+        project.forEach(function (p, i) {
+          func($(form), i, Pelanggan.Old, p);
+        });
+      }
+      if (after) {
+        after();
+      }
+    },
   },
   Validate: function (isEdit = false, callback) {
     let ok = {
       message: [],
       valid: true
     };
-    let data = this.Form;
-    let set = this.Set;
+    let data = Pelanggan.Form;
     let check = function () {
-      if (!data.code) {
+      if (!data.code || data.code.length < 3) {
         ok.valid = false;
         ok.message.push({
           name: "code",
-          text: "kode tidak boleh kosong"
+          text: "kode tidak boleh kurang dari 3 karakter"
         });
       } else {
         data.code = data.code.toUpperCase();
@@ -92,22 +114,25 @@ const Pelanggan = {
             text: "jabatan tidak boleh kosong"
           });
         }
-        data.project.forEach((p, i) => {
-          if (!p.name) {
-            ok.valid = false;
-            ok.message.push({
-              name: `project[${i}][name]`,
-              text: "nama proyek tidak boleh kosong"
-            });
-          }
-          if (!p.location) {
-            ok.valid = false;
-            ok.message.push({
-              name: `project[${i}][location]`,
-              text: "lokasi proyek tidak boleh kosong"
-            });
-          }
-        })
+
+        if (data.project) {
+          data.project.forEach((p, i) => {
+            if (!p.name) {
+              ok.valid = false;
+              ok.message.push({
+                name: `project[${i}][name]`,
+                text: "nama proyek tidak boleh kosong"
+              });
+            }
+            if (!p.location) {
+              ok.valid = false;
+              ok.message.push({
+                name: `project[${i}][location]`,
+                text: "lokasi proyek tidak boleh kosong"
+              });
+            }
+          })
+        }
       } else {
         data.group_name = "";
         data.role = "";
@@ -131,7 +156,7 @@ const Pelanggan = {
       if (callback) {
         callback(ok);
       }
-      set(data);
+      Pelanggan.Set(data);
     }
     if (!isEdit) {
       $.ajax({
@@ -161,8 +186,7 @@ const Pelanggan = {
     return ok
   },
   Create: function (callback, failedCallback) {
-    let data = this.Form;
-    let set = this.Set;
+    let data = Pelanggan.Form;
     $.ajax({
       type: 'POST',
       url: '/customer',
@@ -170,7 +194,7 @@ const Pelanggan = {
       data: JSON.stringify(data),
       success: function (data, status, xhr) {
         if (status === 'success') {
-          set(data.result);
+          Pelanggan.Set(data.result);
           if (callback) {
             callback(data.result);
             Daftar.Reload();
@@ -306,7 +330,43 @@ $(document).ready(function () {
       var url = window.location.pathname + '?' + $.param(query);
       window.location.replace(url);
     });
-    // TODO listener button delete
+
+    $('.deleteBtn').on('click', function (e) {
+      var code = $(this).data('index');
+      console.log(code);
+      $.confirm({
+        title: 'Peringatan!',
+        content: `Apakah anda yakin untuk menghapus "${code}"?`,
+        buttons: {
+          ok: function () {
+            $.ajax({
+              type: 'DELETE',
+              url: `/customer/${code}`,
+              contentType: 'application/json',
+              success: function (data, status, xhr) {
+                if (status === 'success' && data.result == 'OK') {
+                  Daftar.Reload();
+                  $.alert({
+                    title: 'Berhasil',
+                    content: `${code}: berhasil dihapus.`,
+                  });
+                }
+                console.log(data, status);
+              },
+              error: function (xhr, status, error) {
+                console.log(status, error);
+                $.alert({
+                  title: 'Gagal',
+                  content: `${code}: ${error}`,
+                });
+              }
+            });
+          },
+          cancel: function () {}
+        },
+      });
+    });
+    // TODO listener button cetak surat
   });
 
   $('#search').on('keypress', function (e) {
@@ -361,7 +421,7 @@ $(document).ready(function () {
     e.preventDefault();
     Form.Reset($(this));
     let tambah = $(this).serializeObject();
-    tambah.project = Pelanggan.Form.project;
+    tambah.project = Pelanggan.New.Project;
     console.log(tambah);
     Pelanggan.Set(tambah);
     Pelanggan.Validate(false, (ok) => {
@@ -373,7 +433,7 @@ $(document).ready(function () {
           Loading.End();
           Form.Reset($('#formAdd'), () => {
             $('#formAdd input').val('');
-            $('#formAdd textarea').empty();
+            $('#formAdd textarea').val('');
             $('#formAdd .projectRows').empty();
           });
         }, () => {
@@ -386,7 +446,7 @@ $(document).ready(function () {
     });
   });
 
-  var addProject = function (formHere, index, row) {
+  var addProject = function (formHere, index, obj, row) {
     let button = {
       tag: 'warning',
       text: 'Edit',
@@ -405,7 +465,6 @@ $(document).ready(function () {
         disabled: '',
       };
     }
-    console.log(index, row);
     let form = `<div class="form-row">
 			<div class="form-group col-4">
 				<label for="nameProject${index}">Nama</label>
@@ -413,7 +472,7 @@ $(document).ready(function () {
 			</div>
 			<div class="form-group col-6">
 				<label for="locationProject${index}">Lokasi</label>
-				<input name="project[${index}][location]" type="text" class="form-control" id="locationProject${index}" value="${row.name}" required ${button.disabled}>
+				<input name="project[${index}][location]" type="text" class="form-control" id="locationProject${index}" value="${row.location}" required ${button.disabled}>
 			</div>
 			<div class="col-2 d-flex align-items-end mb-3 btn-group">
         <button type="button" class="btn btn-${button.tag} btn-block ${button.class}" data-index="${index}">${button.text}</button>
@@ -423,14 +482,14 @@ $(document).ready(function () {
 
     $(formHere).find('.projectRows').append(form);
     let editProject = function (here) {
-      let row = $(this).parents('.form-row');
+      let row = $(here).parents('.form-row');
       $(row).find('input, select').removeAttr('disabled');
       $(row).find('.edit-project').removeClass('btn-warning');
       $(row).find('.edit-project').addClass('btn-success');
       $(row).find('.edit-project').html('OK');
       $(row).find('.edit-project').unbind('click');
       $(row).find('.edit-project').on('click', function () {
-        okProject($(this));
+        okProject($(here));
       });
       $(row).find('.edit-project').addClass('ok-project');
       $(row).find('.edit-project').removeClass('edit-project');
@@ -444,11 +503,11 @@ $(document).ready(function () {
       $(row).find('.ok-project').html('Edit');
       $(row).find('.ok-project').unbind('click');
       $(row).find('.ok-project').on('click', function () {
-        editProject($(this));
+        editProject($(here));
       });
       $(row).find('.ok-project').addClass('edit-project');
       $(row).find('.ok-project').removeClass('ok-project');
-      Pelanggan.EditProject(index, {
+      obj.Edit(index, {
         name: $('#nameProject' + index).val(),
         location: $('#locationProject' + index).val(),
       });
@@ -456,7 +515,7 @@ $(document).ready(function () {
     let deleteProject = function (here) {
       $(here).parents('.form-row').remove();
       let index = $(here).data('index');
-      Pelanggan.RemoveProject(index, function () {
+      obj.Remove(index, function () {
         $(formHere).find('.projectRows').find('.form-row').each(function (i, row) {
           $(row).find('[id^="nameProject"').attr({
             id: `#nameProject${i}`,
@@ -486,20 +545,20 @@ $(document).ready(function () {
 
   var setByType = function (form, type) {
     if (type == 1) {
-      $(form).find('[name="group_name"]').parent().prop('hidden', true);
-      $(form).find('[name="role"]').parent().prop('hidden', true);
+      $(form).find('[name="group_name"]').parent().hide();
+      $(form).find('[name="role"]').parent().hide();
       $(form).find('.projectButton').prop('disabled', true);
       $(form).find('.projectRows').html('');
     } else if (type == 2) {
-      $(form).find('[name="group_name"]').parent().prop('hidden', false);
-      $(form).find('[name="role"]').parent().prop('hidden', false);
+      $(form).find('[name="group_name"]').parent().show();
+      $(form).find('[name="role"]').parent().show();
       $(form).find('.projectButton').prop('disabled', false);
     }
   }
 
   $('#addProjectNew').on('click', function () {
-    addProject($('#formAdd'), Pelanggan.LenProject());
-    Pelanggan.AppendProject({
+    addProject($('#formAdd'), Pelanggan.New.Len(), Pelanggan.New);
+    Pelanggan.New.Append({
       name: '',
       location: '',
     });
@@ -511,7 +570,7 @@ $(document).ready(function () {
   });
 
   // UBAH
-  var initCust = function(cust) {
+  var initCust = function (cust) {
     let name = $('#formEdit [name="name"]');
     let type = $('#formEdit [name="type"]');
     let groupName = $('#formEdit [name="group_name"]');
@@ -539,9 +598,9 @@ $(document).ready(function () {
       return
     }
     Pelanggan.GetDetail(cust.value, (d) => {
-      Pelanggan.Form = d
+      Pelanggan.Form = d;
       console.log(d);
-      Pelanggan.SetProject(addProject, function () {
+      Pelanggan.Old.Set(d.project, $('#formEdit'), addProject, function () {
         setByType($('#formEdit'), d.type);
         $(projects).empty();
       });
@@ -568,7 +627,7 @@ $(document).ready(function () {
     e.preventDefault();
     Form.Reset($(this));
     let ubah = $(this).serializeObject();
-    ubah.project = Pelanggan.Form.project;
+    ubah.project = Pelanggan.Old.Project;
     Pelanggan.Set(ubah);
     Pelanggan.Validate(true, (ok) => {
       Form.Reset($(this));
@@ -607,9 +666,20 @@ $(document).ready(function () {
     initCust(select);
   });
 
+  $('#addProjectEdit').on('click', function () {
+    addProject($('#formEdit'), Pelanggan.Old.Len(), Pelanggan.Old);
+    Pelanggan.Old.Append({
+      name: '',
+      location: '',
+    });
+  });
+
   var code = Menu.Query['code'];
   if (code) {
-    var data = { value: code, text: code };
+    var data = {
+      value: code,
+      text: code
+    };
     $('#formEdit .autocomplete').autoComplete('set', data);
     initCust(data);
   }

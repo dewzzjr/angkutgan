@@ -17,11 +17,11 @@ const Barang = {
     let data = this.Form;
     let set = this.Set;
     let check = function () {
-      if (!data.code) {
+      if (!data.code || data.code.length < 3) {
         ok.valid = false;
         ok.message.push({
           name: "code",
-          text: "kode tidak boleh kosong"
+          text: "kode tidak boleh kurang dari 3 karakter"
         });
       } else {
         data.code = data.code.toUpperCase();
@@ -342,7 +342,42 @@ $(document).ready(function () {
       var url = window.location.pathname + '?' + $.param(query);
       window.location.replace(url);
     });
-    // TODO listener button delete, cetak surat
+
+    $('.deleteBtn').on('click', function (e) {
+      var code = $(this).data('index');
+      console.log(code);
+      $.confirm({
+        title: 'Peringatan!',
+        content: `Apakah anda yakin untuk menghapus "${code}"?`,
+        buttons: {
+          ok: function () {
+            $.ajax({
+              type: 'DELETE',
+              url: `/item/${code}`,
+              contentType: 'application/json',
+              success: function (data, status, xhr) {
+                if (status === 'success' && data.result == 'OK') {
+                  Daftar.Reload();
+                  $.alert({
+                    title: 'Berhasil',
+                    content: `${code}: berhasil dihapus.`,
+                  });
+                }
+                console.log(data, status);
+              },
+              error: function (xhr, status, error) {
+                console.log(status, error);
+                $.alert({
+                  title: 'Gagal',
+                  content: `${code}: ${error}`,
+                });
+              }
+            });
+          },
+          cancel: function () {}
+        },
+      });
+    });
   });
 
   $('#search').on('keypress', function(e) {

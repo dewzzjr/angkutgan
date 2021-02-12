@@ -30,6 +30,9 @@ var Templates = []string{
 	"/admin/daftar.html",
 	"/admin/tambah.html",
 	"/admin/ubah.html",
+	"/profil/index.html",
+	"/profil/ubah.html",
+	"/profil/password.html",
 }
 
 // URLs by template name
@@ -41,4 +44,5 @@ var URLs = map[string]string{
 	"penjualan": "/penjualan",
 	"persewaan": "/persewaan",
 	"admin":     "/admin",
+	"profil":    "/profil",
 }

@@ -263,13 +263,13 @@ func (d *Database) DeleteCustomer(ctx context.Context, code string) (err error) 
 		err = errors.Wrap(err, "BeginTxx")
 		return
 	}
-	if _, err = tx.ExecContext(ctx, qDeleteCustomer, code); err != nil {
-		err = errors.Wrapf(err, "ExecContext [%s]", code)
+	if _, err = tx.ExecContext(ctx, qDeleteProjects, code); err != nil {
+		err = errors.Wrapf(err, "ExecContext [qDeleteProjects, %s]", code)
 		_ = tx.Rollback()
 		return
 	}
-	if _, err = tx.ExecContext(ctx, qDeleteProjects, code); err != nil {
-		err = errors.Wrapf(err, "ExecContext [%s]", code)
+	if _, err = tx.ExecContext(ctx, qDeleteCustomer, code); err != nil {
+		err = errors.Wrapf(err, "ExecContext [qDeleteCustomer, %s]", code)
 		_ = tx.Rollback()
 		return
 	}

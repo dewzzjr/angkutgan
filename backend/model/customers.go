@@ -1,6 +1,8 @@
 package model
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+)
 
 // Customer is model for Pelanggan
 type Customer struct {
