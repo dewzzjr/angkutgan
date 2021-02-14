@@ -50,6 +50,7 @@ const Sales = {
     customer: '',
     project_id: 0,
     deposit: 0,
+    discount: 0,
     address: '',
     shipping_fee: 0,
     items: []
@@ -206,7 +207,7 @@ $(document).ready(function () {
   });
 
   // Selected autocomplete
-  $('.autocomplete').on('autocomplete.select', (e, item) => {
+  $('.autocomplete#customerCode').on('autocomplete.select', (e, item) => {
     Pelanggan.GetDetail(item.value, (p) => {
       $('#customerCode').val(p.code);
       $('#customerName').val(p.name);
@@ -261,7 +262,9 @@ $(document).ready(function () {
       }
       $('#ringkasan').html(sum);
     });
-    
+  });
+
+  $('.autocomplete#addCodeBarang').on('autocomplete.select', (e, item) => {
     Barang.GetDetail(item.value, (b) => {
       $('#setCode').val(b.code);
       $('#nameEdit').val(b.name);
@@ -279,6 +282,7 @@ $(document).ready(function () {
 
   // Tambah Barang to list Item
   $('#tambah').on('click', function (e) {     
+    e.preventDefault();
     if (!$('#nameEdit').val() || !$('#countBarang').val()) {
       $('#tambah').addClass('btn-warning');
       $('#tambah').removeClass('btn-success');
@@ -288,8 +292,6 @@ $(document).ready(function () {
         $('#tambah').removeClass('btn-warning');
         $('#tambah').text('Tambah');
       }, 2000);
-
-      e.preventDefault();
     } else {
       let listItem = {};
       var id = 'item' + (++rowIdx);
@@ -321,8 +323,6 @@ $(document).ready(function () {
       $('#unit span').text('');
       $('#priceBarang').val('');
       $('#totalBarang').attr('value', '');
-
-      e.preventDefault();
     }
 	});
 
@@ -456,25 +456,25 @@ $(document).ready(function () {
       }, 3000);
     } else {
       var date = $('#datePicker').val();
-      var customer = $('#customerName').val();
+      var customer = $('#customerCode').val();
       var address = $('#customerAddress').val();
       var shipping = ongkir;
-      var totalprice = totalPrice;
+      //var totalprice = totalPrice;
       var item = [];
 
       for (var i = 0; i < itemObj.length; i++){
         let listItem = {};
-        var id = itemObj[i].id;
+        //var id = itemObj[i].id;
         var code = itemObj[i].code;
-        var name = itemObj[i].name;
+        //var name = itemObj[i].name;
         var price = double(itemObj[i].price);
         var amount = parseInt(itemObj[i].count);
         //var unit = itemObj[i].unit;
         //var total = double(itemObj[i].total);
 
-        listItem ["id"] = id;
+        //listItem ["id"] = id;
         listItem ["code"] = code;
-        listItem ["name"] = name;
+        //listItem ["name"] = name;
         listItem ["price"] = price;
         listItem ["amount"] = amount;
         //listItem ["unit"] = unit;
@@ -489,7 +489,7 @@ $(document).ready(function () {
       Sales.Form ["customer"] = customer;
       Sales.Form ["address"] = address;
       Sales.Form ["shipping_fee"] = shipping;
-      Sales.Form ["totalprice"] = totalprice;
+      //Sales.Form ["totalprice"] = totalprice;
       Sales.Form ["items"] = items;
 
       console.log(Sales.Form);
