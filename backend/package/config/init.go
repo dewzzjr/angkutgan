@@ -54,7 +54,11 @@ func loadEnv(env string) {
 		BuildInDBKey = "JAWSDB_MARIA_URL"
 	)
 	if _, ok := os.LookupEnv(UseBuildIn); ok {
-		config.DatabaseURL = os.Getenv(BuildInDBKey)
+		db := os.Getenv(BuildInDBKey)
+		db = strings.Trim(db, "mysql://")
+		db = strings.Replace(db, "@", "@tcp(", 1)
+		db = strings.Replace(db, "/", ")/", 1)
+		config.DatabaseURL = db
 	}
 }
 
