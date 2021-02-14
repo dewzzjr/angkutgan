@@ -17,8 +17,8 @@ const qGetTransaction = `SELECT
 	COALESCE(ss.deposit, 0),
 	COALESCE(ss.discount, 0),
 	COALESCE(ss.shipping_fee, 0),
-	COALESCE(DATE_FORMAT(ss.done_date, '%d/%m/%Y'), ''),
-	COALESCE(DATE_FORMAT(ss.paid_date, '%d/%m/%Y'), ''),
+	COALESCE(DATE_FORMAT(tx.done_date, '%d/%m/%Y'), ''),
+	COALESCE(DATE_FORMAT(tx.paid_date, '%d/%m/%Y'), ''),
 	COALESCE(ss.project, 0),
 	COALESCE(pr.name, ''),
 	cs.code, 
@@ -38,7 +38,7 @@ JOIN
 		AND tx.customer = ?
 		AND tx.type = ?
 JOIN
-	customer AS cs ON tx.customer = cs.code
+	customers AS cs ON tx.customer = cs.code
 LEFT JOIN
 	projects AS pr ON ss.project = pr.id
 `
@@ -72,6 +72,7 @@ func (d *Database) GetTransaction(ctx context.Context, date time.Time, code stri
 		err = errors.Wrapf(err, "QueryRowxContext [%s, %v]", code, date)
 		return
 	}
+	tx.Date = date.Format(model.DateFormat)
 	if tx.Items, err = d.GetSnapshotItems(ctx, tx.ID); err != nil {
 		err = errors.Wrapf(err, "GetSnapshotItems [%s, %v]", code, date)
 	}
@@ -84,10 +85,10 @@ const qGetSnapshotItems = `SELECT
 	i.name,
 	t.amount,
 	t.price,
-	t.claim,
-	t.time_unit,
-	t.duration,
-	t.amount - SUM(p.amount) - SUM(s.amount) AS need_shipment
+	COALESCE(t.claim, 0) AS claim,
+	COALESCE(t.time_unit, 0) AS time_unit,
+	COALESCE(t.duration, 0) AS duration,
+	COALESCE(t.amount, 0) - SUM(COALESCE(p.amount, 0)) - SUM(COALESCE(s.amount, 0)) AS need_shipment
 FROM
 	snapshot_item AS t
 JOIN
@@ -130,7 +131,7 @@ func (d *Database) GetTransactionID(ctx context.Context, date time.Time, code st
 		err = errors.Wrapf(err, "QueryRowxContext [%s, %s, %v]", txType.String(), code, date)
 		return
 	}
-	return
+	return txID, nil
 }
 
 const (
@@ -256,13 +257,14 @@ func (d *Database) InsertTransaction(ctx context.Context, txType model.Transacti
 		err = errors.Wrap(err, "BeginTxx")
 		return
 	}
+	date, _ := time.Parse(model.DateFormat, tx.Date)
 	res, e := txx.ExecContext(ctx, qInsertTransaction,
-		tx.Date,
+		date,
 		tx.Customer,
 		txType,
 		NullInt64(actionBy),
 	)
-	if err != nil {
+	if e != nil {
 		err = errors.Wrapf(e, "ExecContext [qInsertTransaction, %s, %v]", txType.String(), tx)
 		_ = txx.Rollback()
 		return
@@ -277,9 +279,9 @@ func (d *Database) InsertTransaction(ctx context.Context, txType model.Transacti
 		txID,
 		tx.Address,
 		NullInt64(tx.ProjectID),
-		NullInt(tx.Deposit),
-		NullInt(tx.Discount),
-		NullInt(tx.ShippingFee),
+		tx.Deposit,
+		tx.Discount,
+		tx.ShippingFee,
 		tx.TotalPrice,
 	); err != nil {
 		err = errors.Wrapf(err, "ExecContext [qInsertSnapshot, %s, %v]", txType.String(), tx)

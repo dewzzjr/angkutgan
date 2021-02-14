@@ -26,9 +26,10 @@ const (
 
 func (c CustomerType) String() string {
 	return [...]string{
+		"",
 		"Perorangan",
 		"Perusahaan",
-	}[c-1]
+	}[c]
 }
 
 // A RentUnit specified unit used for rent (Week = 1, Month = 2).
@@ -42,9 +43,10 @@ const (
 
 func (r RentUnit) String() string {
 	return [...]string{
+		"",
 		"Minggu",
 		"Bulan",
-	}[r-1]
+	}[r]
 }
 
 // Valid check rent unit is valid
@@ -66,9 +68,10 @@ const (
 
 func (c TransactionType) String() string {
 	return [...]string{
+		"",
 		"Penjualan",
 		"Persewaan",
-	}[c-1]
+	}[c]
 }
 
 // PaymentMethod type

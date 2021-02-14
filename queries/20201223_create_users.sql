@@ -38,6 +38,3 @@ CREATE TABLE IF NOT EXISTS user_access (
     FOREIGN KEY ( access_id ) REFERENCES access( id ),
     UNIQUE ( user_id, access_id )
 );
-
-REPLACE INTO users ( id, username, password, status ) VALUES ( 0, 'admin', '$2a$10$jLquAzQsf3izuCFadOGspen0H9gzEEj/4m5INfNgzWawJwvIDrvHC', 'ACTIVE' );
-REPLACE INTO user_info ( id, user_id, nik, ktp, fullname, address, phone, birthdate, religion ) VALUES ( 0, 0, '', '', 'Admin', '', '', CURRENT_DATE, '' );

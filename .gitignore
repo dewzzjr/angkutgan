@@ -4,3 +4,4 @@ vendor/
 main
 cmd/__debug_bin
 cmd/main_test.go
+queries/insert/
