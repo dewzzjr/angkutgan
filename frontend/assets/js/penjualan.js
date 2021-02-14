@@ -465,7 +465,8 @@ $(document).ready(function () {
       for (var i = 0; i < itemObj.length; i++){
         let listItem = {};
         //var id = itemObj[i].id;
-        var code = itemObj[i].code;
+        var code = itemObj[i].code.split('-');
+        var newCode = code[0];
         //var name = itemObj[i].name;
         var price = double(itemObj[i].price);
         var amount = parseInt(itemObj[i].count);
@@ -473,7 +474,7 @@ $(document).ready(function () {
         //var total = double(itemObj[i].total);
 
         //listItem ["id"] = id;
-        listItem ["code"] = code;
+        listItem ["code"] = newCode;
         //listItem ["name"] = name;
         listItem ["price"] = price;
         listItem ["amount"] = amount;
