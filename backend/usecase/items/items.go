@@ -53,6 +53,7 @@ func (i *Items) Get(ctx context.Context, code string) (item model.Item, err erro
 
 // Create new item
 func (i *Items) Create(ctx context.Context, item model.Item, actionBy int64) (err error) {
+	item.Code = strings.ToUpper(strings.Join(strings.Fields(item.Code), ""))
 	if err = i.database.UpdateInsertItem(ctx, item, actionBy); err != nil {
 		err = errors.Wrap(err, "UpdateInsertItem")
 		return

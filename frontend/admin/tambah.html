@@ -1,0 +1,49 @@
+{{ define "admin/tambah" }}
+<!-- TAMBAH -->
+<div class="tab-pane fade" id="add" role="tabpanel">
+	<form id="formAdd">
+		<div class="form-group">
+			<label for="usernameAdd">Username</label>
+			<input name="code" type="text" class="form-control" id="codeAdd" style="text-transform:uppercase" />
+		</div>
+		<div class="form-group">
+			<label for="nameAdd">Nama Lengkap</label>
+			<input name="name" type="text" class="form-control" id="nameAdd" disabled>
+		</div>
+		<div class="form-group">
+			<label for="nikAdd">Nomor Induk Kependudukan</label>
+			<input name="nik" type="text" class="form-control" id="nikAdd" disabled>
+		</div>
+		<div class="form-group">
+			<label for="ktpAdd">Nomor Kartu Tanda Penduduk</label>
+			<input name="ktp" type="text" class="form-control" id="ktpAdd" disabled>
+		</div>
+		<div class="form-group">
+			<label for="ttlAdd">Tanggal Lahir</label>
+			<div class="input-group">
+				<input name="birthdate" class="form-control datepicker" id="ttlAdd" disabled>
+			</div>
+		</div>
+        <div class="form-group">
+            <label for="religionAdd">Agama</label>
+            <select name="religion" class="form-control" id="religionAdd" required>
+                <option selected>-- Pilih salah satu --</option>
+                <option value="ISLAM">Islam</option>
+                <option value="KRISTEN">Kristen</option>
+                <option value="KATHOLIK">Katholik</option>
+                <option value="HINDU">Hindu</option>
+                <option value="BUDHA">Budha</option>
+                <option value="KONGHUCU">Kong Hu Chu</option>
+            </select>
+        </div>
+		<div class="alert alert-success fade none" role="alert">
+			<span id="messageAdd"></span>
+			<button type="button" class="close">
+				<span>&times;</span>
+			</button>
+		</div>
+		<button type="submit" class="btn btn-success">Submit</button>
+	</form>
+</div>
+<!-- END TAMBAH -->
+{{ end }}

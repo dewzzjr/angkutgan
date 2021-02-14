@@ -3,4 +3,5 @@ configs/angkutgan.*
 vendor/
 main
 cmd/__debug_bin
-bin/
+cmd/main_test.go
+queries/insert/

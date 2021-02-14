@@ -1,0 +1,27 @@
+{{ define "profil" }}
+<html>
+
+<head>
+	<title>Profil</title>
+	{{ template "css"}}
+</head>
+
+<body>
+	{{ template "header" }}
+	<div class="container-fluid">
+		<div class="row flex-xl-nowrap">
+			{{ template "sidebar/profil" }}
+			<main class="col-md-9">
+				<div class="tab-content" id="tabContent">
+					{{ template "profil/ubah" }}
+					{{ template "profil/password" }}
+				</div>
+			</main>
+		</div>
+	</div>
+	{{ template "js" }}
+	<script src="/assets/js/profil.js"> </script>
+</body>
+
+</html>
+{{ end }}

@@ -56,10 +56,18 @@ type CreateTransaction struct {
 // Calculate total price transaction by type
 func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
 	var total int
+	if tx.Customer == "" {
+		err = errors.New("kode pelanggan kosong")
+		return
+	}
 	switch txType {
 	case Sales:
 		tx.Deposit = 0
 		for i, item := range tx.Items {
+			if item.Code == "" {
+				err = errors.New("kode barang kosong")
+				return
+			}
 			tx.Items[i].Claim = 0
 			tx.Items[i].TimeUnit = 0
 			tx.Items[i].Duration = 0
@@ -72,6 +80,10 @@ func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
 		}
 	case Rental:
 		for i, item := range tx.Items {
+			if item.Code == "" {
+				err = errors.New("kode barang kosong")
+				return
+			}
 			if !item.TimeUnit.Valid() {
 				err = errors.New("satuan waktu tidak valid")
 				return

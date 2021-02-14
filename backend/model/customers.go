@@ -1,6 +1,8 @@
 package model
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+)
 
 // Customer is model for Pelanggan
 type Customer struct {
@@ -13,7 +15,7 @@ type Customer struct {
 	NIK       string       `json:"nik" db:"nik"`
 	GroupName string       `json:"group_name" db:"group_name"`
 	Role      string       `json:"role" db:"role"`
-	Projects  []Project    `json:"project,omitempty" db:"-"`
+	Projects  []Project    `json:"project" db:"-"`
 }
 
 // Project is model for Proyek Perusahaan

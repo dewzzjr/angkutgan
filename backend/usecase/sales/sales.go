@@ -44,7 +44,7 @@ func (i *Sales) CreateTransaction(ctx context.Context, tx model.CreateTransactio
 		return
 	}
 	if err = i.database.InsertTransaction(ctx, model.Sales, tx, actionBy); err != nil {
-		err = errors.Wrap(err, "UpdateInsertTransaction")
+		err = errors.Wrap(err, "InsertTransaction")
 		return
 	}
 	return
@@ -69,7 +69,7 @@ func (i *Sales) EditTransaction(ctx context.Context, tx model.CreateTransaction,
 		return
 	}
 	if err = i.database.UpdateTransaction(ctx, txID, model.Sales, tx, actionBy); err != nil {
-		err = errors.Wrap(err, "UpdateInsertTransaction")
+		err = errors.Wrap(err, "UpdateTransaction")
 		return
 	}
 	return

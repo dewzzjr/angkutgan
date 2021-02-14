@@ -1,0 +1,48 @@
+{{ define "profil/ubah" }}
+<!-- UBAH -->
+<div class="tab-pane fade" id="edit" role="tabpanel">
+	<form id="formEdit">
+		<div class="form-group">
+			<label for="usernameEdit">Username</label>
+			<input name="username" type="text" class="form-control" id="usernameEdit" disabled>
+		</div>
+		<div class="form-group">
+			<label for="nameEdit">Nama Lengkap</label>
+			<input name="name" type="text" class="form-control" id="nameEdit">
+		</div>
+		<div class="form-group">
+			<label for="nikEdit">Nomor Induk Kependudukan</label>
+			<input name="nik" type="text" class="form-control" id="nikEdit">
+		</div>
+		<div class="form-group">
+			<label for="ktpEdit">Nomor Kartu Tanda Penduduk</label>
+			<input name="ktp" type="text" class="form-control" id="ktpEdit">
+		</div>
+		<div class="form-group">
+			<label for="ttlEdit">Tanggal Lahir</label>
+			<div class="input-group">
+				<input name="birthdate" class="form-control datepicker" id="ttlEdit">
+			</div>
+		</div>
+        <div class="form-group">
+            <label for="religionEdit">Agama</label>
+            <select name="religion" class="form-control" id="religionEdit">
+                <option value="ISLAM">Islam</option>
+                <option value="KRISTEN">Kristen</option>
+                <option value="KATHOLIK">Katholik</option>
+                <option value="HINDU">Hindu</option>
+                <option value="BUDHA">Budha</option>
+                <option value="KONGHUCU">Kong Hu Chu</option>
+            </select>
+        </div>
+		<div class="alert alert-success fade none" role="alert">
+			<span id="messageEdit"></span>
+			<button type="button" class="close">
+				<span>&times;</span>
+			</button>
+		</div>
+		<button type="submit" class="btn btn-success">Submit</button>
+	</form>
+</div>
+<!-- END UBAH -->
+{{ end }}

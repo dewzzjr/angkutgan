@@ -13,6 +13,7 @@ import (
 func (i *Customers) GetList(ctx context.Context, page int, row int) (customers []model.Customer, err error) {
 	if customers, err = i.database.GetListCustomers(ctx, row, pagination.Offset(page, row)); err != nil {
 		err = errors.Wrap(err, "GetListCustomers")
+		return
 	}
 	for i, v := range customers {
 		customers[i].TypeDesc = v.Type.String()
@@ -29,6 +30,7 @@ func (i *Customers) GetByKeyword(ctx context.Context, page int, row int, key str
 		model.ColumnProjects,
 	); err != nil {
 		err = errors.Wrap(err, "GetListCustomersByKeyword")
+		return
 	}
 	for i, v := range customers {
 		customers[i].TypeDesc = v.Type.String()
@@ -40,6 +42,7 @@ func (i *Customers) GetByKeyword(ctx context.Context, page int, row int, key str
 func (i *Customers) Get(ctx context.Context, code string) (customer model.Customer, err error) {
 	if customer, err = i.database.GetCustomerDetail(ctx, code); err != nil {
 		err = errors.Wrap(err, "GetCustomerDetail")
+		return
 	}
 	customer.TypeDesc = customer.Type.String()
 	return
@@ -47,6 +50,7 @@ func (i *Customers) Get(ctx context.Context, code string) (customer model.Custom
 
 // Create new customer
 func (i *Customers) Create(ctx context.Context, customer model.Customer, actionBy int64) (err error) {
+	customer.Code = strings.ToUpper(strings.Join(strings.Fields(customer.Code), ""))
 	if err = (&customer).Validate(); err != nil {
 		err = errors.Wrap(err, "Validate")
 		return
@@ -98,7 +102,7 @@ func (i *Customers) Update(ctx context.Context, customer model.Customer, actionB
 func (i *Customers) Remove(ctx context.Context, code string) (err error) {
 	// TODO check is delete eligible
 	if err = i.database.DeleteCustomer(ctx, code); err != nil {
-		err = errors.Wrap(err, "UpdateProject")
+		err = errors.Wrap(err, "DeleteCustomer")
 	}
 	return
 }

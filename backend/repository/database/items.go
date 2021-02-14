@@ -342,6 +342,12 @@ FROM
 WHERE
 	code = ?
 `
+	qDeleteStock = `DELETE
+FROM
+	stock
+WHERE
+	code = ?
+`
 )
 
 // DeleteItem delete item including price
@@ -351,18 +357,23 @@ func (d *Database) DeleteItem(ctx context.Context, code string) (err error) {
 		err = errors.Wrap(err, "BeginTxx")
 		return
 	}
+	if _, err = tx.ExecContext(ctx, qDeleteStock, code); err != nil {
+		err = errors.Wrapf(err, "ExecContext [qDeleteStock, %s]", code)
+		_ = tx.Rollback()
+		return
+	}
 	if _, err = tx.ExecContext(ctx, qDeleteRent, code); err != nil {
-		err = errors.Wrapf(err, "ExecContext [%s]", code)
+		err = errors.Wrapf(err, "ExecContext [qDeleteRent, %s]", code)
 		_ = tx.Rollback()
 		return
 	}
 	if _, err = tx.ExecContext(ctx, qDeleteSell, code); err != nil {
-		err = errors.Wrapf(err, "ExecContext [%s]", code)
+		err = errors.Wrapf(err, "ExecContext [qDeleteSell, %s]", code)
 		_ = tx.Rollback()
 		return
 	}
 	if _, err = tx.ExecContext(ctx, qDeleteItem, code); err != nil {
-		err = errors.Wrapf(err, "ExecContext [%s]", code)
+		err = errors.Wrapf(err, "ExecContext [qDeleteItem, %s]", code)
 		_ = tx.Rollback()
 		return
 	}

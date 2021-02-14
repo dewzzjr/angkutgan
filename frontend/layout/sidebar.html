@@ -79,3 +79,39 @@
 </div>
 <!-- END SIDEBAR -->
 {{ end }}
+
+{{ define "sidebar/admin" }}
+<!-- SIDEBAR -->
+<div class="col-md-3 pb-3">
+	<h4 class="nav-link text-title bold">Admin</h4>
+	<ul class="nav flex-row flex-md-column nav-pills" role="tablist">
+		<li class="nav-item">
+			<a class="nav-link" id="tabList" data-toggle="pill" href="#list">Daftar</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="tabAdd" data-toggle="pill" href="#add">Tambah</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="tabEdit" data-toggle="pill" href="#edit">Ubah</a>
+		</li>
+	</ul>
+</div>
+<!-- END SIDEBAR -->
+{{ end }}
+
+
+{{ define "sidebar/profil" }}
+<!-- SIDEBAR -->
+<div class="col-md-3 pb-3">
+	<h4 class="nav-link text-title bold">Profil</h4>
+	<ul class="nav flex-row flex-md-column nav-pills" role="tablist">
+		<li class="nav-item">
+			<a class="nav-link" id="tabEdit" data-toggle="pill" href="#edit">Ubah</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="tabPass" data-toggle="pill" href="#pass">Tambah</a>
+		</li>
+	</ul>
+</div>
+<!-- END SIDEBAR -->
+{{ end }}
