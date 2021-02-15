@@ -88,6 +88,7 @@ const Sales = {
 $(document).ready(function () {
   header();
 
+  // BUAT TRANSAKSI
   var rowIdx = 0;
   var totalPrice = 0;
   var ongkir =0;
@@ -109,6 +110,7 @@ $(document).ready(function () {
     return parseInt(temp); 
   }
 
+  // Convert date format
   function dateFormat(date){
     var dateAr = date.split('-');
     var newDate = dateAr[2] + '/' + dateAr[1] + '/' + dateAr[0];
@@ -151,8 +153,24 @@ $(document).ready(function () {
     ongkir = newOngkir;
   }
 
+  // Update total Ringkasa
   function updateTotal($param){    
     totalPrice += double($param);
+  }
+
+  function resetForm(){
+    $('#datePicker').val('');
+    $('#customerCode').val('');
+    $('#customerName').val('');
+    $('#formLokasi').empty();
+    $('#deliveryFee').val('');
+    $('#listItem').empty();
+    $('#ringkasan').empty();
+    $('#ringkasanItem').empty();
+    $('#ongkir span').text('Rp 0,00');
+    $('#total span').text('Rp 0,00');
+
+    itemObj = [];
   }
 
   // Display list of item in Ringkasan
@@ -459,27 +477,18 @@ $(document).ready(function () {
       var customer = $('#customerCode').val();
       var address = $('#customerAddress').val();
       var shipping = ongkir;
-      //var totalprice = totalPrice;
       var item = [];
 
       for (var i = 0; i < itemObj.length; i++){
         let listItem = {};
-        //var id = itemObj[i].id;
         var code = itemObj[i].code.split('-');
         var newCode = code[0];
-        //var name = itemObj[i].name;
         var price = double(itemObj[i].price);
         var amount = parseInt(itemObj[i].count);
-        //var unit = itemObj[i].unit;
-        //var total = double(itemObj[i].total);
 
-        //listItem ["id"] = id;
         listItem ["code"] = newCode;
-        //listItem ["name"] = name;
         listItem ["price"] = price;
         listItem ["amount"] = amount;
-        //listItem ["unit"] = unit;
-        //listItem ["total"] = total;
 
         item.push(listItem);
       }
@@ -490,7 +499,6 @@ $(document).ready(function () {
       Sales.Form ["customer"] = customer;
       Sales.Form ["address"] = address;
       Sales.Form ["shipping_fee"] = shipping;
-      //Sales.Form ["totalprice"] = totalprice;
       Sales.Form ["items"] = items;
 
       console.log(Sales.Form);
@@ -502,15 +510,7 @@ $(document).ready(function () {
         }, 3000);
         Loading.End();
 
-        $('#datePicker').empty();
-        $('#customerCode').val('');
-        $('#customerName').val('');
-        $('#formLokasi').empty();
-        $('#deliveryFee').val('');
-
-        itemObj = [];
-        addTable();
-        showRingkasan();
+        resetForm();
 
       }, () => {
         $('#failedSubmit').show('fade');
@@ -523,5 +523,36 @@ $(document).ready(function () {
       e.preventDefault();
     }
   });
+  // END OF BUAT TRANSAKSI
+
+  // DAFTAR
+  Daftar.Init('/sales');
+  Daftar.GetData(function (data) {
+    $('#tablePenjualan tbody').html('');
+    data.forEach(e => {
+      let empty = '';
+      var date = e.date;
+      if (e.customer.type == '1') {
+        var name = e.customer.name;
+      } else {
+        var name = e.customer.group_name;
+      }
+      var row = `
+      <tr>
+        <td>${date}</td>
+        <td>${name}</td>
+        <td>Belum Dibayar</td>
+        <td>
+          <button type="button" class="btn btn-info">Cetak Kwitansi Pembayaran
+            Pelanggan</button>
+          <button type="button" class="btn btn-success">Dibayar</button>
+          <button type="button" class="btn btn-warning">Ubah</button>
+          <button type="button" class="btn btn-danger">Hapus</button>
+        </td>
+      </tr>`
+      $('#tablePenjualan tbody').append(row);
+    });
+  });
+  // END OF DAFTAR
 
 });
