@@ -91,7 +91,9 @@ $(document).ready(function () {
   // BUAT TRANSAKSI
   var rowIdx = 0;
   var totalPrice = 0;
-  var ongkir =0;
+  var ongkir = 0;
+  var disc = 0;
+  var finalPrice = 0;
   let itemObj = [];
   let projs = [];
 
@@ -143,40 +145,59 @@ $(document).ready(function () {
     $('#listItem').append(tr);
   }
 
+  // Update ongkir
   function updateOngkir($param){
-    var newOngkir = double($param.text());
-    if (ongkir < newOngkir) {
-      totalPrice += (newOngkir - ongkir);
+    if (ongkir < $param) {
+      finalPrice += ($param - ongkir);
     } else {
-      totalPrice -= ongkir - newOngkir;
+      finalPrice -= ongkir - $param;
     }
-    ongkir = newOngkir;
+    ongkir = $param;
   }
 
-  // Update total Ringkasa
+  // Update total Ringkasan
   function updateTotal($param){    
     totalPrice += double($param);
   }
 
+  function updateFinal(){
+    if ((disc == 0) && (ongkir == 0)) {
+      finalPrice = totalPrice;
+    } else {
+      finalPrice = totalPrice + ongkir - disc;
+    }
+    $('#totalFinal span').text(currency(finalPrice));
+  }
+
+  function updateDiscount() {
+    var val = $("#discount").val();
+    disc = totalPrice * val / 100;
+    $('#diskon span').text(`${$("#discount").val()} % = ${currency(disc)}`);
+  }
+
+  // Reset form after submit
   function resetForm(){
     $('#datePicker').val('');
     $('#customerCode').val('');
     $('#customerName').val('');
     $('#formLokasi').empty();
-    $('#deliveryFee').val('');
+    $('#deliveryFee').val(0);
+    $('#discount').val(0);
     $('#listItem').empty();
     $('#ringkasan').empty();
     $('#ringkasanItem').empty();
     $('#ongkir span').text('Rp 0,00');
     $('#total span').text('Rp 0,00');
+    $('#diskon span').text('0 % = Rp 0,00');
+    $('#totalFinal span').text('Rp 0,00');
 
     itemObj = [];
   }
 
   // Display list of item in Ringkasan
   function showRingkasan(){
-    totalPrice = ongkir;
     var newList = [];
+    totalPrice = 0;
     $.each(itemObj, function(i, item) {
       var li = (`
       <li class="list-group-item text-right" id="${item["id"]}">
@@ -187,8 +208,28 @@ $(document).ready(function () {
     });
     $('#ringkasanItem span').html(newList.join(''));
     console.log(newList);
+    updateFinal();
     $('#total span').text(currency(totalPrice));
   }
+
+  // Input diskon
+  $("#discount").on('change', function() {
+    var max = parseInt($(this).attr('max'));
+    var min = parseInt($(this).attr('min'));
+    if ($(this).val() > max) {
+      $(this).val(max);
+    }
+    else if ($(this).val() < min) {
+      $(this).val(min);
+    }
+    
+    if (isNaN($(this).val()) || !$(this).val()) {
+      $('#diskon span').text(`0 % = ${currency(0)}`);
+    } else {
+      updateDiscount();
+      updateFinal();
+    }
+  });
   
   // Convert number with adding comma per 3 digits
   $('input.number').keyup(function(event) {
@@ -331,6 +372,8 @@ $(document).ready(function () {
       itemObj.push(listItem);
       addTable();
       showRingkasan();
+      updateDiscount();
+      updateFinal();
 
       console.log(itemObj);
       console.log(totalPrice);
@@ -353,6 +396,8 @@ $(document).ready(function () {
     var index = itemObj.map(function (item) { return item.id; }).indexOf(id);
     itemObj.splice(index, 1);
     showRingkasan();
+    updateDiscount();
+    updateFinal();
     console.log(itemObj);
 	});
 
@@ -412,7 +457,7 @@ $(document).ready(function () {
       if (!$(this).val()) {
         $('#editTotal').attr('value', currency(0));
       } else {
-        $('#editTotal').attr('value', currency((double($(this).val())*double(itemObj[index].total))));
+        $('#editTotal').attr('value', currency((double($(this).val())*double(itemObj[index].price))));
       } 
     });
   });
@@ -446,8 +491,10 @@ $(document).ready(function () {
       <td><button type="button" class="btn btn-warning edit">Ubah</button>
         <button type="button" class="btn btn-danger remove">Hapus</button></td>`;
       row.html(update);
-
+      
       showRingkasan();
+      updateDiscount();
+      updateFinal();
 
       e.preventDefault();
     }
@@ -455,14 +502,14 @@ $(document).ready(function () {
 
   // Update ringkasan ongkir
   $("#deliveryFee").on("change paste", function() {
-    var ongkir = double($(this).val());
+    ongkir = double($(this).val());
     if (isNaN(ongkir)) {
       $('#ongkir span').text(currency(0));
     } else {
       $('#ongkir span').text(currency(ongkir));
+      updateOngkir(ongkir);
+      updateFinal();
     }
-    updateOngkir($('#ongkir span'));
-    $('#total span').text(currency(totalPrice));
   });
 
   // Submit transaksi
@@ -476,6 +523,7 @@ $(document).ready(function () {
       var date = $('#datePicker').val();
       var customer = $('#customerCode').val();
       var address = $('#customerAddress').val();
+      var discount = $('#discount').val();
       var shipping = ongkir;
       var item = [];
 
@@ -500,6 +548,7 @@ $(document).ready(function () {
       Sales.Form ["address"] = address;
       Sales.Form ["shipping_fee"] = shipping;
       Sales.Form ["items"] = items;
+      Sales.Form ["discount"] = parseInt(discount);
 
       console.log(Sales.Form);
 
@@ -526,33 +575,7 @@ $(document).ready(function () {
   // END OF BUAT TRANSAKSI
 
   // DAFTAR
-  Daftar.Init('/sales');
-  Daftar.GetData(function (data) {
-    $('#tablePenjualan tbody').html('');
-    data.forEach(e => {
-      let empty = '';
-      var date = e.date;
-      if (e.customer.type == '1') {
-        var name = e.customer.name;
-      } else {
-        var name = e.customer.group_name;
-      }
-      var row = `
-      <tr>
-        <td>${date}</td>
-        <td>${name}</td>
-        <td>Belum Dibayar</td>
-        <td>
-          <button type="button" class="btn btn-info">Cetak Kwitansi Pembayaran
-            Pelanggan</button>
-          <button type="button" class="btn btn-success">Dibayar</button>
-          <button type="button" class="btn btn-warning">Ubah</button>
-          <button type="button" class="btn btn-danger">Hapus</button>
-        </td>
-      </tr>`
-      $('#tablePenjualan tbody').append(row);
-    });
-  });
+  
   // END OF DAFTAR
 
 });
