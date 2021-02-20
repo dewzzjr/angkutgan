@@ -41,6 +41,7 @@ func (h *HTTP) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params
 		Name:    h.Config.CookieName,
 		Value:   tokenString,
 		Expires: expirationTime,
+		Domain:  r.Host,
 		Path:    "/",
 	})
 	response.JSON(w, map[string]interface{}{
@@ -52,6 +53,7 @@ func (h *HTTP) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params
 func (h *HTTP) Logout(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    h.Config.CookieName,
+		Domain:  r.Host,
 		Expires: time.Now(),
 	})
 	response.JSON(w, map[string]interface{}{
@@ -80,6 +82,7 @@ func (h *HTTP) Refresh(w http.ResponseWriter, r *http.Request, p httprouter.Para
 		Name:    h.Config.CookieName,
 		Value:   tokenString,
 		Expires: expirationTime,
+		Domain:  r.Host,
 		Path:    "/",
 	})
 	response.JSON(w, map[string]interface{}{
@@ -113,6 +116,70 @@ func (h *HTTP) CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.P
 	}
 	payload.Birthdate, _ = time.Parse(model.DateFormat, payload.BirthdateStr)
 	if err := h.users.Create(ctx, payload, claims.UserID); err != nil {
+		response.Error(w, err)
+		return
+	}
+	response.JSON(w, map[string]interface{}{
+		"result": "OK",
+	})
+}
+
+// GetUserProfile by token session cookies
+func (h *HTTP) GetUserProfile(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	ctx := r.Context()
+	claims, ok := h.Auth(ctx, w, r)
+	if !ok {
+		return
+	}
+	result, err := h.users.Get(ctx, claims.Username)
+	if err != nil {
+		response.Error(w, err)
+		return
+	}
+	response.JSON(w, map[string]interface{}{
+		"result": result,
+	})
+}
+
+// PatchUserProfile by token session cookies
+func (h *HTTP) PatchUserProfile(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	ctx := r.Context()
+	claims, ok := h.Auth(ctx, w, r)
+	if !ok {
+		return
+	}
+	payload := model.UserInfo{}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	payload.ID = claims.UserID
+	payload.Birthdate, _ = time.Parse(model.DateFormat, payload.BirthdateStr)
+	if err := h.users.Edit(ctx, payload, claims.UserID); err != nil {
+		response.Error(w, err)
+		return
+	}
+	response.JSON(w, map[string]interface{}{
+		"result": "OK",
+	})
+}
+
+// ChangePassword by old password new password and username from token session cookies
+func (h *HTTP) ChangePassword(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	ctx := r.Context()
+	claims, ok := h.Auth(ctx, w, r)
+	if !ok {
+		return
+	}
+	var payload struct {
+		New string `json:"new"`
+		Old string `json:"old"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if err := h.users.ChangePassword(ctx, claims.Username, payload.New, payload.Old); err != nil {
 		response.Error(w, err)
 		return
 	}

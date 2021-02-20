@@ -115,7 +115,7 @@ SET
 	modified_by = ?,
 	update_time = CURRENT_TIMESTAMP
 WHERE
-	id = ? OR user_id = ?
+	user_id = ?
 `
 
 // EditUser update user information
@@ -129,10 +129,45 @@ func (d *Database) EditUser(ctx context.Context, data model.UserInfo, actionBy i
 		data.Birthdate,
 		data.Religion,
 		actionBy,
-		data.InfoID,
 		data.ID,
 	); err != nil {
 		err = errors.Wrapf(err, "ExecContext [%v]", data)
+	}
+	return
+}
+
+const qGetProfile = `SELECT
+	user_id,
+	i.id
+	username,
+	nik,
+	ktp,
+	fullname,
+	address,
+	phone,
+	COALESCE(DATE_FORMAT(birthdate, '%d/%m/%Y'), '') AS birthdate,
+	religion
+FROM users AS u
+JOIN user_info AS i ON u.id = i.user_id
+WHERE
+	username = ?
+`
+
+// GetUserProfile get user information
+func (d *Database) GetUserProfile(ctx context.Context, username string) (data model.UserInfo, err error) {
+	if err = d.DB.QueryRowxContext(ctx, qGetProfile, username).Scan(
+		&data.ID,
+		&data.InfoID,
+		&data.Username,
+		&data.NIK,
+		&data.KTP,
+		&data.Fullname,
+		&data.Address,
+		&data.Phone,
+		&data.Birthdate,
+		&data.Religion,
+	); err != nil {
+		err = errors.Wrapf(err, "QueryRowxContext [%s]", username)
 	}
 	return
 }

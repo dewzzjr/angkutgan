@@ -2,6 +2,7 @@ package sales
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
@@ -14,14 +15,40 @@ func (i *Sales) GetDetail(ctx context.Context, code string, date time.Time) (tx 
 		err = errors.Wrap(err, "GetTransaction")
 		return
 	}
-	if tx.Payment, err = i.payments.GetByTransactionID(ctx, tx.ID); err != nil {
-		err = errors.Wrap(err, "GetByTransactionID")
+	tx, err = i.completeTx(ctx, tx)
+	return
+}
+
+// GetByCustomer by customer code and transaction date
+func (i *Sales) GetByCustomer(ctx context.Context, page, row int, customer string, date time.Time) (txs []model.Transaction, err error) {
+	if txs, err = i.transaction.GetByCustomer(ctx,
+		strings.TrimSpace(customer),
+		model.Sales,
+		date,
+		page,
+		row,
+	); err != nil {
+		err = errors.Wrap(err, "GetByCustomer")
 		return
 	}
-	if tx.Shipment, err = i.shipment.GetByTransactionID(ctx, tx.ID); err != nil {
-		err = errors.Wrap(err, "GetByTransactionID")
+
+	txs, err = i.bulkTx(ctx, txs)
+	return
+}
+
+// GetList sales using pagination
+func (i *Sales) GetList(ctx context.Context, page, row int, date time.Time) (txs []model.Transaction, err error) {
+	if txs, err = i.transaction.GetList(ctx,
+		model.Sales,
+		date,
+		page,
+		row,
+	); err != nil {
+		err = errors.Wrap(err, "GetList")
 		return
 	}
+
+	txs, err = i.bulkTx(ctx, txs)
 	return
 }
 

@@ -27,4 +27,7 @@ type iDatabase interface {
 	GetUserLogin(ctx context.Context, claim *model.Claims) (err error)
 	VerifyUser(ctx context.Context, username, password string) (ok bool, err error)
 	CreateUser(ctx context.Context, data model.UserInfo, actionBy int64) (err error)
+	EditUser(ctx context.Context, data model.UserInfo, actionBy int64) (err error)
+	ChangePassword(ctx context.Context, username, newPassword string) (err error)
+	GetUserProfile(ctx context.Context, username string) (data model.UserInfo, err error)
 }

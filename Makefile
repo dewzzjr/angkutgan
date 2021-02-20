@@ -42,6 +42,9 @@ build:
 	@go mod vendor
 	@./scripts/build.sh
 
+run:
+	@go run cmd/main.go
+
 check:
 	@echo $(OSFLAG)
 	@golangci-lint run ./...

@@ -33,7 +33,7 @@ func New(cfg config.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
 		Router:    httprouter.New(),
 		Config:    cfg,
 		View:      v,
-		users:     bypass(u.Users, cfg.ByPass),
+		users:     u.Users,
 		items:     u.Items,
 		customers: u.Customers,
 		sales:     u.Sales,
@@ -51,6 +51,9 @@ type iUsers interface {
 	GetByToken(ctx context.Context, token string) (user model.Claims, tkn *jwt.Token, err error)
 	RefreshSession(ctx context.Context, claim *model.Claims) (expire time.Time, ok bool)
 	Create(ctx context.Context, data model.UserInfo, actionBy int64) (err error)
+	Get(ctx context.Context, username string) (user model.UserInfo, err error)
+	Edit(ctx context.Context, user model.UserInfo, actionBy int64) (err error)
+	ChangePassword(ctx context.Context, username, newPass, oldPass string) (err error)
 }
 type iItems interface {
 	GetList(ctx context.Context, page int, row int) (items []model.Item, err error)
@@ -77,6 +80,8 @@ type iAjax interface {
 }
 type iSales interface {
 	GetDetail(ctx context.Context, code string, date time.Time) (tx model.Transaction, err error)
+	GetByCustomer(ctx context.Context, page, row int, customer string, date time.Time) (txs []model.Transaction, err error)
+	GetList(ctx context.Context, page, row int, date time.Time) (txs []model.Transaction, err error)
 	CreateTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
 	EditTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
 }

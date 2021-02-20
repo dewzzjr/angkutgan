@@ -19,7 +19,7 @@ func (h *HTTP) GetCustomers(w http.ResponseWriter, r *http.Request, p httprouter
 	keyword := r.FormValue("keyword")
 	var err error
 	var result []model.Customer
-	if len(keyword) > 3 {
+	if len(keyword) > model.MinLengthKeyword {
 		result, err = h.customers.GetByKeyword(ctx, page, row, keyword)
 	} else {
 		result, err = h.customers.GetList(ctx, page, row)

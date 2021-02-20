@@ -43,6 +43,7 @@ const (
 	qGetReturns = `SELECT
 	DATE_FORMAT(r.date, '%d/%m/%Y') AS date,
 	DATE_FORMAT(s.date, '%d/%m/%Y') AS s_date,
+	DATE_FORMAT(s.deadline, '%d/%m/%Y') AS deadline,
 	r.id AS id,
 	r.s_id AS s_id,
 	i.item AS code,

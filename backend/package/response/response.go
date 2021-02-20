@@ -20,11 +20,14 @@ func JSON(w http.ResponseWriter, object interface{}) {
 }
 
 // Error response when error from internal server
-func Error(w http.ResponseWriter, err error) {
+func Error(w http.ResponseWriter, err error, status ...int) {
 	if os.Getenv("LOG_LEVEL") == "DEBUG" {
 		log.Printf("ERR %+v", err)
 	} else {
 		log.Printf("ERR %s", err)
+	}
+	if len(status) > 0 {
+		w.WriteHeader(status[0])
 	}
 	w.WriteHeader(http.StatusInternalServerError)
 }
