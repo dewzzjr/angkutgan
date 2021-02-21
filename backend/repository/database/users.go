@@ -138,7 +138,7 @@ func (d *Database) EditUser(ctx context.Context, data model.UserInfo, actionBy i
 
 const qGetProfile = `SELECT
 	user_id,
-	i.id
+	i.id,
 	username,
 	nik,
 	ktp,
@@ -164,7 +164,7 @@ func (d *Database) GetUserProfile(ctx context.Context, username string) (data mo
 		&data.Fullname,
 		&data.Address,
 		&data.Phone,
-		&data.Birthdate,
+		&data.BirthdateStr,
 		&data.Religion,
 	); err != nil {
 		err = errors.Wrapf(err, "QueryRowxContext [%s]", username)
