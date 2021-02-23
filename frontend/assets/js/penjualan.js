@@ -49,7 +49,7 @@ const Sales = {
     date: '',
     customer: '',
     project_id: 0,
-    deposit: 0,
+    //deposit: 0,
     discount: 0,
     address: '',
     shipping_fee: 0,
@@ -57,6 +57,38 @@ const Sales = {
   },
   Set: function (data) {
     Sales.Form = data;
+  },
+  Edit: function (callback, failedCallback) {
+    let data = this.Form;
+    let set = this.Set;
+    let retries = false;
+    $.ajax({
+      type: 'PATCH',
+      url: `/sales`,
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      success: function (data, status, xhr) {
+        if (status === 'success') {
+          set(data.result);
+          if (callback) {
+            callback(data.result);
+            Daftar.Reload();
+          }
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log(status, error);
+        if (failedCallback) {
+          failedCallback(error);
+        }
+        if (xhr.status == 401 && !retries) {
+          retries = true;
+          Auth.Refresh(function() {
+            $.ajax(this);
+          });
+        }
+      },
+    });
   },
   Edit: function (callback, failedCallback) {
     let data = this.Form;
@@ -142,10 +174,13 @@ $(document).ready(function () {
 
   // BUAT TRANSAKSI
   var rowIdx = 0;
+  var rowIdxEdit = 0;
   var totalPrice = 0;
   var ongkir = 0;
   var disc = 0;
   var finalPrice = 0;
+  //var idTrx = 0;
+  //var deposit = 0;
   let itemObj = [];
   let projs = [];
 
@@ -212,9 +247,9 @@ $(document).ready(function () {
     var tdTotal = $('<td>');
     var tdBtn = $('<td>');
     th.append(last.code);
-    tdJumlah.append(last.amount);
-    tdHarga.append(currency(last.price));
-    tdTotal.append(currency(last.amount*last.price));
+    tdJumlah.append(last.count);
+    tdHarga.append(last.price);
+    tdTotal.append(currency(last.count*double(last.price)));
     tdBtn.append(
       `<button type="button" class="btn btn-warning edit">Ubah</button>
       <button type="button" class="btn btn-danger remove">Hapus</button>`
@@ -244,7 +279,7 @@ $(document).ready(function () {
   }
 
   function updateTotalEdit($param){    
-    totalPrice += $param;
+    totalPrice += double($param);
   }
 
   function updateFinal(){
@@ -277,6 +312,8 @@ $(document).ready(function () {
     $('#total span').text('Rp 0,00');
     $('#diskon span').text('0 % = Rp 0,00');
     $('#totalFinal span').text('Rp 0,00');
+    $('#submit').removeClass('submitEdit');
+    $('#submit').addClass('submit');
 
     itemObj = [];
   }
@@ -305,7 +342,7 @@ $(document).ready(function () {
     $.each(itemObj, function(i, item) {
       var li = (`
       <li class="list-group-item text-right" id="${item["id"]}">
-      ${item["name"]} &times; ${item["amount"]} = ${currency(item["total"])}
+      ${item["name"]} &times; ${item["count"]} = ${item["total"]}
       </li>`);
       newList.push(li);
       updateTotalEdit(item["total"]);
@@ -617,7 +654,7 @@ $(document).ready(function () {
   });
 
   // Submit transaksi
-  $('#submit').on('click', function (e) {
+  $('.submit').off().on('click', function (e) {
     if (!$('#datePicker').val() || !$('#customerName').val() || itemObj.length < 1) {
       $('#warningSubmit').show('fade');
       setTimeout (function(){
@@ -664,6 +701,7 @@ $(document).ready(function () {
         Loading.End();
 
         resetForm();
+        $('body').scrollTop(0);
 
       }, () => {
         $('#failedSubmit').show('fade');
@@ -681,7 +719,7 @@ $(document).ready(function () {
   // DAFTAR
   // http://localhost:8000/sales/dewangga/20210218
   var result = {
-    "date": "18/02/2021",
+    "date": "23/02/2021",
     "customer": {
       "code": "DEWANGGA"
     },
@@ -689,7 +727,6 @@ $(document).ready(function () {
   
   // Edit Transaksi
   $('#tablePenjualan').delegate('.editSales', 'click', function (e) {
-    //var id = $(this).data('id');
     var dateAr = result.date.split('/');
     var date = dateAr[2] + dateAr[1] + dateAr[0];
     var customer = result.customer.code;
@@ -707,6 +744,8 @@ $(document).ready(function () {
   var customer = Menu.Query['customer'];
   var date = Menu.Query['date'];
   if (customer && date) {
+    $('#submit').removeClass('submit');
+    $('#submit').addClass('submitEdit');
     Sales.GetDetail(customer, date, (s) => {
       $('#datePicker').val(dateFormatReset(s.date));
       $('#customerCode').val(s.customer.code);
@@ -715,6 +754,8 @@ $(document).ready(function () {
       $('#discount').val(disc);
       ongkir = s.shipping_fee;
       $('#deliveryFee').val(ongkir);
+      idTrx = s.id;
+      deposit = s.deposit;
 
       if ($('#customerCode').val()) {
         Pelanggan.GetDetail(s.customer.code, (p) => {
@@ -777,24 +818,30 @@ $(document).ready(function () {
 
       for (var i = 0; i < s.items.length; i++){
         let listItem = {};
-        var id = s.items[i].id;
+        var id = 'item' + rowIdxEdit;
         var code = s.items[i].code;
         var name = s.items[i].name;
         var price = s.items[i].price;
-        var amount = s.items[i].amount;
+        var count = s.items[i].amount;
         var total = s.items[i].price * s.items[i].amount;
 
         listItem ["id"] = id;
         listItem ["code"] = code;
         listItem ["name"] = name;
-        listItem ["price"] = price;
-        listItem ["amount"] = amount;
-        listItem ["total"] = total;
+        Barang.GetDetail(code, (b) => {
+          listItem ["unit"] = b.unit;
+        });
+        listItem ["price"] = currency(price);
+        listItem ["count"] = count;
+        listItem ["total"] = currency(total);
 
         itemObj.push(listItem);
+
+        addTableEdit();
+
+        ++rowIdxEdit;
       }
 
-      addTableEdit();
       if ($('#discount').val()) { updateDiscount() };
       $('#ongkir span').text(currency(ongkir));
       showRingkasanEdit();
@@ -805,5 +852,66 @@ $(document).ready(function () {
       console.log(disc);
     });
   }
+
+  $('.submitEdit').off().on('click', function (e) {
+    if (!$('#datePicker').val() || !$('#customerName').val() || itemObj.length < 1) {
+      $('#warningSubmit').show('fade');
+      setTimeout (function(){
+        $('#warningSubmit').hide('fade');
+      }, 3000);
+    } else {
+      var date = $('#datePicker').val();
+      var customer = $('#customerCode').val();
+      var address = $('#customerAddress').val();
+      var discount = $('#discount').val();
+      var shipping = ongkir;
+      var item = [];
+
+      for (var i = 0; i < itemObj.length; i++){
+        let listItem = {};
+        var code = itemObj[i].code.split('-');
+        var newCode = code[0];
+        var price = double(itemObj[i].price);
+        var amount = parseInt(itemObj[i].count);
+
+        listItem ["code"] = newCode;
+        listItem ["price"] = price;
+        listItem ["amount"] = amount;
+
+        item.push(listItem);
+      }
+
+      var items = item;
+
+      Sales.Form ["date"] = dateFormat(date);
+      Sales.Form ["customer"] = customer;
+      Sales.Form ["address"] = address;
+      Sales.Form ["shipping_fee"] = shipping;
+      Sales.Form ["items"] = items;
+      Sales.Form ["discount"] = parseInt(discount);
+
+      console.log(Sales.Form);
+
+      Sales.Edit(() => {
+        $('#successSubmit').show('fade');
+        setTimeout (function(){
+          $('#successSubmit').hide('fade');
+        }, 3000);
+        Loading.End();
+
+        resetForm();
+        $('body').scrollTop(0);
+
+      }, () => {
+        $('#failedSubmit').show('fade');
+        setTimeout (function(){
+          $('#failedSubmit').hide('fade');
+        }, 3000);
+        Loading.End();
+      });
+
+      e.preventDefault();
+    }
+  });
   // END OF DAFTAR
 });

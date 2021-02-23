@@ -2,6 +2,10 @@
 <!-- BUAT TRANSAKSI -->
 <div class="tab-pane fade" id="create" role="tabpanel">
     <form id="formAddSales">
+        <div id="successSubmit" class="alert alert-success collapse">
+            <a id="linkClose" href="#" class="close">&times;</a>
+            <strong>Success!</strong> Transaksi telah dibuat
+        </div>
         <div class="form-row">
             <div class="form-group col-2">
                 <label for="pickDate">Tanggal</label>
@@ -134,16 +138,12 @@
             <a id="linkClose" href="#" class="close">&times;</a>
             <strong>Error!</strong> Form tidak dapat disubmit
         </div>
-        <div id="successSubmit" class="alert alert-success collapse">
-            <a id="linkClose" href="#" class="close">&times;</a>
-            <strong>Success!</strong> Transaksi telah dibuat
-        </div>
         <div id="warningSubmit" class="alert alert-warning collapse">
             <a id="linkClose" href="#" class="close">&times;</a>
             <strong>Warning!</strong> Lengkapi form sebelum submit
         </div>
     </form>
-    <button class="btn btn-success btn-block" type="submit" id="submit">Submit</button>
+    <button class="btn btn-success btn-block submit" type="submit" id="submit">Submit</button>
 </div>
 <!-- END BUAT TRANSAKSI -->
 {{ end }}
