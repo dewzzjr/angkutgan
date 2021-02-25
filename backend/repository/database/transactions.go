@@ -3,12 +3,157 @@ package database
 import (
 	"context"
 	"database/sql"
+	"strings"
 	"time"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
+
+const qGetListTransactions = `SELECT
+	DATE_FORMAT(tx.date, '%d/%m/%Y') as date,
+	tx.id as id,
+	ss.address as address,
+	ss.total_price as total_price,
+	COALESCE(ss.deposit, 0) as deposit,
+	COALESCE(ss.discount, 0) as discount,
+	COALESCE(ss.shipping_fee, 0) as shipping_fee,
+	COALESCE(DATE_FORMAT(tx.done_date, '%d/%m/%Y'), '') as done_date,
+	COALESCE(DATE_FORMAT(tx.paid_date, '%d/%m/%Y'), '') as paid_date,
+	COALESCE(ss.project, 0) as project_id,
+	COALESCE(pr.name, '') as project_name,
+	cs.code as customer_code, 
+	cs.name as customer_name, 
+	cs.type as customer_type,
+	cs.address as customer_address,
+	cs.phone as customer_phone, 
+	COALESCE(cs.nik, '') as nik,
+	COALESCE(cs.role, '') as role,
+	COALESCE(cs.group_name, '') as group_name
+FROM
+	transactions AS tx
+JOIN
+	snapshot AS ss ON tx.id = ss.t_id
+JOIN
+	customers AS cs ON tx.customer = cs.code
+LEFT JOIN
+	projects AS pr ON ss.project = pr.id
+WHERE tx.type = ? AND tx.date <= ?
+ORDER BY tx.date DESC
+LIMIT ? OFFSET ?
+`
+
+// GetListTransactions with pagination
+func (d *Database) GetListTransactions(ctx context.Context, txType model.TransactionType, date time.Time, limit, offset int) (txs []model.Transaction, err error) {
+	var rows *sqlx.Rows
+	if rows, err = d.DB.QueryxContext(ctx, qGetListTransactions,
+		txType,
+		date,
+		limit,
+		offset,
+	); err != nil {
+		err = errors.Wrapf(err, "QueryxContext [%s, %d, %d]", txType, limit, offset)
+		return
+	}
+	if txs, err = d.GetSnapshotTx(ctx, rows); err != nil {
+		err = errors.Wrap(err, "GetSnapshotTx")
+		return
+	}
+	return
+}
+
+const qGetListTransactionsByCustomer = `SELECT
+	DATE_FORMAT(tx.date, '%d/%m/%Y') as date,
+	tx.id as id,
+	ss.address as address,
+	ss.total_price as total_price,
+	COALESCE(ss.deposit, 0) as deposit,
+	COALESCE(ss.discount, 0) as discount,
+	COALESCE(ss.shipping_fee, 0) as shipping_fee,
+	COALESCE(DATE_FORMAT(tx.done_date, '%d/%m/%Y'), '') as done_date,
+	COALESCE(DATE_FORMAT(tx.paid_date, '%d/%m/%Y'), '') as paid_date,
+	COALESCE(ss.project, 0) as project_id,
+	COALESCE(pr.name, '') as project_name,
+	cs.code as customer_code, 
+	cs.name as customer_name, 
+	cs.type as customer_type,
+	cs.address as customer_address,
+	cs.phone as customer_phone, 
+	COALESCE(cs.nik, '') as nik,
+	COALESCE(cs.role, '') as role,
+	COALESCE(cs.group_name, '') as group_name
+FROM
+	transactions AS tx
+JOIN
+	snapshot AS ss 
+		ON tx.id = ss.t_id
+JOIN
+	customers AS cs ON tx.customer = cs.code
+LEFT JOIN
+	projects AS pr ON ss.project = pr.id
+WHERE tx.type = ? AND tx.customer = ? AND tx.date <= ?
+ORDER BY tx.date DESC
+LIMIT ? OFFSET ?
+`
+
+// GetListTransactionsByCustomer by customer code using pagination
+func (d *Database) GetListTransactionsByCustomer(ctx context.Context, customer string, txType model.TransactionType, date time.Time, limit, offset int) (txs []model.Transaction, err error) {
+	var rows *sqlx.Rows
+	if rows, err = d.DB.QueryxContext(ctx, qGetListTransactionsByCustomer,
+		txType,
+		strings.ToUpper(customer),
+		date,
+		limit,
+		offset,
+	); err != nil {
+		err = errors.Wrapf(err, "QueryxContext [%s, %s, %d, %d]", txType, customer, limit, offset)
+		return
+	}
+	if txs, err = d.GetSnapshotTx(ctx, rows); err != nil {
+		err = errors.Wrap(err, "GetSnapshotTx")
+		return
+	}
+	return
+}
+
+// GetSnapshotTx bulk snapshot
+func (d *Database) GetSnapshotTx(ctx context.Context, rows *sqlx.Rows) (txs []model.Transaction, err error) {
+	defer rows.Close()
+	for rows.Next() {
+		var tx model.Transaction
+		if err = rows.Scan(
+			&tx.Date,
+			&tx.ID,
+			&tx.Address,
+			&tx.TotalPrice,
+			&tx.Deposit,
+			&tx.Discount,
+			&tx.ShippingFee,
+			&tx.DoneDate,
+			&tx.PaidDate,
+			&tx.ProjectID,
+			&tx.ProjectName,
+			&tx.Customer.Code,
+			&tx.Customer.Name,
+			&tx.Customer.Type,
+			&tx.Customer.Address,
+			&tx.Customer.Phone,
+			&tx.Customer.NIK,
+			&tx.Customer.Role,
+			&tx.Customer.GroupName,
+		); err != nil {
+			err = errors.Wrapf(err, "Scan")
+			continue
+		}
+		if tx.Snapshot.Items, err = d.GetSnapshotItems(ctx, tx.ID); err != nil {
+			err = errors.Wrapf(err, "GetSnapshotItems")
+			continue
+		}
+		txs = append(txs, tx)
+	}
+	return
+}
 
 const qGetTransaction = `SELECT
 	tx.id,
@@ -88,7 +233,9 @@ const qGetSnapshotItems = `SELECT
 	COALESCE(t.claim, 0) AS claim,
 	COALESCE(t.time_unit, 0) AS time_unit,
 	COALESCE(t.duration, 0) AS duration,
-	COALESCE(t.amount, 0) - SUM(COALESCE(p.amount, 0)) - SUM(COALESCE(s.amount, 0)) AS need_shipment
+	COALESCE(t.amount, 0) - SUM(COALESCE(p.amount, 0)) - SUM(COALESCE(s.amount, 0)) AS need_shipment,
+	SUM(COALESCE(n.amount, 0)) AS extend_amount,
+	COALESCE(p.prev_snapshot, 0) AS previous_id
 FROM
 	snapshot_item AS t
 JOIN

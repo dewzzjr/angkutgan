@@ -6,8 +6,17 @@ const DateFormat = "02/01/2006"
 // ParamFormat date format when used as parameter
 const ParamFormat = "20060102"
 
+// QueryDate date format when used as query
+const QueryDate = "2006-01-02"
+
 // MaxAutoComplete number of autocomplete search result
 const MaxAutoComplete = 3
+
+// MinLengthKeyword minimum length of keyword
+const MinLengthKeyword = 2
+
+// MaxWorkers max goroutine worker
+const MaxWorkers = 3
 
 // ColumnProjects additional data for customers
 const ColumnProjects = "projects"

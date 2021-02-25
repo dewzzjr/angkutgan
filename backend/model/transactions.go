@@ -1,18 +1,24 @@
 package model
 
-import "github.com/pkg/errors"
+import (
+	"time"
+
+	"github.com/pkg/errors"
+)
 
 // Transaction is model for Transaksi Penjualan/Persewaan
 type Transaction struct {
 	ID       int64    `json:"id"`
-	Date     string   `json:"date"`
+	Date     string   `json:"tx_date"`
 	Customer Customer `json:"customer"`
 	Snapshot
-	Payment  []Payment  `json:"payment"`
-	PaidDate string     `json:"paid_date"`
-	Shipment []Shipment `json:"shipment"`
-	Return   []Return   `json:"return,omitempty"`
-	DoneDate string     `json:"done_date"`
+	PaidDate    string     `json:"paid_date"`
+	DoneDate    string     `json:"done_date"`
+	Payment     []Payment  `json:"payment"`
+	Shipment    []Shipment `json:"shipment"`
+	Return      []Return   `json:"return,omitempty"`
+	Status      TxStatus   `json:"status"`
+	DateSummary TxDate     `json:"date"`
 }
 
 // Snapshot is model for extend Transaction
@@ -38,6 +44,8 @@ type SnapshotItem struct {
 	TimeUnit     RentUnit `json:"time_unit,omitempty" db:"time_unit"`
 	Duration     int      `json:"duration,omitempty" db:"duration"`
 	NeedShipment int      `json:"need_shipment,omitempty" db:"need_shipment"`
+	ExtendAmount int      `json:"extend_amount,omitempty" db:"extend_amount"`
+	PreviousID   int64    `json:"previous_id,omitempty" db:"previous_id"`
 }
 
 // CreateTransaction payload to create transaction
@@ -100,4 +108,101 @@ func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
 	}
 	tx.TotalPrice = total
 	return
+}
+
+// TxStatus is part of TxSummary
+type TxStatus struct {
+	Description  string `json:"desc"`
+	Done         bool   `json:"done"`
+	InPayment    bool   `json:"in_payment"`
+	PaymentDone  bool   `json:"payment_done"`
+	InShipping   bool   `json:"in_shipping"`
+	ShippingDone bool   `json:"shipping_done"`
+	IsDeadline   bool   `json:"is_deadline"`
+	IsReturn     bool   `json:"is_return"`
+	IsExtend     bool   `json:"is_extend"`
+}
+
+// Desc status description
+func (t *TxStatus) Desc(txType TransactionType) {
+	switch {
+	case t.Done && t.ShippingDone && t.PaymentDone:
+		t.Description = "SELESAI"
+	case t.Done && t.InPayment && !t.PaymentDone:
+		t.Description = "BELUM LUNAS"
+	case t.Done && t.IsExtend:
+		t.Description = "DIPERPANJANG"
+	case !t.Done && t.ShippingDone && t.IsDeadline && !t.IsReturn && txType == Rental:
+		t.Description = "BATAS WAKTU"
+	case !t.Done && t.ShippingDone && !t.IsDeadline && !t.IsReturn && txType == Rental:
+		t.Description = "SEDANG DIPINJAM"
+	case !t.Done && t.ShippingDone:
+		t.Description = "SELESAI DIKIRIM"
+	case !t.Done && t.InShipping && !t.ShippingDone:
+		t.Description = "SEDANG DIKIRIM"
+	case !t.Done && t.InPayment && !t.InShipping:
+		t.Description = "DIBAYAR"
+	case !t.Done && !t.InPayment:
+		t.Description = "BARU"
+	default:
+	}
+}
+
+// TxDate is part of TxSummary
+type TxDate struct {
+	Transaction      string `json:"transaction"`
+	LastShipmentDate string `json:"last_shipment"`
+	LastPaymentDate  string `json:"last_payment"`
+	RecentDateline   string `json:"recent_deadline"`
+}
+
+// Summary date and status transaction summary
+func (t *Transaction) Summary(txType TransactionType) {
+	t.DateSummary.Transaction = t.Date
+	if len(t.Payment) > 0 {
+		t.DateSummary.LastPaymentDate = t.Payment[0].Date
+		t.Status.InPayment = true
+	}
+	if len(t.Shipment) > 0 {
+		t.DateSummary.LastShipmentDate = t.Shipment[0].Date
+		t.Status.InShipping = true
+	}
+	if t.PaidDate != "" {
+		t.Status.PaymentDone = true
+	}
+	if t.DoneDate != "" {
+		t.Status.ShippingDone = true
+	}
+	if txType == Rental {
+		var needReturn int
+		var deadline time.Time
+		for _, s := range t.Shipment {
+			for _, i := range s.Items {
+				needReturn += i.NeedReturn
+				if i.NeedReturn > 0 {
+					newDeadline, _ := time.Parse(DateFormat, i.Deadline)
+					if deadline.IsZero() || deadline.After(newDeadline) {
+						deadline = newDeadline
+						continue
+					}
+				}
+			}
+		}
+		if needReturn == 0 {
+			t.Status.IsReturn = true
+		}
+		if !deadline.IsZero() {
+			t.DateSummary.RecentDateline = deadline.Format(DateFormat)
+			if deadline.After(time.Now()) {
+				t.Status.IsDeadline = true
+			}
+		}
+		for _, i := range t.Snapshot.Items {
+			if i.ExtendAmount != 0 {
+				t.Status.IsExtend = true
+				break
+			}
+		}
+	}
+	(&t.Status).Desc(txType)
 }

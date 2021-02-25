@@ -581,14 +581,14 @@ $(document).ready(function () {
 
     $('#rentRows').append(form);    
     let editRent = function (here) {
-      let row = $(this).parents('.form-row');
+      let row = $(here).parents('.form-row');
       $(row).find('input, select').removeAttr('disabled');
       $(row).find('.edit-rent').removeClass('btn-warning');
       $(row).find('.edit-rent').addClass('btn-success');
       $(row).find('.edit-rent').html('OK');
       $(row).find('.edit-rent').unbind('click');
       $(row).find('.edit-rent').on('click', function() {
-        okRent($(this));
+        okRent($(here));
       });
       $(row).find('.edit-rent').addClass('ok-rent');
       $(row).find('.edit-rent').removeClass('edit-rent');
@@ -602,7 +602,7 @@ $(document).ready(function () {
       $(row).find('.ok-rent').html('Edit');
       $(row).find('.ok-rent').unbind('click');
       $(row).find('.ok-rent').on('click', function() {
-        editRent($(this));
+        editRent($(here));
       });
       $(row).find('.ok-rent').addClass('edit-rent');
       $(row).find('.ok-rent').removeClass('ok-rent');
@@ -644,15 +644,19 @@ $(document).ready(function () {
     }
 
     $('.edit-rent').on('click', function() {
+      console.log('edit', $(this).parents('.form-row').html());
       editRent($(this));
     });
     $('.ok-rent').on('click', function() {
+      console.log('ok', $(this).parents('.form-row').html());
       okRent($(this));
     });
     $('.delete-rent').on('click', function () {
+      console.log('delete', $(this).parents('.form-row').html());
       deleteRent($(this));
     });
   }
+
   $('#addRent').on('click', function () {
     addRent(Harga.LenRent());
     Harga.AppendRent({

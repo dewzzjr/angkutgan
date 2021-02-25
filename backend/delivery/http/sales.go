@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
@@ -69,5 +70,30 @@ func (h *HTTP) PatchSalesTransaction(w http.ResponseWriter, r *http.Request, p h
 	}
 	response.JSON(w, map[string]interface{}{
 		"result": "OK",
+	})
+}
+
+// GetSales get list of sales tx
+func (h *HTTP) GetSales(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	ctx := r.Context()
+	page, _ := strconv.Atoi(r.FormValue("page"))
+	row, _ := strconv.Atoi(r.FormValue("row"))
+	customer := r.FormValue("customer")
+	date, err := time.Parse(model.DateFormat, r.FormValue("date"))
+	if err != nil {
+		date = time.Now()
+	}
+	var result []model.Transaction
+	if customer != "" {
+		result, err = h.sales.GetByCustomer(ctx, page, row, customer, date)
+	} else {
+		result, err = h.sales.GetList(ctx, page, row, date)
+	}
+	if err != nil {
+		response.Error(w, err)
+		return
+	}
+	response.JSON(w, map[string]interface{}{
+		"result": result,
 	})
 }

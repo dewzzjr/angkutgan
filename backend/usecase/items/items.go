@@ -13,6 +13,7 @@ import (
 func (i *Items) GetList(ctx context.Context, page int, row int) (items []model.Item, err error) {
 	if items, err = i.database.GetListItems(ctx, row, pagination.Offset(page, row)); err != nil {
 		err = errors.Wrap(err, "GetListItems")
+		return
 	}
 	for i, item := range items {
 		for j, rent := range item.Price.Rent {
@@ -31,6 +32,7 @@ func (i *Items) GetByKeyword(ctx context.Context, page int, row int, key string)
 		model.ColumnRents,
 	); err != nil {
 		err = errors.Wrap(err, "GetListItemsByKeyword")
+		return
 	}
 	for i, item := range items {
 		for j, rent := range item.Price.Rent {
@@ -44,6 +46,7 @@ func (i *Items) GetByKeyword(ctx context.Context, page int, row int, key string)
 func (i *Items) Get(ctx context.Context, code string) (item model.Item, err error) {
 	if item, err = i.database.GetItemDetail(ctx, code); err != nil {
 		err = errors.Wrap(err, "GetItemDetail")
+		return
 	}
 	for j, rent := range item.Price.Rent {
 		item.Price.Rent[j].TimeUnitDesc = rent.TimeUnit.String()

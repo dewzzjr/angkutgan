@@ -25,6 +25,9 @@ func (h *HTTP) Routing() {
 	h.Router.POST("/user/logout", h.Logout)
 	h.Router.POST("/user/session", h.Refresh)
 	h.Router.POST("/user/create", h.CreateUser)
+	h.Router.GET("/user/profile", h.GetUserProfile)
+	h.Router.PATCH("/user/profile", h.PatchUserProfile)
+	h.Router.POST("/user/password", h.ChangePassword)
 
 	h.Router.GET("/items", h.GetItems)
 	h.Router.POST("/item", h.PostItemByCode)
@@ -38,6 +41,7 @@ func (h *HTTP) Routing() {
 	h.Router.PATCH("/customer/:code", h.PatchCustomerByCode)
 	h.Router.DELETE("/customer/:code", h.DeleteCustomerByCode)
 
+	h.Router.GET("/sales", h.GetSales)
 	h.Router.GET("/sales/:customer/:date", h.GetSalesByCustomerDate)
 	h.Router.POST("/sales", h.PostSalesTransaction)
 	h.Router.PATCH("/sales", h.PatchSalesTransaction)

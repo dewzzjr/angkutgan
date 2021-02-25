@@ -9,17 +9,19 @@ import (
 
 // Sales usecase object
 type Sales struct {
-	database iDatabase
-	payments iPayments
-	shipment iShipment
+	database    iDatabase
+	payments    iPayments
+	shipment    iShipment
+	transaction iTransaction
 }
 
 // New initiate usecase/sales
-func New(database iDatabase, payments iPayments, shipment iShipment) *Sales {
+func New(database iDatabase, payments iPayments, shipment iShipment, transaction iTransaction) *Sales {
 	return &Sales{
-		database: database,
-		payments: payments,
-		shipment: shipment,
+		database:    database,
+		payments:    payments,
+		shipment:    shipment,
+		transaction: transaction,
 	}
 }
 
@@ -37,4 +39,9 @@ type iShipment interface {
 
 type iPayments interface {
 	GetByTransactionID(ctx context.Context, txID int64) (pay []model.Payment, err error)
+}
+
+type iTransaction interface {
+	GetList(ctx context.Context, txType model.TransactionType, date time.Time, page, row int) (txs []model.Transaction, err error)
+	GetByCustomer(ctx context.Context, customer string, txType model.TransactionType, date time.Time, page, row int) (txs []model.Transaction, err error)
 }

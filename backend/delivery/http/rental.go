@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/dewzzjr/angkutgan/backend/model"
@@ -19,6 +20,31 @@ func (h *HTTP) GetRentalByCustomerDate(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 	result, err := h.rental.GetDetail(ctx, p.ByName("customer"), date)
+	if err != nil {
+		response.Error(w, err)
+		return
+	}
+	response.JSON(w, map[string]interface{}{
+		"result": result,
+	})
+}
+
+// GetRental get list of rental tx
+func (h *HTTP) GetRental(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	ctx := r.Context()
+	page, _ := strconv.Atoi(r.FormValue("page"))
+	row, _ := strconv.Atoi(r.FormValue("row"))
+	customer := r.FormValue("customer")
+	date, err := time.Parse(model.DateFormat, r.FormValue("date"))
+	if err != nil {
+		date = time.Now()
+	}
+	var result []model.Transaction
+	if customer != "" {
+		result, err = h.rental.GetByCustomer(ctx, page, row, customer, date)
+	} else {
+		result, err = h.rental.GetList(ctx, page, row, date)
+	}
 	if err != nil {
 		response.Error(w, err)
 		return

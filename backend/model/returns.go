@@ -18,6 +18,7 @@ type ReturnItem struct {
 	Claim        int        `json:"claim,omitempty" db:"claim"`
 	ShipmentID   int64      `json:"shipment_id" db:"s_id"`
 	ShipmentDate string     `json:"shipment_date" db:"s_date"`
+	DeadlineDate string     `json:"deadline_date" db:"dateline"`
 }
 
 // Validate return with snapshot item

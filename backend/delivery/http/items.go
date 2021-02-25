@@ -19,7 +19,7 @@ func (h *HTTP) GetItems(w http.ResponseWriter, r *http.Request, p httprouter.Par
 	keyword := r.FormValue("keyword")
 	var err error
 	var result []model.Item
-	if len(keyword) > 3 {
+	if len(keyword) > model.MinLengthKeyword {
 		result, err = h.items.GetByKeyword(ctx, page, row, keyword)
 	} else {
 		result, err = h.items.GetList(ctx, page, row)

@@ -1,3 +1,4 @@
+
 $.ajaxSetup({
   xhrFields: {
     withCredentials: true
@@ -9,6 +10,7 @@ var Auth = {
   setUser: function (user) {
     this.User = user;
   },
+  countdown: 0,
   unauthorized: function () {
     let tab = $(".tab-content .tab-pane.active.show").attr('id');
     let redirect = window.location.pathname + (tab ? "?action=" + tab : '');
@@ -31,6 +33,7 @@ var Auth = {
           if (callback) {
             callback(data.result);
           }
+          Auth.CheckExpire();
         }
       },
       error: function (xhr, status, error) {
@@ -45,7 +48,7 @@ var Auth = {
     let set = this.setUser
     $.ajax({
       type: 'POST',
-      url: 'user/logout',
+      url: '/user/logout',
       contentType: 'application/json',
       success: function (data, status, xhr) {
         set({});
@@ -67,31 +70,31 @@ var Auth = {
     } else {
       $.ajax({
         type: 'GET',
-        url: 'user/info',
+        url: '/user/info',
         contentType: 'application/json',
+        beforeSend: function() {
+          Auth.CheckExpire();
+        },
         success: function (data, status, xhr) {
           if (status === 'success') {
             Auth.setUser(data.result);
             if (callback) {
               callback(data.result);
             }
+            Auth.CheckExpire();
           }
         },
         error: function (xhr, status, error) {
-          if (xhr.status == 401) {
-            Auth.Refresh(callback);
-            return
-          }
           Auth.unauthorized();
           console.log(status, error);
         },
       });
     }
   },
-  Refresh: function (callback) {
+  Refresh: function (callback, failedCallback) {
     $.ajax({
       type: 'POST',
-      url: 'user/session',
+      url: '/user/session',
       contentType: 'application/json',
       success: function (data, status, xhr) {
         if (status === 'success') {
@@ -99,14 +102,26 @@ var Auth = {
           if (callback) {
             callback(data.result);
           }
+          Auth.CheckExpire();
         }
       },
       error: function (xhr, status, error) {
-        Auth.unauthorized();
+        if (failedCallback) {
+          failedCallback()
+        }
+        if (xhr.status == 401) {
+          Auth.unauthorized();
+        }
         console.log(status, error);
       },
     });
   },
+  CheckExpire: function (callback, failedCallback) {
+    clearTimeout(Auth.countdown);
+    Auth.countdown = setTimeout(() => {
+      Auth.Refresh(callback, failedCallback)
+    }, (Auth.User.exp - 30) * 1000 - $.now());
+  }
 };
 
 const Daftar = {
@@ -198,9 +213,12 @@ function alert() {
  });
 }
 
-function header() {
+function header(callback) {
   Auth.Get(function (u) {
     $('#headerUsername').html(u.username);
+    if (callback) {
+      callback(u);
+    }
   });
   let path = window.location.pathname;
   let active = $(`[href="${path}"]`);
