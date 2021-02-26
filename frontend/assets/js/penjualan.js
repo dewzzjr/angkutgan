@@ -45,16 +45,7 @@ const Barang = {
 };
 
 const Sales = {
-  Form: {
-    date: '',
-    customer: '',
-    project_id: 0,
-    //deposit: 0,
-    discount: 0,
-    address: '',
-    shipping_fee: 0,
-    items: []
-  },
+  Form: {},
   Set: function (data) {
     Sales.Form = data;
   },
@@ -179,10 +170,10 @@ $(document).ready(function () {
   var ongkir = 0;
   var disc = 0;
   var finalPrice = 0;
-  //var idTrx = 0;
-  //var deposit = 0;
   let itemObj = [];
   let projs = [];
+  var deposit = 0;
+  var project_id = 0;
 
   // Convert number to currency
   function currency($param){
@@ -439,6 +430,7 @@ $(document).ready(function () {
             if ($(this).val() == value) {
               $('#customerAddress').val(projs[i].location);
               $("#customerAddress").attr("disabled", true);
+              project_id = value;
             }
           }
           if ($(this).val() == "alamat") {
@@ -690,6 +682,7 @@ $(document).ready(function () {
       Sales.Form ["shipping_fee"] = shipping;
       Sales.Form ["items"] = items;
       Sales.Form ["discount"] = parseInt(discount);
+      Sales.Form ["project_id"] = project_id;
 
       console.log(Sales.Form);
 
@@ -717,19 +710,94 @@ $(document).ready(function () {
   // END OF BUAT TRANSAKSI
 
   // DAFTAR
-  // http://localhost:8000/sales/dewangga/20210218
-  var result = {
-    "date": "23/02/2021",
-    "customer": {
-      "code": "DEWANGGA"
-    },
-  };
+  Daftar.Init('/sales');
+  Daftar.GetData(function (data) {
+    $('#tablePenjualan tbody').html('');
+    data.forEach(s => {
+      if (s.customer.type == "1") {
+        var name = s.customer.name;
+      } else {
+        var name = s.customer.group_name;
+      }
+      var dateAr = s.tx_date.split('/');
+      var date = dateAr[2] + dateAr[1] + dateAr[0];
+      var customer = s.customer.code;
+
+      if (s.status.desc == "BARU") {
+        var status = `<td>Belum Dibayar</td>`
+        var button = `
+        <td>
+            <button type="button" class="btn btn-info print">Cetak Kwitansi Pembayaran
+                Pelanggan</button>
+            <br>
+            <button type="button" class="btn btn-success paid">Dibayar</button>
+            <button type="button" class="btn btn-warning editSales" data-id="DEWANGGA">Ubah</button>
+            <button type="button" class="btn btn-danger delete">Hapus</button>
+        </td>`
+      } else if (s.status.payment_done) {
+        var status = `<td>Sudah Dibayar</td>`
+        var button = `
+        <button type="button" class="btn btn-info print">Cetak Surat Jalan Keluar</button>
+        <br>
+        <button type="button" class="btn btn-warning shipment">Dikirim</button>`
+      } else if (s.status.in_shipping) {
+        var status = `<td>Siap Dikirim tgl 20/12/2020</td>`
+        var button = `
+        <button type="button" class="btn btn-info print">Cetak Surat Jalan Keluar</button>
+        <br>
+        <button type="button" class="btn btn-warning editShipment">Ubah Waktu Pengiriman</button>`
+      } else if (s.status.done) {
+        var status = `<td>Selesai</td>`
+        var button = `<td></td>`
+      }
+
+      var row = `
+      <tr data-date=${date} data-customer=${customer}>
+        <td>${s.tx_date}</td>
+        <td>${name}</td>
+        ${status}
+        ${button}
+      </tr>`
+      $('#tablePenjualan').append(row);
+    });
+  });
   
+  function printAlertBox(){
+    $('#printAlertBox').show('fade');
+    setTimeout (function(){
+      $('#printAlertBox').hide('fade');
+    }, 3000);
+  }
+  function paidAlertBox(){
+    $('#paidAlertBox').show('fade');
+    setTimeout (function(){
+      $('#paidAlertBox').hide('fade');
+    }, 3000);
+  }
+  function delAlertBox(){
+    $('#delAlertBox').show('fade');
+    setTimeout (function(){
+      $('#delAlertBox').hide('fade');
+    }, 3000);
+  }
+
+  $('#tablePenjualan').delegate('.paid', 'click', function (e) {
+    paidAlertBox();    
+  });
+
+  $('#tablePenjualan').delegate('.print', 'click', function (e) {
+    printAlertBox();    
+  });
+
+  $('#tablePenjualan').delegate('.delete', 'click', function (e) {
+    delAlertBox();    
+  });
+
   // Edit Transaksi
   $('#tablePenjualan').delegate('.editSales', 'click', function (e) {
-    var dateAr = result.date.split('/');
-    var date = dateAr[2] + dateAr[1] + dateAr[0];
-    var customer = result.customer.code;
+    var row = $(this).closest('tr');
+    var customer = row.data('customer');
+    var date = row.data('date');
     var query = {
       customer: customer,
       date: date,
@@ -747,14 +815,13 @@ $(document).ready(function () {
     $('#submit').removeClass('submit');
     $('#submit').addClass('submitEdit');
     Sales.GetDetail(customer, date, (s) => {
-      $('#datePicker').val(dateFormatReset(s.date));
+      $('#datePicker').val(dateFormatReset(s.tx_date));
       $('#customerCode').val(s.customer.code);
       $('#customerName').val(s.customer.name);
       disc = s.discount;
       $('#discount').val(disc);
       ongkir = s.shipping_fee;
       $('#deliveryFee').val(ongkir);
-      idTrx = s.id;
       deposit = s.deposit;
 
       if ($('#customerCode').val()) {
@@ -888,6 +955,7 @@ $(document).ready(function () {
       Sales.Form ["address"] = address;
       Sales.Form ["shipping_fee"] = shipping;
       Sales.Form ["items"] = items;
+      Sales.Form ["deposit"] = deposit;
       Sales.Form ["discount"] = parseInt(discount);
 
       console.log(Sales.Form);
