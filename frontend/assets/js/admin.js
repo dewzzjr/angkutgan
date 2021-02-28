@@ -53,6 +53,9 @@ const User = {
 };
 
 $(document).ready(function () {
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+  
+  
   header();
   var user = Auth.User;
   console.log(user);
@@ -64,6 +67,7 @@ $(document).ready(function () {
     return newDate;
   }
 
+  // Reset form after submit
   function resetForm() {
       $('#codeAdd').val('');
       $('#nameAdd').attr('disabled', true).val('');
@@ -75,7 +79,8 @@ $(document).ready(function () {
       $('#religionAdd').attr('disabled', true).val('');
   }
 
-  $('#codeAdd').on('change paste', function() {
+  // Tambah user
+  $('#codeAdd').on('change paste keyup', function() {
     if ($(this).val()) {
       $('#nameAdd').attr('disabled', false);
       $('#phoneAdd').attr('disabled', false);
@@ -137,6 +142,9 @@ $(document).ready(function () {
 
     e.preventDefault();
   });
+
+  //Daftar user
+  
 
 
 });

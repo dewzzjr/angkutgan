@@ -731,7 +731,7 @@ $(document).ready(function () {
                 Pelanggan</button>
             <br>
             <button type="button" class="btn btn-success paid">Dibayar</button>
-            <button type="button" class="btn btn-warning editSales" data-id="DEWANGGA">Ubah</button>
+            <button type="button" class="btn btn-warning editSales">Ubah</button>
             <button type="button" class="btn btn-danger delete">Hapus</button>
         </td>`
       } else if (s.status.payment_done) {
