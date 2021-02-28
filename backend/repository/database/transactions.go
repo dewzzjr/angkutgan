@@ -213,7 +213,10 @@ func (d *Database) GetTransaction(ctx context.Context, date time.Time, code stri
 		&tx.Customer.NIK,
 		&tx.Customer.Role,
 		&tx.Customer.GroupName,
-	); err != nil {
+	); err == sql.ErrNoRows {
+		err = nil
+		return
+	} else if err != nil {
 		err = errors.Wrapf(err, "QueryRowxContext [%s, %v]", code, date)
 		return
 	}
@@ -228,6 +231,7 @@ const qGetSnapshotItems = `SELECT
 	t.id,
 	t.item,
 	i.name,
+	i.unit AS item_unit,
 	t.amount,
 	t.price,
 	COALESCE(t.claim, 0) AS claim,
@@ -255,6 +259,10 @@ func (d *Database) GetSnapshotItems(ctx context.Context, txID int64) (items []mo
 	items = make([]model.SnapshotItem, 0)
 	if err = d.DB.SelectContext(ctx, &items, qGetSnapshotItems, txID); err != nil {
 		err = errors.Wrapf(err, "SelectContext [%d]", txID)
+		return
+	}
+	for i, v := range items {
+		items[i].TimeUnitDesc = v.TimeUnit.String()
 	}
 	return
 }
@@ -342,7 +350,6 @@ func (d *Database) UpdateTransaction(ctx context.Context, txID int64, txType mod
 			item.Code,
 			item.Amount,
 			item.Price,
-			NullInt(item.Claim),
 			NullInt(int(item.TimeUnit)),
 			NullInt(item.Duration),
 		); err != nil {
@@ -389,11 +396,10 @@ INTO
 		item,
 		amount,
 		price,
-		claim,
 		time_unit,
 		duration
 	)
-VALUE ( ?, ?, ?, ?, ?, ?, ? )
+VALUE ( ?, ?, ?, ?, ?, ? )
 `
 )
 
@@ -441,7 +447,6 @@ func (d *Database) InsertTransaction(ctx context.Context, txType model.Transacti
 			item.Code,
 			item.Amount,
 			item.Price,
-			NullInt(item.Claim),
 			NullInt(int(item.TimeUnit)),
 			NullInt(item.Duration),
 		); err != nil {

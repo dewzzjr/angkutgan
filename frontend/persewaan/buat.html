@@ -1,170 +1,169 @@
 {{ define "persewaan/buat" }}
 <!-- BUAT TRANSAKSI -->
 <div class="tab-pane fade" id="create" role="tabpanel">
-    <div class="form-row">
-        <div class="form-group col-4">
-            <label for="customerCode">Kode Pelanggan</label>
-            <div class="input-group">
-                <select name="code" class="form-control autocomplete" id="customerCode"
-                    data-url="testdata/pelanggan.json" autocomplete="off"></select>
-            </div>
-        </div>
-        <div class="form-group col-8">
-            <label for="customerName">Nama</label>
-            <input class="form-control" type="text" disabled id="customerName" value="PT. Sejahtera Indah">
-        </div>
-    </div>
-    <table class="table" id="tableBarang">
-        <thead>
-            <tr>
-                <th scope="col">Kode</th>
-                <th scope="col">Jumlah</th>
-                <th scope="col">Waktu</th>
-                <th scope="col">Harga</th>
-                <th scope="col">Total</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">MH001</th>
-                <td>3 Batang</td>
-                <td>2 Minggu</td>
-                <td>Rp10.000/Minggu</td>
-                <th>Rp60.000</th>
-                <td>
-                    <button type="button" class="btn btn-warning">Ubah</button>
-                    <button type="button" class="btn btn-danger">Hapus</button>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="6">
-                    <div class="form-row">
-                        <div class="form-group col-12 col-md-6">
-                            <label for="addCodeBarang">Kode Barang</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <button class="btn btn-outline-secondary" type="button" id="setCode">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                </div>
-                                <select name="code" class="form-control autocomplete" id="addCodeBarang"
-                                    data-url="testdata/barang.json" autocomplete="off"></select>
-                            </div>
-                        </div>
-                        <div class="form-group col-12 col-md-6">
-                            <label for="nameEdit">Nama Barang</label>
-                            <input disabled name="name" type="text" class="form-control" id="nameEdit"
-                                value="Mainframe">
-                        </div>
-                        <div class="form-group col-6 col-md-4 align-middle">
-                            <div class="row">
-                                <label class="col-form-label col-md-12 col-3">Harga</label>
-                                <div class="col-md-12 col-9">
-                                    <div class="form-check m-2">
-                                        <input class="form-check-input" type="radio" name="price" id="day1"
-                                            value="10000">
-                                        <label class="form-check-label" for="day1">
-                                            1 Minggu - Rp10.000
-                                        </label>
-                                    </div>
-                                    <div class="form-check m-2">
-                                        <input class="form-check-input" type="radio" name="price" id="week1"
-                                            value="20000">
-                                        <label class="form-check-label" for="week1">
-                                            7 Minggu - Rp20.000
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-6 col-md-4">
-                            <label for="countBarang">Jumlah</label>
-                            <div class="input-group">
-                                <input name="count" type="number" class="form-control" id="countBarang">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">Batang</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-6 col-md-4">
-                            <label for="timeBarang">Waktu</label>
-                            <div class="input-group">
-                                <input name="time" type="number" class="form-control" id="timeBarang">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">&times; 7 Minggu</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-6 col-md-4 offset-md-8">
-                            <label for="totalBarang">Total</label>
-                            <div class="input-group">
-                                <input disabled name="total" type="text" class="form-control" id="totalBarang">
-                                <div class="input-group-append">
-                                    <button class="btn btn-success">Tambah</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <div class="form-row">
-        <div class="form-group col-12">
-            <label for="customerAddress">Lokasi</label>
-            <textarea class="form-control" type="text" disabled
-                id="customerAddress">Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan Timur 75122</textarea>
-        </div>
-        <div class="form-group col-12 col-md-6">
-            <label for="discount">Diskon</label>
-            <div class="input-group">
-                <input name="time" type="number" class="form-control" id="discount" max="100" min="0">
-                <div class="input-group-append">
-                    <span class="input-group-text">%</span>
-                </div>
-            </div>
-        </div>
-        <div class="form-group col-12 col-md-6">
-            <label for="deliveryFee">Ongkos Kirim</label>
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Rp</span>
-                </div>
-                <input name="delivery" type="number" class="form-control" id="deliveryFee">
-            </div>
-        </div>
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    Ringkasan
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">PT. Sejahtera Indah</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">
-                        Jl. Pasundan No.21, Jawa, Kec. Samarinda Ulu, Kota Samarinda, Kalimantan
-                        Timur 75122
-                    </h6>
-                    <p class="card-text">CP Eko Patrio - 085777888999</p>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item text-right">
-                        Mainframe &times; 3 Batang &times; 3 Minggu = Rp90.000
-                    </li>
-                    <li class="list-group-item text-right">
-                        Baut &times; 2 Buah &times; 3 Minggu = Rp6.000
-                    </li>
-                    <li class="list-group-item text-right">
-                        Ongkos Kirim = Rp50.000
-                    </li>
-                </ul>
-                <div class="card-footer text-right font-weight-bold">
-                    Total Tagihan: Rp146.000
-                </div>
-            </div>
-        </div>
-    </div>
-    <button type="submit" class="btn btn-success btn-block">Submit</button>
+	<div class="form-row initialTx">
+		<div class="form-group col-6">
+			<label for="txDate">Tanggal</label>
+			<input name="tx_date" class="form-control datepicker txID" id="txDate" autocomplete="off" />
+		</div>
+		<div class="form-group col-6">
+			<label for="customerCode">Kode Pelanggan</label>
+			<div class="input-group">
+				<select name="customer" class="form-control autocomplete txID" id="customerCode" autocomplete="off"></select>
+			</div>
+		</div>
+		<div class="form-group col">
+			<label for="customerName">Nama</label>
+			<input class="form-control customerName" type="text" disabled id="customerName">
+		</div>
+	</div>
+	<form id="formTx">
+		<table class="table" id="tableBarang">
+			<thead>
+				<tr>
+					<th scope="col">Kode</th>
+					<th scope="col">Jumlah</th>
+					<th scope="col">Waktu</th>
+					<th scope="col">Harga</th>
+					<th scope="col">Total</th>
+					<th scope="col"></th>
+				</tr>
+			</thead>
+			<tbody class="items">
+				<tr>
+					<td colspan="6">
+						<div class="form-row" id="formItem">
+							<div class="form-group col-12 col-md-6">
+								<label for="addCodeBarang">Kode Barang</label>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<button class="btn btn-outline-secondary" type="button" id="setCode">
+											<i class="fas fa-check"></i>
+										</button>
+									</div>
+									<select name="code" class="form-control autocomplete" id="addCodeBarang" autocomplete="off"></select>
+								</div>
+							</div>
+							<div class="form-group col-12 col-md-6">
+								<label for="nameBarang">Nama Barang</label>
+								<input disabled name="name" type="text" class="form-control" id="nameBarang">
+							</div>
+							<div class="form-group col-6 col-md-4 align-middle">
+								<div class="row">
+									<label class="col-form-label col-md-12 col-3">Harga</label>
+									<div class="col-md-12 col-9 rentSelection">
+										<!-- LOAD BY JS -->
+									</div>
+								</div>
+							</div>
+							<div class="form-group col-6 col-md-4">
+								<label for="countBarang">Jumlah</label>
+								<div class="input-group">
+									<input name="amount" type="number" class="form-control" id="countBarang" min="0">
+									<div class="input-group-append">
+										<span class="input-group-text" id="itemUnit"></span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group col-6 col-md-4">
+								<label for="timeBarang">Waktu</label>
+								<div class="input-group">
+									<input name="time" type="number" class="form-control" id="timeBarang" min="0">
+									<div class="input-group-append">
+										<span class="input-group-text" id="timeDuration">&times;</span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group col-6 col-md-4 offset-md-8">
+								<label for="totalBarang">Total</label>
+								<div class="input-group">
+									<input disabled name="total" type="number" class="form-control" id="totalBarang">
+									<div class="input-group-append">
+										<input type="hidden" name="unit">
+										<input type="hidden" name="timeunit">
+										<input type="hidden" name="duration">
+										<span id="itemAction">
+											<button class="btn btn-success" id="itemSubmit" disabled>Tambah</input>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="form-row">
+			<div class="form-group col-12">
+				<label for="projectTx">Proyek</label>
+				<select name="project_id" class="form-control" id="projectTx"></select>
+			</div>
+			<div class="form-group col-12">
+				<label for="customerAddress">Lokasi</label>
+				<textarea name="address" class="form-control" type="text" id="customerAddress" disabled></textarea>
+			</div>
+			<div class="form-group col-12 col-md-4">
+				<label for="discountItem">Diskon</label>
+				<div class="input-group">
+					<input name="discount" type="number" class="form-control" id="discountItem" max="100" min="0">
+					<div class="input-group-append">
+						<span class="input-group-text">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="form-group col-12 col-md-4">
+				<label for="deliveryFee">Ongkos Kirim</label>
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">Rp</span>
+					</div>
+					<input name="shipping_fee" type="number" class="form-control" id="deliveryFee">
+				</div>
+			</div>
+			<div class="form-group col-12 col-md-4">
+				<label for="depositFee">Deposit</label>
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">Rp</span>
+					</div>
+					<input name="deposit" type="number" class="form-control" id="depositFee">
+				</div>
+			</div>
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header">
+						Ringkasan
+					</div>
+					<div class="card-body">
+						<h5 class="card-title customerName"></h5>
+						<h6 class="card-subtitle mb-2 text-muted shippingLocation"></h6>
+						<p class="card-text contactPerson"></p>
+					</div>
+					<ul class="list-group list-group-flush itemSummary">
+						<li class="list-group-item text-right">
+							Mainframe &times; 3 Batang &times; 3 Minggu = Rp90.000
+						</li>
+						<li class="list-group-item text-right">
+							Baut &times; 2 Buah &times; 3 Minggu = Rp6.000
+						</li>
+						<li class="list-group-item text-right">
+							Ongkos Kirim = Rp50.000
+						</li>
+					</ul>
+					<div class="card-footer text-right font-weight-bold">
+						Total Tagihan: <span id="totalFee"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="alert alert-success fade none" role="alert">
+			<span id="messageTx"></span>
+			<button type="button" class="close">
+				<span>&times;</span>
+			</button>
+		</div>
+		<button type="submit" class="btn btn-success btn-block">Submit</button>
+	</form>
 </div>
 <!-- END BUAT TRANSAKSI -->
 {{ end }}

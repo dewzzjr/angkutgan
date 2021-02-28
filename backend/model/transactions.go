@@ -35,17 +35,22 @@ type Snapshot struct {
 
 // SnapshotItem is model for Barang dalam Transaksi
 type SnapshotItem struct {
-	ID           int64    `json:"id" db:"id"`
+	// GET and POST
 	Code         string   `json:"code" db:"item"`
-	Name         string   `json:"name" db:"name"`
 	Amount       int      `json:"amount" db:"amount"`
 	Price        int      `json:"price" db:"price"`
-	Claim        int      `json:"claim,omitempty" db:"claim"`
 	TimeUnit     RentUnit `json:"time_unit,omitempty" db:"time_unit"`
+	TimeUnitDesc string   `json:"time_unit_desc,omitempty" db:"-"`
 	Duration     int      `json:"duration,omitempty" db:"duration"`
-	NeedShipment int      `json:"need_shipment,omitempty" db:"need_shipment"`
-	ExtendAmount int      `json:"extend_amount,omitempty" db:"extend_amount"`
 	PreviousID   int64    `json:"previous_id,omitempty" db:"previous_id"`
+	// GET only
+	ID           int64  `json:"id" db:"id"`
+	Name         string `json:"name" db:"name"`
+	Unit         string `json:"item_unit" db:"item_unit"`
+	NeedShipment int    `json:"need_shipment,omitempty" db:"need_shipment"`
+	ExtendAmount int    `json:"extend_amount,omitempty" db:"extend_amount"`
+	// POST on specific action
+	Claim int `json:"claim,omitempty" db:"claim"`
 }
 
 // CreateTransaction payload to create transaction

@@ -24,8 +24,13 @@ func (h *HTTP) GetRentalByCustomerDate(w http.ResponseWriter, r *http.Request, p
 		response.Error(w, err)
 		return
 	}
+	var success bool
+	if result.ID > 0 {
+		success = true
+	}
 	response.JSON(w, map[string]interface{}{
-		"result": result,
+		"success": success,
+		"result":  result,
 	})
 }
 

@@ -248,6 +248,7 @@ function formatPrice(number) {
   var formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
+    currencySign: 'accounting',
   
     // These options are needed to round to whole numbers if that's what you want.
     minimumFractionDigits: 2, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
@@ -332,7 +333,7 @@ const Form = {
     message.forEach(e => {
       let input = $(form).find(`[name="${e.name}"]`);
       $(input).addClass('is-invalid');
-      $(input).parent('.form-group').append(`<div class="invalid-feedback">${e.text}</div>`);
+      $(input).parents().find('.input-group').append(`<div class="invalid-feedback">${e.text}</div>`);
     });
   },
 };
