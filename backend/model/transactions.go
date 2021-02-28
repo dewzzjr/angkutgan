@@ -85,14 +85,12 @@ func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
 			tx.Items[i].TimeUnit = 0
 			tx.Items[i].Duration = 0
 
-			price := (100 - tx.Discount) / 100 * item.Price
+			price := (100 - tx.Discount) * item.Price / 100
 			subTotal := item.Amount * price
-
-			tx.Items[i].Price = price
 			total += subTotal
 		}
 	case Rental:
-		for i, item := range tx.Items {
+		for _, item := range tx.Items {
 			if item.Code == "" {
 				err = errors.New("kode barang kosong")
 				return
@@ -101,10 +99,8 @@ func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
 				err = errors.New("satuan waktu tidak valid")
 				return
 			}
-			price := (100 - tx.Discount) / 100 * item.Price
+			price := (100 - tx.Discount) * item.Price / 100
 			subTotal := item.Amount * item.Duration * price
-
-			tx.Items[i].Price = price
 			total += subTotal
 		}
 	default:

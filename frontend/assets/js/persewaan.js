@@ -279,6 +279,7 @@ $(document).ready(function () {
           Transactions.Edit(() => {
             Form.Message('success', 'berhasil mengubah transaksi', $('#messageTx'));
             Loading.End();
+            clearTx();
             Form.Reset($('#formTx'));
           }, () => {
             Form.Message('danger', 'gagal mengubah transaksi', $('#messageTx'));
@@ -288,6 +289,7 @@ $(document).ready(function () {
           Transactions.Create(() => {
             Form.Message('success', 'berhasil membuat transaksi', $('#messageTx'));
             Loading.End();
+            clearTx();
             Form.Reset($('#formTx'));
           }, () => {
             Form.Message('danger', 'gagal membuat transaksi', $('#messageTx'));
@@ -312,6 +314,7 @@ $(document).ready(function () {
   });
   $('#customerCode').on('autocomplete.select', function (e, select) {
     if (!select) {
+      getTransaction(e);
       return;
     }
     Transactions.GetCustomer(select.value, (customer) => {
@@ -359,7 +362,7 @@ $(document).ready(function () {
   }
 
   // DATE
-  $('#formTx').hide();
+  $('#tableBarang').hide();
   var getTransaction = (e) => {
     let customer = $('[name="customer"]').val();
     let date = $('[name="tx_date"]').val();
@@ -369,14 +372,14 @@ $(document).ready(function () {
         setEdit(ok);
         Transactions.IsEdit = true;
         Loading.End();
-        $('#formTx').show();
+        $('#tableBarang').show();
       }, () => {
         Transactions.IsEdit = false;
         Loading.End();
-        $('#formTx').show();
+        $('#tableBarang').show();
       });
     } else {
-      $('#formTx').hide();
+      $('#tableBarang').hide();
     }
   }
   $('[name="tx_date"]').datepicker({
@@ -431,7 +434,7 @@ $(document).ready(function () {
       $('[name="amount"]').val(edit.amount);
       $('#itemAction').html(action);
       $('#itemSubmit').on('click', editItem);
-      $('#itemCancel').on('click', clear);
+      $('#itemCancel').on('click', clearItem);
     }
     Transactions.GetItem(code, (item) => {
       if (edit) {
@@ -545,7 +548,7 @@ $(document).ready(function () {
     total += discountPrice + shippingFee + depositFee;
     $('#totalFee').html(formatPrice(total));
   }
-  var clear = function () {
+  var clearItem = function () {
     $('#addCodeBarang').autoComplete('clear');
     $('#itemUnit').html('');
     $('#timeDuration').html('');
@@ -554,6 +557,16 @@ $(document).ready(function () {
     $('[name="amount"]').attr('max', 0);
     $('#itemAction').html('<button class="btn btn-success" id="itemSubmit" disabled>Tambah</input>');
     $('#itemSubmit').on('click', addItem);
+  }
+  var clearTx = function () {
+    $('#customerCode').autoComplete('clear');
+    $('[name="tx_date"]').datepicker('update', new Date());
+    $('#formTx input, #formTx textarea, #formTx select').val('');
+    $('#formTx input, #formTx textarea').val('');
+    Transactions.Items = [];
+    Transactions.Reload();
+    clearItem();
+    summary();
   }
   var calculateItem = function () {
     let i = getCalculation();
@@ -584,18 +597,20 @@ $(document).ready(function () {
       time_unit_desc: unitdesc,
       duration: i.time * i.duration,
     };
-    Transactions.AddItem(item, clear);
+    Transactions.AddItem(item, clearItem);
     summary();
   }
   var editItem = function (e) {
     e.preventDefault();
     let i = getCalculation();
     let timeunit = parseInt($('[name="timeunit"]').val()) || 0;
-    let unitdesc = $('[name="unit"]').val()
+    let unitdesc = $('[name="unit"]').val();
+    let itemName = $('[name="name"]').val();
     let code = $('[name="code"]').val();
     let itemunit = $('#itemUnit').html();
     let item = {
       code: code,
+      name: itemName,
       price: i.price / i.duration,
       amount: i.amount,
       item_unit: itemunit,
@@ -604,7 +619,7 @@ $(document).ready(function () {
       duration: i.time * i.duration,
     };
     let index = parseInt($(this).data('index'));
-    Transactions.EditItem(item, index, clear);
+    Transactions.EditItem(item, index, clearItem);
     summary();
   }
   $('#itemSubmit').on('click', addItem);
