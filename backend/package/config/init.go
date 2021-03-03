@@ -26,8 +26,6 @@ func init() {
 		if config == nil {
 			log.Fatalln("no config loaded")
 		}
-		// fmt.Printf("%+v", config)
-		// os.Exit(0)
 	}
 }
 

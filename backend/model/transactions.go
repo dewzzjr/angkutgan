@@ -35,17 +35,22 @@ type Snapshot struct {
 
 // SnapshotItem is model for Barang dalam Transaksi
 type SnapshotItem struct {
-	ID           int64    `json:"id" db:"id"`
+	// GET and POST
 	Code         string   `json:"code" db:"item"`
-	Name         string   `json:"name" db:"name"`
 	Amount       int      `json:"amount" db:"amount"`
 	Price        int      `json:"price" db:"price"`
-	Claim        int      `json:"claim,omitempty" db:"claim"`
 	TimeUnit     RentUnit `json:"time_unit,omitempty" db:"time_unit"`
+	TimeUnitDesc string   `json:"time_unit_desc,omitempty" db:"-"`
 	Duration     int      `json:"duration,omitempty" db:"duration"`
-	NeedShipment int      `json:"need_shipment,omitempty" db:"need_shipment"`
-	ExtendAmount int      `json:"extend_amount,omitempty" db:"extend_amount"`
 	PreviousID   int64    `json:"previous_id,omitempty" db:"previous_id"`
+	// GET only
+	ID           int64  `json:"id" db:"id"`
+	Name         string `json:"name" db:"name"`
+	Unit         string `json:"item_unit" db:"item_unit"`
+	NeedShipment int    `json:"need_shipment,omitempty" db:"need_shipment"`
+	ExtendAmount int    `json:"extend_amount,omitempty" db:"extend_amount"`
+	// POST on specific action
+	Claim int `json:"claim,omitempty" db:"claim"`
 }
 
 // CreateTransaction payload to create transaction
@@ -80,14 +85,12 @@ func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
 			tx.Items[i].TimeUnit = 0
 			tx.Items[i].Duration = 0
 
-			price := (100 - tx.Discount) / 100 * item.Price
+			price := (100 - tx.Discount) * item.Price / 100
 			subTotal := item.Amount * price
-
-			tx.Items[i].Price = price
 			total += subTotal
 		}
 	case Rental:
-		for i, item := range tx.Items {
+		for _, item := range tx.Items {
 			if item.Code == "" {
 				err = errors.New("kode barang kosong")
 				return
@@ -96,10 +99,8 @@ func (tx *CreateTransaction) Calculate(txType TransactionType) (err error) {
 				err = errors.New("satuan waktu tidak valid")
 				return
 			}
-			price := (100 - tx.Discount) / 100 * item.Price
+			price := (100 - tx.Discount) * item.Price / 100
 			subTotal := item.Amount * item.Duration * price
-
-			tx.Items[i].Price = price
 			total += subTotal
 		}
 	default:

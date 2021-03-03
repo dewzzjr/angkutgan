@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     -- SALES (1), RENTAL (2),
     type INT NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP,
     paid_date DATE,
     done_date DATE,
     modified_by INT,

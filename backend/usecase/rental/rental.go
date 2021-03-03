@@ -15,19 +15,11 @@ func (i *Rental) GetDetail(ctx context.Context, code string, date time.Time) (tx
 		err = errors.Wrap(err, "GetTransaction")
 		return
 	}
-	if tx.Payment, err = i.payments.GetByTransactionID(ctx, tx.ID); err != nil {
-		err = errors.Wrap(err, "GetByTransactionID")
+	// empty struct when not found
+	if tx.ID == 0 {
 		return
 	}
-	if tx.Shipment, err = i.shipment.GetByTransactionID(ctx, tx.ID); err != nil {
-		err = errors.Wrap(err, "GetByTransactionID")
-		return
-	}
-	if tx.Return, err = i.returns.GetByTransactionID(ctx, tx.ID); err != nil {
-		err = errors.Wrap(err, "GetByTransactionID")
-		return
-	}
-	(&tx).Summary(model.Rental)
+	tx, err = i.completeTx(ctx, tx)
 	return
 }
 
@@ -74,21 +66,7 @@ func (i *Rental) GetList(ctx context.Context, page, row int, date time.Time) (tx
 		return
 	}
 
-	for t, tx := range txs {
-		if txs[t].Payment, err = i.payments.GetByTransactionID(ctx, tx.ID); err != nil {
-			err = errors.Wrap(err, "GetByTransactionID")
-			return
-		}
-		if txs[t].Shipment, err = i.shipment.GetByTransactionID(ctx, tx.ID); err != nil {
-			err = errors.Wrap(err, "GetByTransactionID")
-			return
-		}
-		if txs[t].Return, err = i.returns.GetByTransactionID(ctx, tx.ID); err != nil {
-			err = errors.Wrap(err, "GetByTransactionID")
-			return
-		}
-		(&(txs[t])).Summary(model.Rental)
-	}
+	txs, err = i.bulkTx(ctx, txs)
 	return
 }
 

@@ -15,6 +15,10 @@ func (i *Sales) GetDetail(ctx context.Context, code string, date time.Time) (tx 
 		err = errors.Wrap(err, "GetTransaction")
 		return
 	}
+	// empty struct when not found
+	if tx.ID == 0 {
+		return
+	}
 	tx, err = i.completeTx(ctx, tx)
 	return
 }
