@@ -1,6 +1,6 @@
 const User = {
   Form: {
-    username: '',
+    username: '', //validate ajax di tambah user
     fullname: '',
     address: '',
     phone: '',
@@ -81,23 +81,30 @@ $(document).ready(function () {
 
   // Tambah user
   $('#codeAdd').on('change paste keyup', function() {
-    if ($(this).val()) {
-      $('#nameAdd').attr('disabled', false);
-      $('#phoneAdd').attr('disabled', false);
-      $('#addressAdd').attr('disabled', false).val('');
-      $('#nipAdd').attr('disabled', false);
-      $('#ktpAdd').attr('disabled', false);
-      $('#ttlAdd').attr('disabled', false);
-      $('#religionAdd').attr('disabled', false);
-    } else {
-      $('#nameAdd').attr('disabled', true);
-      $('#phoneAdd').attr('disabled', true);
-      $('#addressAdd').attr('disabled', true);
-      $('#nipAdd').attr('disabled', true);
-      $('#ktpAdd').attr('disabled', true);
-      $('#ttlAdd').attr('disabled', true);
-      $('#religionAdd').attr('disabled', true);
-    }
+    $.ajax({
+      type: 'GET',
+      url: `/ajax?action=username&new=${$(this).val()}`,
+      contentType: 'application/json',
+      success: function (data, status, xhr) {
+        if (status === 'success' && data.valid) {
+          $('#nameAdd').attr('disabled', false);
+          $('#phoneAdd').attr('disabled', false);
+          $('#addressAdd').attr('disabled', false).val('');
+          $('#nipAdd').attr('disabled', false);
+          $('#ktpAdd').attr('disabled', false);
+          $('#ttlAdd').attr('disabled', false);
+          $('#religionAdd').attr('disabled', false);
+        }
+        console.log(data, status);
+      },
+      error: function (xhr, status, error) {
+        console.log(status, error);
+        $.alert({
+          title: 'Gagal',
+          content: `${$(this).val()}: ${data.message}`,
+        });
+      }
+    });
   });
 
   $('.submit').on('click', function (e) {
