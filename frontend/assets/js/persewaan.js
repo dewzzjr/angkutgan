@@ -306,8 +306,8 @@ $(document).ready(function () {
       </button>` : '';
       let tx = `
 			<tr>
-        <td>19/12/2020</td>
-        <td>PT. Sejahtera Indah</td>
+        <td>${e.tx_date}</td>
+        <td>${name}</td>
         <td>${e.status.desc}</td>
         <td>
           <div class="btn-group">
@@ -476,11 +476,14 @@ $(document).ready(function () {
       Loading.Start($('#initialTx'));
       Transactions.Get(customer, date, (ok) => {
         setEdit(ok);
-        Transactions.IsEdit = true;
+        if (ok.id) {
+          Transactions.IsEdit = true;
+        } else {
+          Transactions.IsEdit = false;
+        }
         Loading.End();
         $('#tableBarang').show();
       }, () => {
-        Transactions.IsEdit = false;
         Loading.End();
         $('#tableBarang').show();
       });
@@ -490,12 +493,13 @@ $(document).ready(function () {
   }
   $('#create [name="tx_date"]').datepicker({
     format: 'dd/mm/yyyy',
-  }).on('change', getTransaction);
+  }).on('change', function() {
+    getTransaction();
+  });
 
   // CUSTOMER
   var initCustomer = function(code) {
     Transactions.GetCustomer(code, (customer) => {
-      getTransaction();
       let name = (customer.group_name) ? customer.group_name : customer.name;
       $('.customerName').html(name);
       $('#customerName').val(name);
@@ -527,12 +531,12 @@ $(document).ready(function () {
     preventEnter: true,
     noResultsText: 'Tidak ditemukan'
   });
-  $('#customerCode').on('autocomplete.select', function (e, select) {
-    if (!select) {
-      getTransaction(e);
-      return;
+  $('#customerCode').on('change', function (e) {
+    getTransaction();
+    let customer = $('#create [name="customer"]').val();
+    if (customer) {
+      initCustomer(customer);
     }
-    initCustomer(select.value);
   });
 
   // INIT TRANSACTION
@@ -549,19 +553,22 @@ $(document).ready(function () {
 
   // EDIT
   var setEdit = (ok) => {
-    console.log(ok);
-    if (ok.project_id) {
-      $('#create [name="project_id"]').val(ok.project_id);
-      $('#create [name="address"]').prop('disabled', true);
+    if (ok.id) {
+      if (ok.project_id) {
+        $('#create [name="project_id"]').val(ok.project_id);
+        $('#create [name="address"]').prop('disabled', true);
+      } else {
+        $('#create [name="project_id"]').val('');
+        $('#create [name="address"]').prop('disabled', false);
+      }
+      $('#create [name="address"]').val(ok.address);
+      $('#create [name="discount"]').val(ok.discount);
+      $('#create [name="shipping_fee"]').val(ok.shipping_fee);
+      $('#create [name="deposit"]').val(ok.deposit);
+      Transactions.Items = ok.items;
     } else {
-      $('#create [name="project_id"]').val('');
-      $('#create [name="address"]').prop('disabled', false);
+      Transactions.Items = [];
     }
-    $('#create [name="address"]').val(ok.address);
-    $('#create [name="discount"]').val(ok.discount);
-    $('#create [name="shipping_fee"]').val(ok.shipping_fee);
-    $('#create [name="deposit"]').val(ok.deposit);
-    Transactions.Items = ok.items;
     Transactions.Reload();
     summary();
   }
