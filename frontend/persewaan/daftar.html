@@ -5,11 +5,11 @@
 		<div class="input-group-prepend">
 			<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown">Cari</button>
 			<div class="dropdown-menu">
-				<a class="dropdown-item" href="#" value="code">Kode</a>
 				<a class="dropdown-item" href="#" value="keyword">Nama</a>
 			</div>
 		</div>
-		<input type="text" class="form-control" placeholder="masukkan kata kunci">
+		<input type="text" class="form-control datepicker" placeholder="cari tanggal transaksi" id="searchDate">
+		<select type="text" class="form-control autocomplete" placeholder="cari kode pelanggan" name="search_code" id="searchCustomer" autocomplete="off"></select>
 	</div>
 	<table class="table accordion" id="tableTx">
 		<thead>
@@ -21,6 +21,7 @@
 			</tr>
 		</thead>
 		<tbody>
+		<!-- 	FOR MOCKING PURPOSE
 			<tr>
 				<td>19/12/2020</td>
 				<td>PT. Sejahtera Indah</td>
@@ -126,7 +127,7 @@
 						Detail
 					</button>
 				</td>
-			</tr>
+			</tr>  -->
 		</tbody>
 	</table>
 </div>

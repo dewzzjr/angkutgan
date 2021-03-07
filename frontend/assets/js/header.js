@@ -148,7 +148,6 @@ const Daftar = {
     let rows = this.Rows;
     let keyword = this.Keyword;
     let set = this.SetData;
-    let retries = false;
     this.SetFunc('GetData', callback, failedCallback);
     $.ajax({
       type: 'GET',
@@ -171,12 +170,6 @@ const Daftar = {
         console.log(status, error);
         if (failedCallback) {
           failedCallback(error);
-        }
-        if (xhr.status == 401 && !retries) {
-          retries = true;
-          Auth.Refresh(function() {
-            $.ajax(this);
-          });
         }
       },
     });
