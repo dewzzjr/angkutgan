@@ -17,6 +17,7 @@ func (i *Rental) GetDetail(ctx context.Context, code string, date time.Time) (tx
 	}
 	// empty struct when not found
 	if tx.ID == 0 {
+		tx.Items = make([]model.SnapshotItem, 0)
 		return
 	}
 	tx, err = i.completeTx(ctx, tx)
