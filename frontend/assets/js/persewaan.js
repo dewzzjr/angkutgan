@@ -230,7 +230,7 @@ const Transactions = {
           text: "ongkos kirim tidak valid"
         });
       }
-      if (data.items.length == 0) {
+      if (!data.items || data.items.length == 0) {
         ok.valid = false;
         ok.message.push({
           name: "code_text",
@@ -251,16 +251,181 @@ $(document).ready(function () {
     $('#formTx :input').on('change', summary);
     $('#formItem :input').on('change', calculateItem);
   });
+
+  // DAFTAR
+  Daftar.Init('/rental');
+  Daftar.GetData(function (data) {
+    $('#tableTx tbody').empty();
+    data.forEach(e => {
+      console.log(e);
+      let id = e.customer.code + '_' + e.tx_date.split('/').reverse().join('');
+      let name = (e.customer.group_name) ? e.customer.group_name : e.customer.name;
+
+      let total = e.total_price;
+      let items = '';
+      e.items.forEach(i => {
+        items += `
+        <li class="list-group-item text-right">
+          ${i.name} &times; ${i.amount} ${i.item_unit} &times; ${i.duration} ${i.time_unit_desc} = ${formatPrice(i.amount * i.duration * i.price)}
+        </li>`
+      });
+      if (e.shipping_fee) {
+        total += e.shipping_fee;
+        items += `
+        <li class="list-group-item text-right">
+          Ongkos Kirim = ${formatPrice(e.shipping_fee)}
+        </li>
+        `
+      }
+      if (e.deposit) {
+        total += e.deposit;
+        items += `
+        <li class="list-group-item text-right">
+          Deposit = ${formatPrice(e.deposit)}
+        </li>
+        `
+      }
+      let btnTx = (!e.status.is_payment) ? `
+      <button type="button" class="btn btn-warning editBtn">Ubah</button>
+      <button type="button" class="btn btn-danger deleteBtn">Hapus</button>
+      ` : '';
+      let btnPay = (!e.status.payment_done) ? `
+      <button type="button" class="btn btn-success paymentBtn">Bayar</button>
+      ` : '';
+      let btnShip = (!e.status.shipping_done  && e.status.is_payment && !e.status.in_shipping) ? `
+      <button type="button" class="btn btn-primary shipmentBtn">Kirim</button>
+      ` : (!e.status.shipping_done && e.status.is_payment) ? `
+      <button type="button" class="btn btn-primary shipmentBtn">Ubah Pengiriman</button>
+      ` : '';
+      let btnReturn = (e.status.in_shipping && !e.status.is_return) ? `
+      <button type="button" class="btn btn-primary">Kembali</button>
+      ` : '';
+      let btnExtend = (e.status.in_shipping && !e.status.is_return && !e.status.done) ? `
+      <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#extendModal">
+        Perpanjangan
+      </button>` : '';
+      let tx = `
+			<tr>
+        <td>19/12/2020</td>
+        <td>PT. Sejahtera Indah</td>
+        <td>${e.status.desc}</td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#${id}"
+              data-parent="#tableTx" class="collapsed">
+              Detail
+            </button>
+            ${btnTx}
+          </div>
+          <div class="btn-group">
+            ${btnPay}${btnShip}${btnReturn}${btnExtend}
+          </div>
+        </td>
+      </tr>
+      <tr class="collapse rowTx" id="${id}">
+        <td colspan="4">
+          <div class="card">
+            <div class="card-header">
+              Ringkasan
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">${name}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">
+                ${e.address}
+              </h6>
+              <p class="card-text">CP ${e.customer.name} - ${e.customer.phone}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+              ${items}
+            </ul>
+            <div class="card-footer text-right font-weight-bold">
+              Total Tagihan: ${formatPrice(total)}
+            </div>
+          </div>
+        </td>
+      </tr>`
+      $('#tableTx tbody').append(tx);
+    });
+
+    $('.editBtn').on('click', function() {
+      let code = $(this).parents().find('.rowTx').attr('id');
+      code = code.split('_');
+      var query = {
+        customer: code[0],
+        date: code[1],
+        action: 'create'
+      };
+      var url = window.location.pathname + '?' + $.param(query);
+      window.location.replace(url);
+    });
+
+    $('.deleteBtn').on('click', function (e) {
+      let code = $(this).parents().find('.rowTx').attr('id').split('_').join('/');
+      $.confirm({
+        title: 'Peringatan!',
+        content: `Apakah anda yakin untuk menghapus "${code}"?`,
+        buttons: {
+          ok: function () {
+            $.ajax({
+              type: 'DELETE',
+              url: `/rental/${code}`,
+              contentType: 'application/json',
+              success: function (data, status, xhr) {
+                if (status === 'success' && data.result == 'OK') {
+                  Daftar.Reload();
+                  $.alert({
+                    title: 'Berhasil',
+                    content: `${code}: berhasil dihapus.`,
+                  });
+                }
+                console.log(data, status);
+              },
+              error: function (xhr, status, error) {
+                console.log(status, error);
+                $.alert({
+                  title: 'Gagal',
+                  content: `${code}: ${error}`,
+                });
+              }
+            });
+          },
+          cancel: function () {}
+        },
+      });
+    });
+  });
+
+  var search = function (e) {
+    let cust = $('#list [name="search_code"]').val();
+    let date = $('#searchDate').val();
+    console.log(cust, date);
+  }
+
+  $('#searchDate').datepicker({
+    format: 'dd/mm/yyyy',
+  }).on('change', search);
+
+  $('#searchCustomer').autoComplete({
+    resolverSettings: {
+      minLength: 2,
+      url: '/ajax?action=customers',
+      fail: () => {}
+    },
+    preventEnter: true,
+    noResultsText: 'Tidak ditemukan'
+  });
+  $('#searchCustomer').on('autocomplete.select', search);
+
   // SUBMIT
   serializeObject = () => {
     return {
-      date: $('[name="tx_date"]').val(),
-      customer: $('[name="customer"]').val(),
-      address: $('[name="address"]').val(),
-      project_id: parseInt($('[name="project_id"]').val()) || 0,
-      discount: parseInt($('[name="discount"]').val()) || 0,
-      shipping_fee: parseInt($('[name="shipping_fee"]').val()) || 0,
-      deposit: parseInt($('[name="deposit"]').val()) || 0,
+      date: $('#create [name="tx_date"]').val(),
+      customer: $('#create [name="customer"]').val(),
+      address: $('#create [name="address"]').val(),
+      project_id: parseInt($('#create [name="project_id"]').val()) || 0,
+      discount: parseInt($('#create [name="discount"]').val()) || 0,
+      shipping_fee: parseInt($('#create [name="shipping_fee"]').val()) || 0,
+      deposit: parseInt($('#create [name="deposit"]').val()) || 0,
       items: Transactions.Items,
     }
   }
@@ -302,70 +467,11 @@ $(document).ready(function () {
     });
   });
 
-  // CUSTOMER
-  $('#customerCode').autoComplete({
-    resolverSettings: {
-      minLength: 2,
-      url: '/ajax?action=customers',
-      fail: () => {}
-    },
-    preventEnter: true,
-    noResultsText: 'Tidak ditemukan'
-  });
-  $('#customerCode').on('autocomplete.select', function (e, select) {
-    if (!select) {
-      getTransaction(e);
-      return;
-    }
-    Transactions.GetCustomer(select.value, (customer) => {
-      getTransaction(e);
-      let name = (customer.group_name) ? customer.group_name : customer.name;
-      $('.customerName').html(name);
-      $('#customerName').val(name);
-      if (customer.type == 2) {
-        $('.contactPerson').html(`CP ${customer.name} (${customer.role}) - ${customer.phone}`)
-      } else {
-        $('.contactPerson').html(`${customer.phone}`);
-      }
-
-      $('[name="address"]').prop('disabled', false).val(customer.address);
-      if (customer.project.length > 0) {
-        $('#projectTx').parent().show();
-        $('[name="project_id"]').html('<option value="" selected>Tidak ada proyek</option>');
-        customer.project.forEach(e => {
-          $('[name="project_id"]').append(`<option value="${e.id}">${e.name}</option>`);
-        });
-      } else {
-        $('#projectTx').parent().hide()
-      }
-      summary();
-    });
-  });
-
-  // EDIT
-  var setEdit = (ok) => {
-    console.log(ok);
-    if (ok.project_id) {
-      $('[name="project_id"]').val(ok.project_id);
-      $('[name="address"]').prop('disabled', true);
-    } else {
-      $('[name="project_id"]').val('');
-      $('[name="address"]').prop('disabled', false);
-    }
-    $('[name="address"]').val(ok.address);
-    $('[name="discount"]').val(ok.discount);
-    $('[name="shipping_fee"]').val(ok.shipping_fee);
-    $('[name="deposit"]').val(ok.deposit);
-    Transactions.Items = ok.items;
-    Transactions.Reload();
-    summary();
-  }
-
   // DATE
   $('#tableBarang').hide();
-  var getTransaction = (e) => {
-    let customer = $('[name="customer"]').val();
-    let date = $('[name="tx_date"]').val();
+  var getTransaction = function () {
+    let customer = $('#create [name="customer"]').val();
+    let date = $('#create [name="tx_date"]').val();
     if (customer && date) {
       Loading.Start($('#initialTx'));
       Transactions.Get(customer, date, (ok) => {
@@ -382,25 +488,98 @@ $(document).ready(function () {
       $('#tableBarang').hide();
     }
   }
-  $('[name="tx_date"]').datepicker({
+  $('#create [name="tx_date"]').datepicker({
     format: 'dd/mm/yyyy',
   }).on('change', getTransaction);
-  $('[name="tx_date"]').datepicker('update', new Date());
+
+  // CUSTOMER
+  var initCustomer = function(code) {
+    Transactions.GetCustomer(code, (customer) => {
+      getTransaction();
+      let name = (customer.group_name) ? customer.group_name : customer.name;
+      $('.customerName').html(name);
+      $('#customerName').val(name);
+      if (customer.type == 2) {
+        $('.contactPerson').html(`CP ${customer.name} (${customer.role}) - ${customer.phone}`)
+      } else {
+        $('.contactPerson').html(`${customer.phone}`);
+      }
+
+      $('#create [name="address"]').prop('disabled', false).val(customer.address);
+      if (customer.project.length > 0) {
+        $('#projectTx').parent().show();
+        $('#create [name="project_id"]').html('<option value="" selected>Tidak ada proyek</option>');
+        customer.project.forEach(e => {
+          $('#create [name="project_id"]').append(`<option value="${e.id}">${e.name}</option>`);
+        });
+      } else {
+        $('#projectTx').parent().hide()
+      }
+      summary();
+    });
+  }
+  $('#customerCode').autoComplete({
+    resolverSettings: {
+      minLength: 2,
+      url: '/ajax?action=customers',
+      fail: () => {}
+    },
+    preventEnter: true,
+    noResultsText: 'Tidak ditemukan'
+  });
+  $('#customerCode').on('autocomplete.select', function (e, select) {
+    if (!select) {
+      getTransaction(e);
+      return;
+    }
+    initCustomer(select.value);
+  });
+
+  // INIT TRANSACTION
+  if (Menu.Query['date'] && Menu.Query['customer']) {
+    let date = Menu.Query['date'];
+    date = [date.substring(0,4),date.substring(4,6),date.substring(6,8)].join('-');
+    $('#create [name="tx_date"]').datepicker('update', new Date(date));
+    let cust = Menu.Query['customer'];
+    $('#customerCode').autoComplete('set', { value: cust, text: cust });
+    initCustomer(cust);
+  } else {
+    $('#create [name="tx_date"]').datepicker('update', new Date());
+  }
+
+  // EDIT
+  var setEdit = (ok) => {
+    console.log(ok);
+    if (ok.project_id) {
+      $('#create [name="project_id"]').val(ok.project_id);
+      $('#create [name="address"]').prop('disabled', true);
+    } else {
+      $('#create [name="project_id"]').val('');
+      $('#create [name="address"]').prop('disabled', false);
+    }
+    $('#create [name="address"]').val(ok.address);
+    $('#create [name="discount"]').val(ok.discount);
+    $('#create [name="shipping_fee"]').val(ok.shipping_fee);
+    $('#create [name="deposit"]').val(ok.deposit);
+    Transactions.Items = ok.items;
+    Transactions.Reload();
+    summary();
+  }
 
   // PROJECT
   $('#projectTx').parent().hide()
-  $('[name="project_id"]').on('change', function (e) {
+  $('#create [name="project_id"]').on('change', function (e) {
     let id = $(this).val();
     if (id == "") {
-      $('[name="address"]').prop('disabled', false);
-      $('[name="address"]').val(Transactions.Customer.address);
+      $('#create [name="address"]').prop('disabled', false);
+      $('#create [name="address"]').val(Transactions.Customer.address);
     } else {
-      $('[name="address"]').prop('disabled', true);
+      $('#create [name="address"]').prop('disabled', true);
       let project = Transactions.Customer.project.filter((e) => {
         return e.id == id;
       });
       if (project.length > 0) {
-        $('[name="address"]').val(project[0].location);
+        $('#create [name="address"]').val(project[0].location);
       }
     }
     summary();
@@ -430,8 +609,8 @@ $(document).ready(function () {
       <button class="btn btn-warning" id="itemSubmit" disabled data-index="${index}">Ubah</input>
       <button class="btn btn-danger" id="itemCancel">Batal</input>
       `
-      $('[name="duration"]').val(edit.duration);
-      $('[name="amount"]').val(edit.amount);
+      $('#create [name="duration"]').val(edit.duration);
+      $('#create [name="amount"]').val(edit.amount);
       $('#itemAction').html(action);
       $('#itemSubmit').on('click', editItem);
       $('#itemCancel').on('click', clearItem);
@@ -444,8 +623,8 @@ $(document).ready(function () {
         });
       }
       $('#itemUnit').html(item.unit);
-      $('[name="name"]').val(item.name);
-      $('[name="amount"]').attr('max', item.avail.inventory);
+      $('#create [name="name"]').val(item.name);
+      $('#create [name="amount"]').attr('max', item.avail.inventory);
       $('.rentSelection').empty();
       let ok = false;
       item.price.rent.forEach(e => {
@@ -458,10 +637,10 @@ $(document).ready(function () {
             ok = true;
             let newTime = edit.duration / e.duration;
             $('#timeDuration').html(`&times; ${e.duration} ${e.unit_desc}`);
-            $('[name="duration"]').val(e.duration);
-            $('[name="time"]').val(newTime);
-            $('[name="timeunit"]').val(e.unit);
-            $('[name="unit"]').val(e.unit_desc);
+            $('#create [name="duration"]').val(e.duration);
+            $('#create [name="time"]').val(newTime);
+            $('#create [name="timeunit"]').val(e.unit);
+            $('#create [name="unit"]').val(e.unit_desc);
           }
         }
         let checked = (ok) ? 'checked' : '';
@@ -483,9 +662,9 @@ $(document).ready(function () {
         let unit = $(this).data('unit');
         let duration = $(this).data('duration');
         $('#timeDuration').html(`&times; ${duration} ${unit}`);
-        $('[name="duration"]').val(duration);
-        $('[name="timeunit"]').val(timeunit);
-        $('[name="unit"]').val(unit);
+        $('#create [name="duration"]').val(duration);
+        $('#create [name="timeunit"]').val(timeunit);
+        $('#create [name="unit"]').val(unit);
         calculateItem();
       });
       calculateItem();
@@ -493,10 +672,10 @@ $(document).ready(function () {
   }
 
   var getCalculation = function () {
-    let price = parseInt($('[name="price"]:checked').val()) || 0;
-    let time = parseInt($('[name="time"]').val()) || 0;
-    let duration = parseInt($('[name="duration"]').val()) || 0;
-    let amount = parseInt($('[name="amount"]').val()) || 0;
+    let price = parseInt($('#create [name="price"]:checked').val()) || 0;
+    let time = parseInt($('#create [name="time"]').val()) || 0;
+    let duration = parseInt($('#create [name="duration"]').val()) || 0;
+    let amount = parseInt($('#create [name="amount"]').val()) || 0;
     let total = price * amount * time;
     return {
       price: price,
@@ -508,22 +687,24 @@ $(document).ready(function () {
   }
   var summary = function (e) {
     // address
-    let address = $('[name="address"]').val();
+    let address = $('#create [name="address"]').val();
     $('.shippingLocation').html(address);
     // item
     $('.itemSummary').empty();
     let total = 0
-    Transactions.Items.forEach(e => {
-      let price = e.price * e.duration * e.amount;
-      total += price;
-      let item = `
-      <li class="list-group-item text-right">
-        ${e.name} &times; ${e.amount} ${e.item_unit} &times; ${e.duration} ${e.time_unit_desc} = ${formatPrice(price)}
-      </li>`
-      $('.itemSummary').append(item);
-    });
+    if (Transactions.Items) {
+      Transactions.Items.forEach(e => {
+        let price = e.price * e.duration * e.amount;
+        total += price;
+        let item = `
+        <li class="list-group-item text-right">
+          ${e.name} &times; ${e.amount} ${e.item_unit} &times; ${e.duration} ${e.time_unit_desc} = ${formatPrice(price)}
+        </li>`
+        $('.itemSummary').append(item);
+      });
+    }
     // discount
-    let percent = parseInt($('[name="discount"]').val()) || 0;
+    let percent = parseInt($('#create [name="discount"]').val()) || 0;
     let discountPrice = total * percent * -1 / 100;
     let discount = `
     <li class="list-group-item text-right">
@@ -531,14 +712,14 @@ $(document).ready(function () {
     </li>`
     $('.itemSummary').append(discount);
     // shipping fee
-    let shippingFee = parseInt($('[name="shipping_fee"]').val()) || 0;
+    let shippingFee = parseInt($('#create [name="shipping_fee"]').val()) || 0;
     let ongkir = `
     <li class="list-group-item text-right">
       Ongkos Kirim = ${formatPrice(shippingFee)}
     </li>`
     $('.itemSummary').append(ongkir);
     // deposit
-    let depositFee = parseInt($('[name="deposit"]').val()) || 0;
+    let depositFee = parseInt($('#create [name="deposit"]').val()) || 0;
     let deposit = `
     <li class="list-group-item text-right">
       Deposit = ${formatPrice(depositFee)}
@@ -554,13 +735,13 @@ $(document).ready(function () {
     $('#timeDuration').html('');
     $('.rentSelection').empty();
     $('#formItem input').val('');
-    $('[name="amount"]').attr('max', 0);
+    $('#create [name="amount"]').attr('max', 0);
     $('#itemAction').html('<button class="btn btn-success" id="itemSubmit" disabled>Tambah</input>');
     $('#itemSubmit').on('click', addItem);
   }
   var clearTx = function () {
     $('#customerCode').autoComplete('clear');
-    $('[name="tx_date"]').datepicker('update', new Date());
+    $('#create [name="tx_date"]').datepicker('update', new Date());
     $('#formTx input, #formTx textarea, #formTx select').val('');
     $('#formTx input, #formTx textarea').val('');
     Transactions.Items = [];
@@ -570,8 +751,8 @@ $(document).ready(function () {
   }
   var calculateItem = function () {
     let i = getCalculation();
-    $('[name="total"]').val(i.total);
-    let code = $('[name="code"]').val();
+    $('#create [name="total"]').val(i.total);
+    let code = $('#create [name="code"]').val();
     if (i.total > 0 && code != '') {
       $('#itemSubmit').prop('disabled', false);
     } else {
@@ -582,10 +763,10 @@ $(document).ready(function () {
   var addItem = function (e) {
     e.preventDefault();
     let i = getCalculation();
-    let timeunit = parseInt($('[name="timeunit"]').val()) || 0;
-    let unitdesc = $('[name="unit"]').val();
-    let itemName = $('[name="name"]').val();
-    let code = $('[name="code"]').val();
+    let timeunit = parseInt($('#create [name="timeunit"]').val()) || 0;
+    let unitdesc = $('#create [name="unit"]').val();
+    let itemName = $('#create [name="name"]').val();
+    let code = $('#create [name="code"]').val();
     let itemunit = $('#itemUnit').html();
     let item = {
       code: code,
@@ -603,10 +784,10 @@ $(document).ready(function () {
   var editItem = function (e) {
     e.preventDefault();
     let i = getCalculation();
-    let timeunit = parseInt($('[name="timeunit"]').val()) || 0;
-    let unitdesc = $('[name="unit"]').val();
-    let itemName = $('[name="name"]').val();
-    let code = $('[name="code"]').val();
+    let timeunit = parseInt($('#create [name="timeunit"]').val()) || 0;
+    let unitdesc = $('#create [name="unit"]').val();
+    let itemName = $('#create [name="name"]').val();
+    let code = $('#create [name="code"]').val();
     let itemunit = $('#itemUnit').html();
     let item = {
       code: code,
@@ -625,7 +806,11 @@ $(document).ready(function () {
   $('#itemSubmit').on('click', addItem);
   Transactions.Reload = function () {
     $('.item').remove();
+    if (!Transactions.Items) {
+      return;
+    }
     let len = Transactions.Items.length;
+    
     Transactions.Items.slice().reverse().forEach((e, i) => {
       let index = len - i - 1;
       let price = formatPrice(e.price);

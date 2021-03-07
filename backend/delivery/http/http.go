@@ -46,6 +46,7 @@ func (h *HTTP) Routing() {
 	h.Router.POST("/sales", h.PostSalesTransaction)
 	h.Router.PATCH("/sales", h.PatchSalesTransaction)
 
+	h.Router.GET("/rental", h.GetRental)
 	h.Router.GET("/rental/:customer/:date", h.GetRentalByCustomerDate)
 	h.Router.POST("/rental", h.PostRentalTransaction)
 	h.Router.PATCH("/rental", h.PatchRentalTransaction)
