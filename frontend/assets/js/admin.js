@@ -79,6 +79,15 @@ $(document).ready(function () {
       $('#religionAdd').attr('disabled', true).val('');
   }
 
+  function invalid($param){
+    if (!$param.val()) {
+      $param.addClass('is-invalid');
+      setTimeout (function(){
+        $param.removeClass('is-invalid');
+      }, 3000);
+    }
+  }
+
   // Tambah user
   $('#codeAdd').on('change paste keyup', function() {
     $.ajax({
@@ -103,6 +112,7 @@ $(document).ready(function () {
           title: 'Gagal',
           content: `${$(this).val()}: ${data.message}`,
         });
+        invalid($(this));
       }
     });
   });
@@ -114,6 +124,18 @@ $(document).ready(function () {
       setTimeout (function(){
         $('#alert').removeClass("alert-danger").hide('fade');
       }, 3000);
+      if (!$('#codeAdd').val()) {
+        invalid($('#codeAdd'));
+      }
+      if (!$('#nameAdd').val()) {
+        invalid($('#nameAdd'));
+      }
+      if (!$('#religionAdd').val()) {
+        invalid($('#religionAdd'));
+      }
+      if (!$('#ttlAdd').val()) {
+        invalid($('#ttlAdd'));
+      }
     } else {
       User.Form ["username"] = $('#codeAdd').val();
       User.Form ["fullname"] = $('#nameAdd').val();

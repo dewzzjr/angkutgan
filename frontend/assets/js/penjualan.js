@@ -344,6 +344,15 @@ $(document).ready(function () {
     $('#total span').text(currency(totalPrice));
   }
 
+  function invalid($param){
+    if (!$param.val()) {
+      $param.addClass('is-invalid');
+      setTimeout (function(){
+        $param.removeClass('is-invalid');
+      }, 3000);
+    }
+  }
+
   // Input diskon
   $("#discount").on('change', function() {
     var max = parseInt($(this).attr('max'));
@@ -484,6 +493,12 @@ $(document).ready(function () {
         $('#tambah').removeClass('btn-warning');
         $('#tambah').text('Tambah');
       }, 2000);
+      if (!$('#nameEdit').val()) {
+        invalid($('#addCodeBarang'));
+      }
+      if (!$('#countBarang').val()) {
+        invalid($('#countBarang'));
+      }
     } else {
       let listItem = {};
       var id = 'item' + (++rowIdx);
@@ -606,7 +621,7 @@ $(document).ready(function () {
         $('#update').removeClass('btn-warning');
         $('#update').text('Tambah');
       }, 2000);
-
+      invalid($('#editCount'));
       e.preventDefault();
     } else {
       var row = $(this).closest('tr');
@@ -652,6 +667,18 @@ $(document).ready(function () {
       setTimeout (function(){
         $('#warningSubmit').hide('fade');
       }, 3000);
+      if (!$('#datePicker').val()){
+        invalid($('#datePicker'));
+      }
+      if (!$('#customerName').val()){
+        invalid($('#customerCode'));
+      }
+      if (itemObj.length < 1) {
+        $('#list thead').addClass('table-danger');
+        setTimeout (function(){
+          $('#list thead').removeClass('table-danger');
+        }, 3000);
+      }
     } else {
       var date = $('#datePicker').val();
       var customer = $('#customerCode').val();
@@ -760,6 +787,7 @@ $(document).ready(function () {
       </tr>`
       $('#tablePenjualan').append(row);
     });
+    $('#loader').hide();
   });
   
   function printAlertBox(){
