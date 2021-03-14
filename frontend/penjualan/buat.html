@@ -2,18 +2,22 @@
 <!-- BUAT TRANSAKSI -->
 <div class="tab-pane fade" id="create" role="tabpanel">
     <form id="formAddSales">
+        <div id="successSubmit" class="alert alert-success collapse">
+            <a id="linkClose" href="#" class="close">&times;</a>
+            <strong>Success!</strong> Transaksi telah dibuat
+        </div>
         <div class="form-row">
             <div class="form-group col-2">
                 <label for="pickDate">Tanggal</label>
                 <input name="date" class="form-control" type="date" id="datePicker">
             </div>
-            <div class="form-group col-2">
+            <div class="form-group col-4">
                 <label for="customerCode">Kode Pelanggan</label>
                 <div class="input-group">
                     <select name="code" class="form-control autocomplete" id="customerCode" autocomplete="off"></select>
                 </div>
             </div>
-            <div class="form-group col-8">
+            <div class="form-group col-6">
                 <label for="customerName">Nama</label>
                 <input name="name" class="form-control" type="text" disabled id="customerName">
             </div>
@@ -90,7 +94,7 @@
             <div class="form-group col-12 col-md-6">
                 <label for="discount">Diskon</label>
                 <div class="input-group">
-                    <input name="time" class="form-control number" id="discount" max="100" min="0" value="0">
+                    <input name="discount" class="form-control number" id="discount" max="100" min="0" value="0">
                     <div class="input-group-append">
                         <span class="input-group-text">%</span>
                     </div>
@@ -134,16 +138,12 @@
             <a id="linkClose" href="#" class="close">&times;</a>
             <strong>Error!</strong> Form tidak dapat disubmit
         </div>
-        <div id="successSubmit" class="alert alert-success collapse">
-            <a id="linkClose" href="#" class="close">&times;</a>
-            <strong>Success!</strong> Transaksi telah dibuat
-        </div>
         <div id="warningSubmit" class="alert alert-warning collapse">
             <a id="linkClose" href="#" class="close">&times;</a>
             <strong>Warning!</strong> Lengkapi form sebelum submit
         </div>
     </form>
-    <button class="btn btn-success btn-block" type="submit" id="submit">Submit</button>
+    <button class="btn btn-success btn-block submit" type="submit" id="submit">Submit</button>
 </div>
 <!-- END BUAT TRANSAKSI -->
 {{ end }}

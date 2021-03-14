@@ -2,6 +2,12 @@
 <!-- UBAH -->
 <div class="tab-pane fade" id="edit" role="tabpanel">
 	<form id="formEdit">
+		<div class="alert collapse" id="success">
+			<span id="messageAdd"></span>
+			<button type="button" class="close">
+				<span>&times;</span>
+			</button>
+		</div>
 		<div class="form-group ">
 			<label for="newUsernameEdit">Username</label>
 			<div class="input-group">
@@ -18,7 +24,16 @@
 			<input name="name" type="text" class="form-control" id="nameEdit" disabled>
 		</div>
 		<div class="form-group">
-			<label for="nikEdit">Nomor Induk Kependudukan</label>
+			<label for="phoneEdit">Nomor Telepon / HP</label>
+			<input name="phone" type="number" class="form-control" id="phoneEdit" disabled>
+		</div>
+		<div class="form-group">
+			<label for="addressEdit">Alamat Lengkap</label>
+			<textarea name="address" type="text" class="form-control" id="addressEdit" disabled>
+			</textarea>
+		</div>
+		<div class="form-group">
+			<label for="nikEdit">Nomor Induk Pegawai</label>
 			<input name="nik" type="text" class="form-control" id="nikEdit" disabled>
 		</div>
 		<div class="form-group">
@@ -42,13 +57,13 @@
                 <option value="KONGHUCU">Kong Hu Chu</option>
             </select>
         </div>
-		<div class="alert alert-success fade none" role="alert">
-			<span id="messageEdit"></span>
+		<div class="alert collapse" id="alert">
+			<span id="messageAdd"></span>
 			<button type="button" class="close">
 				<span>&times;</span>
 			</button>
 		</div>
-		<button type="submit" class="btn btn-success" disabled>Submit</button>
+		<button type="submit" class="btn btn-success submitEdit" disabled>Submit</button>
 	</form>
 </div>
 <!-- END UBAH -->
