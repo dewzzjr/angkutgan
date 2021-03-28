@@ -787,7 +787,7 @@ $(document).ready(function () {
       </tr>`
       $('#tablePenjualan').append(row);
     });
-    $('#loader').hide();
+    $('#loader').addClass('d-none');
   });
   
   function printAlertBox(){
