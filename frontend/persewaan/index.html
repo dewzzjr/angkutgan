@@ -15,16 +15,19 @@
 				<div class="tab-content" id="tabContent">
 					{{ template "persewaan/daftar" }}
 					{{ template "persewaan/buat" }}
+					{{ template "pembayaran" }}
 					{{ template "pengiriman/keluar" }}
 					{{ template "pengiriman/masuk" }}
 				</div>
 			</main>
 		</div>
 	</div>
+	{{ template "modal/pembayaran" }}
 	{{ template "modal/perpanjangan" }}
 	{{ template "modal/masuk" }}
 	{{ template "js" }}
 	<script src="/assets/js/persewaan.js"> </script>
+	<script src="/assets/js/pembayaran.js"> </script>
 </body>
 
 </html>

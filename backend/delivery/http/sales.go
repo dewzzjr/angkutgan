@@ -102,3 +102,21 @@ func (h *HTTP) GetSales(w http.ResponseWriter, r *http.Request, p httprouter.Par
 		"result": result,
 	})
 }
+
+// DeleteSales remove sales transaction detail by customer code and date
+func (h *HTTP) DeleteSales(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	ctx := r.Context()
+	date, err := time.Parse(model.ParamFormat, p.ByName("date"))
+	if err != nil {
+		response.Error(w, err)
+		return
+	}
+	err = h.rental.Cancel(ctx, p.ByName("customer"), date)
+	if err != nil {
+		response.Error(w, err)
+		return
+	}
+	response.JSON(w, map[string]interface{}{
+		"result": "OK",
+	})
+}

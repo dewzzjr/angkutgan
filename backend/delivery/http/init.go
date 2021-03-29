@@ -84,6 +84,7 @@ type iSales interface {
 	GetList(ctx context.Context, page, row int, date time.Time) (txs []model.Transaction, err error)
 	CreateTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
 	EditTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error)
+	Cancel(ctx context.Context, code string, date time.Time) (err error)
 }
 type iRental interface {
 	iSales

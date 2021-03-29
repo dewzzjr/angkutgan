@@ -121,7 +121,7 @@ func (i *Rental) ExtendTransaction(ctx context.Context, tx model.CreateTransacti
 	return
 }
 
-// EditTransaction sales transaction
+// EditTransaction rental transaction
 func (i *Rental) EditTransaction(ctx context.Context, tx model.CreateTransaction, actionBy int64) (err error) {
 	var date time.Time
 	if date, err = time.Parse(model.DateFormat, tx.Date); err != nil {
@@ -141,6 +141,27 @@ func (i *Rental) EditTransaction(ctx context.Context, tx model.CreateTransaction
 	}
 	if err = i.database.UpdateTransaction(ctx, txID, model.Rental, tx, actionBy); err != nil {
 		err = errors.Wrap(err, "UpdateTransaction")
+		return
+	}
+	return
+}
+
+// Cancel rental transaction
+func (i *Rental) Cancel(ctx context.Context, code string, date time.Time) (err error) {
+	var tx model.Transaction
+	tx, err = i.GetDetail(ctx, code, date)
+	if err != nil {
+		return
+	}
+	if tx.ID == 0 {
+		err = errors.New("not found")
+		return
+	}
+	if len(tx.Payment) > 0 {
+		err = errors.New("cannot cancel")
+		return
+	}
+	if err = i.database.DeleteTransaction(ctx, tx.ID); err != nil {
 		return
 	}
 	return

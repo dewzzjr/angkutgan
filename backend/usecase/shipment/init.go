@@ -25,4 +25,5 @@ type iDatabase interface {
 	DeleteInsertShipment(ctx context.Context, txID int64, shipment model.Shipment, isDelete bool, actionBy int64) (err error)
 
 	GetSnapshotItems(ctx context.Context, txID int64) (items []model.SnapshotItem, err error)
+	ChangeStock(ctx context.Context, code string, number int, stype model.StockType, actionBy int64) (err error)
 }

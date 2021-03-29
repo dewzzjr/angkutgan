@@ -246,10 +246,12 @@ const Transactions = {
     return ok;
   }
 };
+
 $(document).ready(function () {
   header(() => {
     $('#formTx :input').on('change', summary);
     $('#formItem :input').on('change', calculateItem);
+    Bayar.Init();
   });
 
   // DAFTAR
@@ -399,6 +401,7 @@ $(document).ready(function () {
     let cust = $('#list [name="search_code"]').val();
     let date = $('#searchDate').val();
     console.log(cust, date);
+    // TODO search
   }
 
   $('#searchDate').datepicker({
@@ -415,6 +418,43 @@ $(document).ready(function () {
     noResultsText: 'Tidak ditemukan'
   });
   $('#searchCustomer').on('autocomplete.select', search);
+
+  $('#nextPage').on('click', function (e) {
+    console.log(Daftar.Data.length, Daftar.Rows)
+    if (Daftar.Data.length == Daftar.Rows) {
+      Daftar.Page = Daftar.Page + 1;
+      Daftar.Apply(function () {
+        if (Daftar.Data.length == Daftar.Rows) {
+          $('#nextPage').parent().removeClass('disabled');
+        } else {
+          $('#nextPage').parent().addClass('disabled');
+        }
+        if (Daftar.Page > 1) {
+          $('#prevPage').parent().removeClass('disabled');
+        } else {
+          $('#prevPage').parent().addClass('disabled');
+        }
+      });
+    }
+  });
+
+  $('#prevPage').on('click', function (e) {
+    if (Daftar.Page > 1) {
+      Daftar.Page = Daftar.Page - 1;
+      Daftar.Apply(function () {
+        if (Daftar.Data.length == Daftar.Rows) {
+          $('#nextPage').parent().removeClass('disabled');
+        } else {
+          $('#nextPage').parent().addClass('disabled');
+        }
+        if (Daftar.Page > 1) {
+          $('#prevPage').parent().removeClass('disabled');
+        } else {
+          $('#prevPage').parent().addClass('disabled');
+        }
+      });
+    }
+  });
 
   // SUBMIT
   serializeObject = () => {

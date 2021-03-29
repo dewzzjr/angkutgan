@@ -1,0 +1,73 @@
+{{ define "pembayaran" }}
+<!-- PEMBAYARAN -->
+<div class="tab-pane fade" id="payment" role="tabpanel">
+	<div class="form-row">
+		<div class="form-group col-6 col-md-3">
+			<label for="txDatePayment">Tanggal Transaksi</label>
+			<div class="input-group">
+				<input name="tx_date" class="form-control datepicker" id="txDatePayment" autocomplete="off">
+			</div>
+		</div>
+		<div class="form-group col-6 col-md-3">
+			<label for="customerCodePayment">Kode Pelanggan</label>
+			<div class="input-group">
+				<select name="customer" class="form-control autocomplete" id="customerCodePayment" autocomplete="off"></select>
+			</div>
+		</div>
+		<div class="form-group col col-md-6">
+			<label for="customerNamePayment">Nama</label>
+			<input class="form-control" type="text" disabled id="customerNamePayment" value="PT. Sejahtera Indah">
+		</div>
+	</div>
+	<table class="table" id="tableBayar">
+		<thead>
+			<tr>
+				<th scope="col">Tanggal</th>
+				<th scope="col">Deskripsi</th>
+				<th scope="col">Jenis</th>
+				<th scope="col">Jumlah</th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">03/01/2021</th>
+				<td>Down Payment</td>
+				<td>TRANSFER</td>
+				<td class="text-right">Rp30.000,00</td>
+				<td>
+          <div class="btn-group">
+          </div>
+        </td>
+			</tr>
+			<tr>
+				<th scope="row">03/01/2021</th>
+				<td>Pelunasan Rekening atas nama Pak Sugiyono</td>
+				<td>TUNAI</td>
+				<td class="text-right">Rp100.000,00</td>
+				<td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-warning editPayment" data-toggle="modal" data-target="#paymentModal">Ubah</button>
+            <button type="button" class="btn btn-danger deletePayment">Hapus</button>
+          </div>
+        </td>
+			</tr>
+		</tbody>
+	</table>
+	<form id="paymentIndex">
+		<div class="input-group">
+			<input disabled name="unpaid" type="text" class="form-control" value="Rp50.000,00">
+			<div class="input-group-append">
+				<button type="button" class="btn btn-success addPayment" data-toggle="modal" data-target="#paymentModal">Tambah</button>
+			</div>
+		</div>
+		<div class="alert alert-success fade none" role="alert">
+			<span id="messagePay"></span>
+			<button type="button" class="close">
+				<span>&times;</span>
+			</button>
+		</div>
+	</form>
+</div>
+<!-- END PEMBAYARAN -->
+{{ end }}

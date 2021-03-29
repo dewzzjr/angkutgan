@@ -24,6 +24,7 @@ var Templates = []string{
 	"/penjualan/index.html",
 	"/penjualan/daftar.html",
 	"/penjualan/buat.html",
+	"/pembayaran/index.html",
 	"/pengiriman/keluar.html",
 	"/pengiriman/masuk.html",
 	"/admin/index.html",

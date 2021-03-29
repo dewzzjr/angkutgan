@@ -142,3 +142,21 @@ func (i ItemStatus) String() string {
 		Lost:      "Hilang/Rusak Parah",
 	}[i]
 }
+
+// StockChange action
+type StockChange int
+
+// Stock change action type
+const (
+	Increment StockChange = 1
+	Decrement StockChange = -1
+)
+
+// StockType type
+type StockType int
+
+// Type of stock
+const (
+	StockInventory StockType = 100
+	StockAsset     StockType = 200
+)
