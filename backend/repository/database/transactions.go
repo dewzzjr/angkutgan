@@ -516,7 +516,7 @@ const qUpdatePaidDate = `UPDATE transactions
 SET
 	paid_date = ?
 WHERE
-	t_id = ?
+	id = ?
 `
 
 // UpdatePaidDate update payment date when already paid off
@@ -525,7 +525,7 @@ func (d *Database) UpdatePaidDate(ctx context.Context, txID int64, date time.Tim
 		date,
 		txID,
 	); err != nil {
-		err = errors.Wrapf(err, "ExecContext [%d]", txID)
+		err = errors.Wrapf(err, "ExecContext [qUpdatePaidDate, %d]", txID)
 		return
 	}
 	return
@@ -542,7 +542,7 @@ WHERE
 // GetTotalPayment get total payment by transaction id
 func (d *Database) GetTotalPayment(ctx context.Context, txID int64) (amount int, err error) {
 	if err = d.DB.QueryRowxContext(ctx, qGetTotalPayment, txID).Scan(&amount); err != nil {
-		err = errors.Wrapf(err, "QueryRowxContext [%d]", txID)
+		err = errors.Wrapf(err, "QueryRowxContext [qGetTotalPayment, %d]", txID)
 		return
 	}
 	return

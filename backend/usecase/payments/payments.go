@@ -69,7 +69,7 @@ func (p *Payments) UpdateTxPaidDate(ctx context.Context, txID int64) (err error)
 	}
 	var date string
 	if paid, date, err = p.database.GetLastPaidAmount(ctx, txID); err != nil {
-		err = errors.Wrap(err, "GetTotalPayment")
+		err = errors.Wrap(err, "GetLastPaidAmount")
 		return
 	}
 	var paidDate time.Time
@@ -79,7 +79,7 @@ func (p *Payments) UpdateTxPaidDate(ctx context.Context, txID int64) (err error)
 		}
 	}
 	if err = p.database.UpdatePaidDate(ctx, txID, paidDate); err != nil {
-		err = errors.Wrap(err, "GetTotalPayment")
+		err = errors.Wrap(err, "UpdatePaidDate")
 		return
 	}
 	return

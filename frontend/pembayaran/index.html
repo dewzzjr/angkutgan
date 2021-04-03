@@ -16,7 +16,7 @@
 		</div>
 		<div class="form-group col col-md-6">
 			<label for="customerNamePayment">Nama</label>
-			<input class="form-control" type="text" disabled id="customerNamePayment" value="PT. Sejahtera Indah">
+			<input class="form-control" type="text" disabled id="customerNamePayment">
 		</div>
 	</div>
 	<table class="table" id="tableBayar">
@@ -26,37 +26,19 @@
 				<th scope="col">Deskripsi</th>
 				<th scope="col">Jenis</th>
 				<th scope="col">Jumlah</th>
-				<th scope="col"></th>
+				<th scope="col">Diterima Oleh</th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<th scope="row">03/01/2021</th>
-				<td>Down Payment</td>
-				<td>TRANSFER</td>
-				<td class="text-right">Rp30.000,00</td>
-				<td>
-          <div class="btn-group">
-          </div>
-        </td>
-			</tr>
-			<tr>
-				<th scope="row">03/01/2021</th>
-				<td>Pelunasan Rekening atas nama Pak Sugiyono</td>
-				<td>TUNAI</td>
-				<td class="text-right">Rp100.000,00</td>
-				<td>
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning editPayment" data-toggle="modal" data-target="#paymentModal">Ubah</button>
-            <button type="button" class="btn btn-danger deletePayment">Hapus</button>
-          </div>
-        </td>
-			</tr>
+			<!-- LOAD BY JS -->
 		</tbody>
 	</table>
 	<form id="paymentIndex">
 		<div class="input-group">
-			<input disabled name="unpaid" type="text" class="form-control" value="Rp50.000,00">
+			<div class="input-group-prepend">
+				<span class="input-group-text">Belum Dibayar</span>
+			</div>
+			<input disabled name="unpaid" type="text" class="form-control">
 			<div class="input-group-append">
 				<button type="button" class="btn btn-success addPayment" data-toggle="modal" data-target="#paymentModal">Tambah</button>
 			</div>

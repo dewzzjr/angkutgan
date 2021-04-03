@@ -211,7 +211,6 @@ const Pelanggan = {
   },
   Edit: function (callback, failedCallback) {
     let data = this.Form;
-    let set = this.Set;
     $.ajax({
       type: 'PATCH',
       url: `/customer/${data.code}`,
@@ -219,7 +218,7 @@ const Pelanggan = {
       data: JSON.stringify(data),
       success: function (data, status, xhr) {
         if (status === 'success') {
-          set(data.result);
+          Pelanggan.Set(data.result);
           if (callback) {
             callback(data.result);
             Daftar.Reload();

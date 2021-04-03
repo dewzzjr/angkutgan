@@ -148,7 +148,6 @@ const Transactions = {
   Get: (customer, date, callback, failedCallback) => {
     let format = date.split("/");
     date = format[2] + format[1] + format[0];
-    console.log(date);
     $.ajax({
       type: 'GET',
       url: `/rental/${customer}/${date}`,
@@ -251,6 +250,7 @@ $(document).ready(function () {
   header(() => {
     $('#formTx :input').on('change', summary);
     $('#formItem :input').on('change', calculateItem);
+    Bayar.SetFunc(Transactions.Get);
     Bayar.Init();
   });
 
@@ -259,7 +259,6 @@ $(document).ready(function () {
   Daftar.GetData(function (data) {
     $('#tableTx tbody').empty();
     data.forEach(e => {
-      console.log(e);
       let id = e.customer.code + '_' + e.tx_date.split('/').reverse().join('');
       let name = (e.customer.group_name) ? e.customer.group_name : e.customer.name;
 
@@ -287,14 +286,14 @@ $(document).ready(function () {
         </li>
         `
       }
-      let btnTx = (!e.status.is_payment) ? `
+      let btnTx = (!e.status.in_payment) ? `
       <button type="button" class="btn btn-warning editBtn">Ubah</button>
       <button type="button" class="btn btn-danger deleteBtn">Hapus</button>
       ` : '';
       let btnPay = (!e.status.payment_done) ? `
       <button type="button" class="btn btn-success paymentBtn">Bayar</button>
       ` : '';
-      let btnShip = (!e.status.shipping_done  && e.status.is_payment && !e.status.in_shipping) ? `
+      let btnShip = (!e.status.shipping_done  && e.status.in_payment && !e.status.in_shipping) ? `
       <button type="button" class="btn btn-primary shipmentBtn">Kirim</button>
       ` : (!e.status.shipping_done && e.status.is_payment) ? `
       <button type="button" class="btn btn-primary shipmentBtn">Ubah Pengiriman</button>
@@ -307,7 +306,7 @@ $(document).ready(function () {
         Perpanjangan
       </button>` : '';
       let tx = `
-			<tr>
+			<tr class="rowTx" data-row="${id}">
         <td>${e.tx_date}</td>
         <td>${name}</td>
         <td>${e.status.desc}</td>
@@ -324,7 +323,7 @@ $(document).ready(function () {
           </div>
         </td>
       </tr>
-      <tr class="collapse rowTx" id="${id}">
+      <tr class="collapse" id="${id}">
         <td colspan="4">
           <div class="card">
             <div class="card-header">
@@ -350,8 +349,7 @@ $(document).ready(function () {
     });
 
     $('.editBtn').on('click', function() {
-      let code = $(this).parents().find('.rowTx').attr('id');
-      code = code.split('_');
+      let code = $(this).closest('.rowTx').data('row').split('_');
       var query = {
         customer: code[0],
         date: code[1],
@@ -361,8 +359,30 @@ $(document).ready(function () {
       window.location.replace(url);
     });
 
+    $('.paymentBtn').on('click', function (e) {
+      let code = $(this).closest('.rowTx').data('row').split('_');
+      var query = {
+        customer: code[0],
+        date: code[1],
+        action: 'payment'
+      };
+      var url = window.location.pathname + '?' + $.param(query);
+      window.location.replace(url);
+    });
+
+    $('.shipmentBtn').on('click', function (e) {
+      let code = $(this).closest('.rowTx').data('row').split('_');
+      var query = {
+        customer: code[0],
+        date: code[1],
+        action: 'shipment'
+      };
+      var url = window.location.pathname + '?' + $.param(query);
+      window.location.replace(url);
+    });
+
     $('.deleteBtn').on('click', function (e) {
-      let code = $(this).parents().find('.rowTx').attr('id').split('_').join('/');
+      let code = $(this).closest('.rowTx').data('row').split('_').join('/');
       $.confirm({
         title: 'Peringatan!',
         content: `Apakah anda yakin untuk menghapus "${code}"?`,
@@ -571,7 +591,7 @@ $(document).ready(function () {
     preventEnter: true,
     noResultsText: 'Tidak ditemukan'
   });
-  $('#customerCode').on('change', function (e) {
+  $('#customerCode').on('autocomplete.select', function (e) {
     getTransaction();
     let customer = $('#create [name="customer"]').val();
     if (customer) {
@@ -587,6 +607,7 @@ $(document).ready(function () {
     let cust = Menu.Query['customer'];
     $('#customerCode').autoComplete('set', { value: cust, text: cust });
     initCustomer(cust);
+    getTransaction();
   } else {
     $('#create [name="tx_date"]').datepicker('update', new Date());
   }

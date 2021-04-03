@@ -128,7 +128,7 @@ func (d *Database) UpdatePayment(ctx context.Context, txID int64, payment model.
 		NullInt64(actionBy),
 		get.ID,
 	); err != nil {
-		err = errors.Wrapf(err, "ExecContext [%d]", txID)
+		err = errors.Wrapf(err, "ExecContext [qUpdatePayment, %d]", txID)
 		return
 	}
 	return
@@ -151,7 +151,7 @@ func (d *Database) DeletePayment(ctx context.Context, txID int64) (err error) {
 	if _, err = d.DB.ExecContext(ctx, qDeletePayment,
 		get.ID,
 	); err != nil {
-		err = errors.Wrapf(err, "ExecContext [%d]", txID)
+		err = errors.Wrapf(err, "ExecContext [qDeletePayment, %d]", txID)
 		return
 	}
 	return
@@ -172,7 +172,7 @@ func (d *Database) GetLastPaidAmount(ctx context.Context, txID int64) (amount in
 		&amount,
 		&date,
 	); err != nil {
-		err = errors.Wrapf(err, "QueryRowxContext [%d]", txID)
+		err = errors.Wrapf(err, "QueryRowxContext [GetLastPaidAmount, %d]", txID)
 		return
 	}
 	return
