@@ -24,7 +24,7 @@ const Barang = {
           text: "kode tidak boleh kurang dari 3 karakter"
         });
       } else {
-        data.code = data.code.toUpperCase();
+        data.code = data.code.replace(/[^A-Za-z0-9]+/g, '').toUpperCase();
       }
       if (!data.name) {
         ok.valid = false;
@@ -119,9 +119,10 @@ const Barang = {
     let data = this.Form;
     let set = this.Set;
     let retries = false;
+    let code = encodeURIComponent(data.code);
     $.ajax({
       type: 'PATCH',
-      url: `/item/${data.code}`,
+      url: `/item/${code}`,
       contentType: 'application/json',
       data: JSON.stringify(data),
       success: function (data, status, xhr) {
@@ -148,6 +149,7 @@ const Barang = {
     });
   },
   GetDetail: function (code, callback) {
+    code = encodeURIComponent(code);
     $.ajax({
       type: 'GET',
       url: `/item/${code}`,
@@ -432,9 +434,9 @@ $(document).ready(function () {
     e.preventDefault();
     Form.Reset($(this));
     let tambah = $(this).serializeObject();
-    console.log(tambah);
     Barang.Set(tambah);
     Barang.Validate(false, (ok) => {
+      console.log(Barang.Form);
       Form.Reset($('#formAdd'));
       if (ok.valid) {
         Loading.Start($('#formAdd [type="submit"]'));

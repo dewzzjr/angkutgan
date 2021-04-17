@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS stock (
     update_time TIMESTAMP,
     modified_by INT,
     FOREIGN KEY ( modified_by ) REFERENCES users( id ) ON DELETE SET NULL,
-    FOREIGN KEY ( code ) REFERENCES items( code )
+    FOREIGN KEY ( code ) REFERENCES items( code ) ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS stock_history (
@@ -23,5 +23,5 @@ CREATE TABLE IF NOT EXISTS stock_history (
     type INT NOT NULL,
     FOREIGN KEY ( t_id ) REFERENCES transactions( id ),
     FOREIGN KEY ( r_id ) REFERENCES returns( id ),
-    FOREIGN KEY ( item ) REFERENCES items( code )
+    FOREIGN KEY ( item ) REFERENCES items( code ) ON UPDATE CASCADE
 );
