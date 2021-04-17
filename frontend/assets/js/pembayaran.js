@@ -93,7 +93,11 @@ Bayar.Init = function() {
         $('#customerNamePayment').val(name);
         $('#paymentModal .modal-title').html(ok.tx_date +" "+ name);
         $('#formPayment [name="amount"]').attr('max', ok.unpaid);
-        $('#payment .addPayment').prop('disabled', true);
+        if (ok.unpaid <= 0) {
+          $('#payment .addPayment').prop('disabled', true);
+        } else {
+          $('#payment .addPayment').prop('disabled', false);
+        }
         ok.payment.forEach((e, idx, arr) => {
           let last = (arr.length - 1) == idx;
 
