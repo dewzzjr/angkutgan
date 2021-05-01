@@ -298,6 +298,9 @@ $(document).ready(function () {
       ` : (!e.status.shipping_done && e.status.is_payment) ? `
       <button type="button" class="btn btn-primary shipmentBtn">Ubah Pengiriman</button>
       ` : '';
+      let btnPrint = (e.status.payment_done) ? `
+      <button type="button" class="btn btn-secondary print">Cetak</button>
+      ` : '';
       let btnReturn = (e.status.in_shipping && !e.status.is_return) ? `
       <button type="button" class="btn btn-primary">Kembali</button>
       ` : '';
@@ -320,6 +323,9 @@ $(document).ready(function () {
           </div>
           <div class="btn-group">
             ${btnPay}${btnShip}${btnReturn}${btnExtend}
+          </div>
+          <div class="btn-group">
+            ${btnPrint}
           </div>
         </td>
       </tr>
@@ -379,6 +385,16 @@ $(document).ready(function () {
       };
       var url = window.location.pathname + '?' + $.param(query);
       window.location.replace(url);
+    });
+
+    $('.print').on('click', function (e) {
+      let code = $(this).closest('.rowTx').data('row').split('_');
+      var query = {
+        customer: code[0],
+        date: code[1]
+      };
+      var template = '/KwitansiPembayaran.html?' + $.param(query);
+      window.open(template);
     });
 
     $('.deleteBtn').on('click', function (e) {
