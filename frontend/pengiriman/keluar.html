@@ -5,19 +5,60 @@
 		<div class="form-group col-6 col-md-3">
 			<label for="txDateShipment">Tanggal Transaksi</label>
 			<div class="input-group">
-				<input name="txdate" class="form-control datepicker" id="txDateShipment">
+				<input name="tx_date" class="form-control datepicker" id="txDateShipment" autocomplete="off">
 			</div>
 		</div>
 		<div class="form-group col-6 col-md-3">
 			<label for="customerCodeShipment">Kode Pelanggan</label>
 			<div class="input-group">
-				<select name="code" class="form-control autocomplete" id="customerCodeShipment"
-					data-url="testdata/pelanggan.json" autocomplete="off"></select>
+				<select name="customer" class="form-control autocomplete" id="customerCodeShipment" autocomplete="off"></select>
 			</div>
 		</div>
 		<div class="form-group col col-md-6">
 			<label for="customerNameShipment">Nama</label>
-			<input class="form-control" type="text" disabled id="customerNameShipment" value="PT. Sejahtera Indah">
+			<input class="form-control" type="text" disabled id="customerNameShipment">
+		</div>
+	</div>
+	<table class="table" id="tableShipment">
+		<thead>
+			<tr>
+				<th scope="col">Tanggal Kirim</th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- LOAD BY JS -->
+			<tr>
+				<td scope="row">2021 Feb 04</td>
+				<td>
+					<div class="btn-group">
+						<button type="button" class="btn btn-success collapsed" data-toggle="collapse" data-target="#SHIP20210204"
+							data-parent="#tableShipment">Detail</button>
+						<button type="button" class="btn btn-danger deleteShipment" data-index="SHIP20210204">Hapus</button>
+						<button type="button" class="btn btn-info">
+							Cetak
+						</button>
+					</div>
+				</td>
+			</tr>
+			<tr class="collapse" id="SHIP20210204">
+				<td class="text-right" scope="row">
+					<p>Barang A</p>
+				</td>
+				<td>
+					<p>&times;3 Buah</p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<div class="input-group">
+		<input name="shipment_date" class="form-control datepicker" id="dateShipment" autocomplete="off"
+			placeholder="pilih tanggal pengiriman">
+		<div class="input-group-append">
+			<button type="button" class="btn btn-warning" id="addShipment" data-toggle="modal" data-target="#shipmentModal"
+				disabled>
+				Tambah Pengiriman Baru
+			</button>
 		</div>
 	</div>
 </div>

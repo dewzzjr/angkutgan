@@ -19,6 +19,8 @@ type Database struct {
 func New(cfg config.Repository) *Database {
 	if cfg.DatabaseURL == "" {
 		cfg.DatabaseURL = fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", cfg.DatabaseUser, cfg.DatabasePassword, cfg.DatabaseHost, cfg.DatabaseName)
+	} else {
+		cfg.DatabaseURL = fmt.Sprintf("%s%s", cfg.DatabaseURL, "?parseTime=true")
 	}
 	return &Database{
 		DB:     sqlx.MustConnect("mysql", cfg.DatabaseURL),

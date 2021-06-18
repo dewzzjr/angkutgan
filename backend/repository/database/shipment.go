@@ -17,7 +17,7 @@ const (
 	i.item AS code,
 	s.amount AS amount,
 	COALESCE(DATE_FORMAT(s.deadline, '%d/%m/%Y'), '') AS deadline,
-	i.amount - SUM(p.amount) - SUM(r.amount) AS need_return
+	COALESCE(i.amount, 0)  - COALESCE(SUM(p.amount), 0) - COALESCE(SUM(r.amount), 0) AS need_return
 FROM
 	shipment s JOIN snapshot_item i ON s.i_id = i.id
 LEFT JOIN
@@ -99,7 +99,7 @@ const qGetShipmentByDate = `SELECT
 	i.item AS code,
 	s.amount AS amount,
 	COALESCE(DATE_FORMAT(s.deadline, '%d/%m/%Y'), '') AS deadline,
-	i.amount - SUM(p.amount) - SUM(r.amount) AS need_return
+	COALESCE(i.amount, 0) - COALESCE(SUM(p.amount), 0) - COALESCE(SUM(r.amount), 0) AS need_return
 FROM
 	shipment s JOIN snapshot_item i ON s.i_id = i.id
 LEFT JOIN
@@ -168,17 +168,12 @@ func (d *Database) DeleteInsertShipment(ctx context.Context, txID int64, shipmen
 		}
 	}
 	for _, item := range shipment.Items {
-		var deadline time.Time
-		if deadline, err = time.Parse(model.DateFormat, item.Deadline); err != nil {
-			_ = tx.Rollback()
-			return
-		}
 		if _, err = tx.ExecContext(ctx, qInsertShipment,
 			txID,
 			date,
 			item.ItemID,
 			item.Amount,
-			deadline,
+			NullTime(item.Deadline),
 			NullInt64(actionBy),
 		); err != nil {
 			err = errors.Wrapf(err, "ExecContext [qInsertShipment, %d]", txID)

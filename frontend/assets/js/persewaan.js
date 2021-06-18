@@ -252,6 +252,8 @@ $(document).ready(function () {
     $('#formItem :input').on('change', calculateItem);
     Bayar.SetFunc(Transactions.Get);
     Bayar.Init();
+    Kirim.SetFunc(Transactions.Get);
+    Kirim.Init();
   });
 
   // DAFTAR
@@ -354,7 +356,7 @@ $(document).ready(function () {
       $('#tableTx tbody').append(tx);
     });
 
-    $('.editBtn').on('click', function() {
+    $('#tableTx .editBtn').on('click', function() {
       let code = $(this).closest('.rowTx').data('row').split('_');
       var query = {
         customer: code[0],
@@ -365,7 +367,7 @@ $(document).ready(function () {
       window.location.replace(url);
     });
 
-    $('.paymentBtn').on('click', function (e) {
+    $('#tableTx .paymentBtn').on('click', function (e) {
       let code = $(this).closest('.rowTx').data('row').split('_');
       var query = {
         customer: code[0],
@@ -376,7 +378,7 @@ $(document).ready(function () {
       window.location.replace(url);
     });
 
-    $('.shipmentBtn').on('click', function (e) {
+    $('#tableTx .shipmentBtn').on('click', function (e) {
       let code = $(this).closest('.rowTx').data('row').split('_');
       var query = {
         customer: code[0],
@@ -387,7 +389,7 @@ $(document).ready(function () {
       window.location.replace(url);
     });
 
-    $('.print').on('click', function (e) {
+    $('#tableTx .print').on('click', function (e) {
       let code = $(this).closest('.rowTx').data('row').split('_');
       var query = {
         customer: code[0],
@@ -397,7 +399,7 @@ $(document).ready(function () {
       window.open(template);
     });
 
-    $('.deleteBtn').on('click', function (e) {
+    $('#tableTx .deleteBtn').on('click', function (e) {
       let code = $(this).closest('.rowTx').data('row').split('_').join('/');
       $.confirm({
         title: 'Peringatan!',

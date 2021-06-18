@@ -179,7 +179,7 @@ Bayar.Init = function() {
     getTransaction();
   });
 
-  if (Menu.Query['date'] && Menu.Query['customer']) {
+  if (Menu.Query['date'] && Menu.Query['customer'] && Menu.Query["action"] == 'payment') {
     let date = Menu.Query['date'];
     date = [date.substring(0,4),date.substring(4,6),date.substring(6,8)].join('-');
     $('#payment [name="tx_date"]').datepicker('update', new Date(date));

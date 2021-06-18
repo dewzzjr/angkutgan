@@ -29,7 +29,7 @@ func (h *HTTP) PostShipmentByTxID(w http.ResponseWriter, r *http.Request, p http
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	_, err := time.Parse(payload.Date, model.DateFormat)
+	_, err := time.Parse(model.DateFormat, payload.Date)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -65,7 +65,7 @@ func (h *HTTP) PatchShipmentByTxID(w http.ResponseWriter, r *http.Request, p htt
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	_, err := time.Parse(payload.Date, model.DateFormat)
+	_, err := time.Parse(model.DateFormat, payload.Date)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -75,7 +75,7 @@ func (h *HTTP) PatchShipmentByTxID(w http.ResponseWriter, r *http.Request, p htt
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	_, err = time.Parse(p.ByName("date"), model.ParamFormat)
+	_, err = time.Parse(model.ParamFormat, p.ByName("date"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -103,7 +103,7 @@ func (h *HTTP) DeleteShipmentByTxID(w http.ResponseWriter, r *http.Request, p ht
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	date, err := time.Parse(payload.Date, model.DateFormat)
+	date, err := time.Parse(model.DateFormat, payload.Date)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
