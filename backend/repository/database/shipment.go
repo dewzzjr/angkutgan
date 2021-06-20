@@ -142,7 +142,7 @@ VALUES ( ?, ?, ?, ?, ?, ? )
 	qDeleteShipmentByDate = `DELETE
 FROM
 	shipment
-WHERE t_id ? AND date = ?
+WHERE t_id = ? AND date = ?
 `
 )
 

@@ -30,11 +30,20 @@ const Kirim = {
       },
     });
   },
+  GetItem: (code) => {
+    for (let i = 0; i < Kirim.Tx.items.length; i++) {
+      let e = Kirim.Tx.items[i];
+      if (e.code == code) {
+        return e;
+      }
+    }
+    return {};
+  },
   Reload: () => {
-    let format = Bayar.Tx.tx_date.split("/");
+    let format = Kirim.Tx.tx_date.split("/");
     let date = format[2] + format[1] + format[0];
     var query = {
-      customer: Bayar.Tx.customer.code,
+      customer: Kirim.Tx.customer.code,
       date: date,
       action: 'shipment'
     };
@@ -56,12 +65,14 @@ Kirim.Init = function () {
         }
         let name = ok.customer.group_name ? ok.customer.group_name : ok.customer.name;
         $('#customerNameShipment').val(name);
+        $('#addressShipment').val(ok.address);
         $('#shipmentModal .modal-title').html(ok.tx_date + " " + name);
 
         $('#tableKirim tbody').empty();
         if (ok.status.shipping_done) {
           $('#addShipment').prop('disabled', true);
         } else {
+          Kirim.Tx = ok;  
           ok.items.forEach((e) => {
             let status;
             if (e.need_shipment == e.amount) {
@@ -105,11 +116,24 @@ Kirim.Init = function () {
         $('#tableShipment tbody').empty();
         ok.shipment.forEach((e, idx, arr) => {
           let last = (arr.length - 1) == idx;
+          let date = e.date;
+          let format = date.split("/");
+          let dateID = format[2] + format[1] + format[0];
+          let id = `SHIP${dateID}`;
+          let items = '';
+          let counts = '';
           let deleteBtn = last ? `
-          <button type="button" class="btn btn-danger deleteShipment" data-index="SHIP20210204">Hapus</button>
+          <button type="button" class="btn btn-danger deleteShipment" data-date="${date}">Hapus</button>
           ` : '';
-          let date = `4 Februari 2021`; // TODO real data
-          let id = `SHIP20210204`; // TODO unique id
+          e.items.forEach((i) => {
+            let obj = Kirim.GetItem(i.code);
+            let item = `
+            <p>${i.code} - ${obj.name}</p>`;
+            let count = `
+            <p>&times;${i.amount} ${obj.item_unit}</p>`;
+            items += item;
+            counts += count;
+          });
           let row = `
           <tr>
             <td scope="row">${date}</td>
@@ -128,16 +152,19 @@ Kirim.Init = function () {
           </tr>
           <tr class="collapse" id="${id}">
             <td class="text-right" scope="row" >
-              <p>Barang A</p>
+              ${items}
             </td>
             <td>
-              <p>&times;3 Buah</p>
+              ${counts}
             </td>
           </tr>`
           $('#tableShipment tbody').append(row);
         });
         $('#tableShipment .deleteShipment').on('click', function () {
-          let id = $(this).data('id');
+          let id = Kirim.Tx.id;
+          let data = {
+            date: $(this).data('date'),
+          }
           $.confirm({
             title: 'Peringatan!',
             content: `Apakah anda yakin untuk menghapus pengiriman terakhir di transaksi ini?`,
@@ -146,6 +173,7 @@ Kirim.Init = function () {
                 $.ajax({
                   type: 'DELETE',
                   url: `/shipment/${id}`,
+                  data: JSON.stringify(data),
                   contentType: 'application/json',
                   success: function (data, status, xhr) {
                     if (status === 'success' && data.result == 'OK') {
@@ -153,7 +181,7 @@ Kirim.Init = function () {
                         title: 'Berhasil',
                         content: `berhasil menghapus pengiriman`,
                         onClose: function () {
-                          Bayar.Reload();
+                          Kirim.Reload();
                         },
                       });
                     }
@@ -188,7 +216,6 @@ Kirim.Init = function () {
         }).on('clearDate', function () {
           $('#addShipment').attr('disabled', 'disabled');
         });
-        Kirim.Tx = ok
       });
     }
   }
@@ -258,6 +285,7 @@ Kirim.Init = function () {
     Kirim.Create(() => {
       Loading.End();
       Form.Reset($('#formShipment'));
+      Kirim.Reload();
     }, () => {
       Loading.End();
     });

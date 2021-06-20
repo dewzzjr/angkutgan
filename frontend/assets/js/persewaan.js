@@ -295,10 +295,10 @@ $(document).ready(function () {
       let btnPay = (!e.status.payment_done) ? `
       <button type="button" class="btn btn-success paymentBtn">Bayar</button>
       ` : '';
-      let btnShip = (!e.status.shipping_done  && e.status.in_payment && !e.status.in_shipping) ? `
+      let btnShip = (!e.status.shipping_done && e.status.in_payment && !e.status.in_shipping) ? `
       <button type="button" class="btn btn-primary shipmentBtn">Kirim</button>
-      ` : (!e.status.shipping_done && e.status.is_payment) ? `
-      <button type="button" class="btn btn-primary shipmentBtn">Ubah Pengiriman</button>
+      ` : (!e.status.shipping_done && e.status.in_payment) ? `
+      <button type="button" class="btn btn-secondary shipmentBtn">Ubah Pengiriman</button>
       ` : '';
       let btnPrint = (e.status.payment_done) ? `
       <button type="button" class="btn btn-secondary print">Cetak</button>
@@ -324,10 +324,10 @@ $(document).ready(function () {
             ${btnTx}
           </div>
           <div class="btn-group">
-            ${btnPay}${btnShip}${btnReturn}${btnExtend}
+            ${btnPay}${btnPrint}
           </div>
           <div class="btn-group">
-            ${btnPrint}
+            ${btnShip}${btnReturn}${btnExtend}
           </div>
         </td>
       </tr>
@@ -338,7 +338,7 @@ $(document).ready(function () {
               Ringkasan
             </div>
             <div class="card-body">
-              <h5 class="card-title">${name}</h5>
+              <h5 class="card-title">${e.customer.code} - ${name}</h5>
               <h6 class="card-subtitle mb-2 text-muted">
                 ${e.address}
               </h6>
@@ -356,7 +356,7 @@ $(document).ready(function () {
       $('#tableTx tbody').append(tx);
     });
 
-    $('#tableTx .editBtn').on('click', function() {
+    $('#tableTx .editBtn').on('click', function () {
       let code = $(this).closest('.rowTx').data('row').split('_');
       var query = {
         customer: code[0],
@@ -571,12 +571,12 @@ $(document).ready(function () {
   }
   $('#create [name="tx_date"]').datepicker({
     format: 'dd/mm/yyyy',
-  }).on('change', function() {
+  }).on('change', function () {
     getTransaction();
   });
 
   // CUSTOMER
-  var initCustomer = function(code) {
+  var initCustomer = function (code) {
     Transactions.GetCustomer(code, (customer) => {
       let name = (customer.group_name) ? customer.group_name : customer.name;
       $('.customerName').html(name);
@@ -620,10 +620,13 @@ $(document).ready(function () {
   // INIT TRANSACTION
   if (Menu.Query['date'] && Menu.Query['customer']) {
     let date = Menu.Query['date'];
-    date = [date.substring(0,4),date.substring(4,6),date.substring(6,8)].join('-');
+    date = [date.substring(0, 4), date.substring(4, 6), date.substring(6, 8)].join('-');
     $('#create [name="tx_date"]').datepicker('update', new Date(date));
     let cust = Menu.Query['customer'];
-    $('#customerCode').autoComplete('set', { value: cust, text: cust });
+    $('#customerCode').autoComplete('set', {
+      value: cust,
+      text: cust
+    });
     initCustomer(cust);
     getTransaction();
   } else {
@@ -896,7 +899,7 @@ $(document).ready(function () {
       return;
     }
     let len = Transactions.Items.length;
-    
+
     Transactions.Items.slice().reverse().forEach((e, i) => {
       let index = len - i - 1;
       let price = formatPrice(e.price);
