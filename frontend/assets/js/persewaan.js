@@ -833,10 +833,25 @@ $(document).ready(function () {
     $('#create [name="tx_date"]').datepicker('update', new Date());
     $('#formTx input, #formTx textarea, #formTx select').val('');
     $('#formTx input, #formTx textarea').val('');
+    Transactions.Form = {};
     Transactions.Items = [];
+    Transactions.Customer = {};
+    Transactions.IsEdit = false;
     Transactions.Reload();
     clearItem();
-    summary();
+    $('.itemSummary').empty();
+    $('.item').remove();
+
+    $('.customerName').empty();
+    $('#customerName').val('');
+    $('.contactPerson').empty();
+
+    $('#create [name="address"]').val('').prop('disabled', true);
+    $('#create [name="project_id"]').empty();
+    $('#projectTx').parent().hide();
+
+    $('.shippingLocation').empty();
+    $('#totalFee').empty();
   }
   var calculateItem = function () {
     let i = getCalculation();
