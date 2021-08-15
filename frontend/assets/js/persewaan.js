@@ -42,7 +42,7 @@ const Transactions = {
       },
     });
   },
-  Reload: () => {},
+  Reload: () => { },
   AddItem: function (data, callback) {
     if (
       data.code == '' ||
@@ -304,7 +304,7 @@ $(document).ready(function () {
       <button type="button" class="btn btn-secondary print">Cetak</button>
       ` : '';
       let btnReturn = (e.status.in_shipping && !e.status.is_return) ? `
-      <button type="button" class="btn btn-primary">Kembali</button>
+      <button type="button" class="btn btn-primary returnBtn">Kembali</button>
       ` : '';
       let btnExtend = (e.status.in_shipping && !e.status.is_return && !e.status.done) ? `
       <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#extendModal">
@@ -389,6 +389,17 @@ $(document).ready(function () {
       window.location.replace(url);
     });
 
+    $('#tableTx .returnBtn').on('click', function (e) {
+      let code = $(this).closest('.rowTx').data('row').split('_');
+      var query = {
+        customer: code[0],
+        date: code[1],
+        action: 'return'
+      };
+      var url = window.location.pathname + '?' + $.param(query);
+      window.location.replace(url);
+    });
+
     $('#tableTx .print').on('click', function (e) {
       let code = $(this).closest('.rowTx').data('row').split('_');
       var query = {
@@ -429,7 +440,7 @@ $(document).ready(function () {
               }
             });
           },
-          cancel: function () {}
+          cancel: function () { }
         },
       });
     });
@@ -450,7 +461,7 @@ $(document).ready(function () {
     resolverSettings: {
       minLength: 2,
       url: '/ajax?action=customers',
-      fail: () => {}
+      fail: () => { }
     },
     preventEnter: true,
     noResultsText: 'Tidak ditemukan'
@@ -604,7 +615,7 @@ $(document).ready(function () {
     resolverSettings: {
       minLength: 2,
       url: '/ajax?action=customers',
-      fail: () => {}
+      fail: () => { }
     },
     preventEnter: true,
     noResultsText: 'Tidak ditemukan'
@@ -679,7 +690,7 @@ $(document).ready(function () {
     resolverSettings: {
       minLength: 2,
       url: '/ajax?action=items',
-      fail: () => {}
+      fail: () => { }
     },
     preventEnter: true,
     noResultsText: 'Tidak ditemukan'
@@ -951,7 +962,7 @@ $(document).ready(function () {
             Transactions.RemoveItem(index);
             summary();
           },
-          cancel: function () {}
+          cancel: function () { }
         },
       });
     });

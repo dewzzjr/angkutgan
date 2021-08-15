@@ -60,5 +60,9 @@ func (h *HTTP) Routing() {
 	h.Router.POST("/shipment/:txid", h.PostShipmentByTxID)
 	h.Router.PATCH("/shipment/:txid", h.PatchShipmentByTxID)
 	h.Router.DELETE("/shipment/:txid", h.DeleteShipmentByTxID)
+
+	h.Router.POST("/return/:txid", h.PostReturnByTxID)
+	h.Router.PATCH("/return/:txid", h.PatchReturnByTxID)
+	h.Router.DELETE("/return/:txid", h.DeleteReturnByTxID)
 	h.Router.NotFound = h.View.Router
 }

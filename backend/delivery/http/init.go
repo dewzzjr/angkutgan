@@ -24,6 +24,7 @@ type HTTP struct {
 	rental    iRental
 	payments  iPayments
 	shipment  iShipment
+	returns   iReturns
 	ajax      iAjax
 }
 
@@ -40,6 +41,7 @@ func New(cfg config.Delivery, v *view.View, u *usecase.Usecase) *HTTP {
 		rental:    u.Rental,
 		payments:  u.Payments,
 		shipment:  u.Shipment,
+		returns:   u.Returns,
 		ajax:      u.Ajax,
 	}
 }
@@ -95,7 +97,12 @@ type iPayments interface {
 	Delete(ctx context.Context, txID int64) (err error)
 }
 type iShipment interface {
-	Add(ctx context.Context, txID int64, pay model.Shipment, actionBy int64) (err error)
-	Edit(ctx context.Context, txID int64, pay model.Shipment, actionBy int64) (err error)
+	Add(ctx context.Context, txID int64, ship model.Shipment, actionBy int64) (err error)
+	Edit(ctx context.Context, txID int64, ship model.Shipment, actionBy int64) (err error)
+	Delete(ctx context.Context, txID int64, date time.Time, actionBy int64) (err error)
+}
+type iReturns interface {
+	Add(ctx context.Context, txID int64, ret model.Return, actionBy int64) (err error)
+	Edit(ctx context.Context, txID int64, ret model.Return, actionBy int64) (err error)
 	Delete(ctx context.Context, txID int64, date time.Time, actionBy int64) (err error)
 }

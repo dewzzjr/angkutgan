@@ -72,7 +72,7 @@ Kirim.Init = function () {
         if (ok.status.shipping_done) {
           $('#addShipment').prop('disabled', true);
         } else {
-          Kirim.Tx = ok;  
+          Kirim.Tx = ok;
           ok.items.forEach((e) => {
             let status;
             if (e.need_shipment == e.amount) {
@@ -196,7 +196,7 @@ Kirim.Init = function () {
                   }
                 });
               },
-              cancel: function () {}
+              cancel: function () { }
             },
           });
         });
@@ -230,7 +230,7 @@ Kirim.Init = function () {
     resolverSettings: {
       minLength: 2,
       url: '/ajax?action=customers',
-      fail: () => {}
+      fail: () => { }
     },
     preventEnter: true,
     noResultsText: 'Tidak ditemukan'
