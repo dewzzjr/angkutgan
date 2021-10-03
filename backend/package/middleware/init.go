@@ -13,7 +13,12 @@ type Logger struct {
 func (l *Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sw := statusRecorder{w, http.StatusOK}
 	l.handler.ServeHTTP(&sw, r)
-	log.Printf("%s %s %s", r.Method, r.URL.Path, http.StatusText(sw.status))
+	log.Printf("%d %s %s %v",
+		sw.status,
+		r.Method,
+		r.URL.Path,
+		r.URL.Query(),
+	)
 }
 
 // NewLogger initiate logging router

@@ -10,7 +10,6 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/main.go",
-            "port": 8000,
             "host": "127.0.0.1"
         }
     ]

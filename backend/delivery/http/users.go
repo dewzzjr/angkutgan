@@ -70,7 +70,7 @@ func (h *HTTP) Refresh(w http.ResponseWriter, r *http.Request, p httprouter.Para
 	}
 	expirationTime, ok := h.users.RefreshSession(ctx, &claims)
 	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusAccepted)
 		return
 	}
 	tokenString, err := h.users.CreateToken(ctx, &claims)
